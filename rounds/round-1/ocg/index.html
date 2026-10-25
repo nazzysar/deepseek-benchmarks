@@ -1,0 +1,5521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Abyssal Vivarium — Specimen Plate Nº 08</title>
+<meta name="description" content="A deterministic, seeded ecosystem under glass: bloom, grazers and hunters evolving through scheduled catastrophes. Single file, no network.">
+<meta name="color-scheme" content="dark">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%2304100e'/%3E%3Ccircle cx='16' cy='16' r='12' fill='none' stroke='%2371e6c6' stroke-opacity='.55'/%3E%3Cpath d='M16 6c6 0 9 4.4 9 8.6 0 4.1-3.2 7.3-7.2 7.3-3.3 0-5.8-2.4-5.8-5.4 0-2.5 1.9-4.4 4.2-4.4 1.9 0 3.3 1.4 3.3 3.1' fill='none' stroke='%2371e6c6' stroke-opacity='.8'/%3E%3C/svg%3E">
+<style>
+/* ============================================================================
+   THE ABYSSAL VIVARIUM — plate styles
+   A deep-sea observatory crossed with a Victorian naturalist's specimen plate.
+   ========================================================================== */
+
+:root {
+  --ink: #020908;
+  --abyss: #04100e;
+  --abyss-2: #061612;
+  --glass: #0a211c;
+  --panel: #071612;
+  --line: #142e27;
+  --line-2: #204339;
+  --line-3: #2f5c4e;
+  --bone: #e9e2ce;
+  --bone-2: #c8c3b0;
+  --mute: #84968c;
+  --dim: #7d9086;
+  --aqua: #71e6c6;
+  --aqua-soft: rgba(113, 230, 198, .14);
+  --aqua-glow: rgba(113, 230, 198, .45);
+  --amber: #e8b56b;
+  --amber-soft: rgba(232, 181, 107, .14);
+  --lichen: #b8dfa4;
+  --brass: #a88a5a;
+  --brass-dim: rgba(168, 138, 90, .35);
+  --drought: #d9a64f;
+  --plague: #b393e1;
+  --eruption: #e5764f;
+  --serif: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Palatino, Georgia, serif;
+  --mono: "SFMono-Regular", "SF Mono", ui-monospace, Menlo, Consolas, "Liberation Mono", monospace;
+  --r: 6px;
+  --accent: var(--aqua);
+  --fill: 50%;
+}
+
+* { box-sizing: border-box; }
+
+html, body { height: 100%; }
+
+body {
+  margin: 0;
+  min-height: 100%;
+  overflow: hidden;
+  color: var(--bone);
+  font-family: var(--serif);
+  font-size: 14px;
+  line-height: 1.45;
+  background:
+    radial-gradient(120% 100% at 12% -20%, rgba(22, 68, 57, .55) 0%, rgba(4, 16, 14, 0) 55%),
+    radial-gradient(90% 80% at 105% 110%, rgba(64, 47, 22, .28) 0%, rgba(4, 16, 14, 0) 55%),
+    linear-gradient(180deg, #04100e 0%, #030c0a 55%, #020807 100%);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  font-feature-settings: "kern" 1, "liga" 1;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: -20%;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(38% 32% at 26% 30%, rgba(29, 110, 92, .10), transparent 70%),
+    radial-gradient(30% 26% at 78% 62%, rgba(168, 138, 90, .06), transparent 70%);
+  animation: ambient 42s ease-in-out infinite alternate;
+}
+
+@keyframes ambient {
+  from { transform: translate3d(-1.4%, -1%, 0) scale(1); }
+  to   { transform: translate3d(1.6%, 1.2%, 0) scale(1.03); }
+}
+
+.grain {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  pointer-events: none;
+  opacity: .05;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='2' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+}
+
+::selection { background: rgba(113, 230, 198, .22); color: var(--bone); }
+
+/* ------------------------------------------------------------------ sheet -- */
+.sheet {
+  position: relative;
+  z-index: 1;
+  height: 100vh;
+  height: 100dvh;
+  max-width: 1840px;
+  margin: 0 auto;
+  padding: 16px clamp(14px, 1.6vw, 24px) 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* --------------------------------------------------------------- masthead -- */
+.masthead {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  padding-bottom: 12px;
+  position: relative;
+}
+
+.masthead::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 4px;
+  border-top: 1px solid var(--line-2);
+  border-bottom: 1px solid var(--line);
+}
+
+.brand { display: flex; align-items: center; gap: 14px; min-width: 0; }
+
+.brand-mark {
+  width: 38px;
+  height: 38px;
+  flex: none;
+  color: rgba(233, 226, 206, .78);
+  filter: drop-shadow(0 0 12px rgba(113, 230, 198, .18));
+}
+
+.brand-text { min-width: 0; }
+
+.brand h1 {
+  margin: 0;
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: clamp(19px, 1.7vw, 26px);
+  line-height: 1;
+  letter-spacing: .24em;
+  text-transform: uppercase;
+  color: var(--bone);
+  white-space: nowrap;
+}
+
+.brand-sub {
+  margin: 7px 0 0;
+  font-size: 12.5px;
+  font-style: italic;
+  letter-spacing: .015em;
+  color: var(--mute);
+  white-space: nowrap;
+}
+
+.mast-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  flex: none;
+}
+
+.plate-tag {
+  font-family: var(--mono);
+  font-size: 8px;
+  letter-spacing: .28em;
+  text-transform: uppercase;
+  color: var(--brass);
+  opacity: .9;
+}
+
+.telemetry {
+  display: flex;
+  align-items: stretch;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  background: rgba(3, 11, 9, .55);
+  overflow: hidden;
+}
+
+.tele {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 5px 13px 6px;
+  min-width: 86px;
+}
+
+.tele + .tele { border-left: 1px solid var(--line); }
+
+.tele-k {
+  font-family: var(--mono);
+  font-size: 7.5px;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: var(--dim);
+}
+
+.tele-v {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: .1em;
+  color: var(--bone);
+  font-variant-numeric: tabular-nums;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.tele-v .lamp {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--aqua);
+  box-shadow: 0 0 7px var(--aqua);
+  animation: lamp 2.6s ease-in-out infinite;
+}
+
+.tele-v.is-paused .lamp { background: var(--amber); box-shadow: 0 0 7px var(--amber); animation: none; }
+.tele-v.is-ended .lamp { background: var(--mute); box-shadow: none; animation: none; }
+
+@keyframes lamp {
+  0%, 100% { opacity: 1; }
+  50% { opacity: .35; }
+}
+
+/* -------------------------------------------------------------- workspace -- */
+.workspace {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 356px;
+  gap: 12px;
+}
+
+/* ------------------------------------------------------------------ stage -- */
+.stage {
+  position: relative;
+  min-height: 0;
+  border: 1px solid var(--line-2);
+  border-radius: var(--r);
+  overflow: hidden;
+  background: #04100e;
+  box-shadow:
+    0 40px 100px -44px #000,
+    inset 0 0 0 1px rgba(0, 0, 0, .6),
+    0 0 110px -58px rgba(113, 230, 198, .55);
+  isolation: isolate;
+}
+
+.world-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* fine inner frame, like the rebate of a museum mount */
+.stage::before {
+  content: "";
+  position: absolute;
+  inset: 6px;
+  border: 1px solid rgba(168, 138, 90, .17);
+  border-radius: 3px;
+  pointer-events: none;
+  z-index: 4;
+}
+
+.glass {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background:
+    linear-gradient(114deg, rgba(233, 226, 206, .055) 0%, rgba(233, 226, 206, 0) 27%),
+    radial-gradient(120% 90% at 50% -18%, rgba(113, 230, 198, .07), transparent 58%),
+    radial-gradient(140% 120% at 50% 120%, rgba(0, 0, 0, .5), transparent 60%);
+  mix-blend-mode: screen;
+}
+
+.stage::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  background: radial-gradient(92% 86% at 50% 46%, transparent 44%, rgba(0, 0, 0, .52) 100%);
+}
+
+.stage-head {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 5;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 13px 17px 26px;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(2, 9, 8, 0.9) 0%, rgba(2, 9, 8, 0.55) 55%, rgba(2, 9, 8, 0) 100%);
+}
+
+.plate-label { display: flex; flex-direction: column; gap: 3px; }
+
+.plate-fig {
+  font-family: var(--mono);
+  font-size: 8px;
+  letter-spacing: .24em;
+  text-transform: uppercase;
+  color: var(--aqua);
+  opacity: .85;
+}
+
+.plate-title {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 15px;
+  color: var(--bone-2);
+  letter-spacing: .03em;
+  text-shadow: 0 1px 5px rgba(0, 0, 0, .85);
+}
+
+.plate-sub {
+  font-family: var(--mono);
+  font-size: 7.5px;
+  letter-spacing: .12em;
+  color: var(--mute);
+  text-transform: uppercase;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, .9);
+}
+.plate-label { border-left: 1px solid var(--brass-dim); padding-left: 11px; }
+
+.corner {
+  position: absolute;
+  z-index: 4;
+  width: 15px;
+  height: 15px;
+  pointer-events: none;
+  opacity: .55;
+}
+.corner.c-tl { top: 10px; left: 10px; border-top: 1px solid var(--brass); border-left: 1px solid var(--brass); }
+.corner.c-tr { top: 10px; right: 10px; border-top: 1px solid var(--brass); border-right: 1px solid var(--brass); }
+.corner.c-bl { bottom: 10px; left: 10px; border-bottom: 1px solid var(--brass); border-left: 1px solid var(--brass); }
+.corner.c-br { bottom: 10px; right: 10px; border-bottom: 1px solid var(--brass); border-right: 1px solid var(--brass); }
+
+.species-key {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  border: 1px solid rgba(22, 48, 41, .8);
+  background: rgba(3, 11, 9, .42);
+  border-radius: 2px;
+  padding: 5px 2px;
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+}
+
+.key-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 9px;
+  font-family: var(--mono);
+  font-size: 7.5px;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--bone-2);
+}
+
+.key-item + .key-item { border-left: 1px solid rgba(22, 48, 41, .8); }
+.key-item svg { width: 10px; height: 10px; flex: none; }
+.key-item.plants { color: var(--lichen); }
+.key-item.prey { color: var(--aqua); }
+.key-item.pred { color: var(--amber); }
+
+/* probe readout ---------------------------------------------------------- */
+.probe {
+  position: absolute;
+  right: 18px;
+  bottom: 14px;
+  z-index: 5;
+  font-family: var(--mono);
+  font-size: 7.5px;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--mute);
+  opacity: 0;
+  transition: opacity .4s ease;
+  pointer-events: none;
+  text-shadow: 0 1px 6px #000;
+}
+
+.stage:hover .probe { opacity: .72; }
+
+/* specimen tag ----------------------------------------------------------- */
+.specimen-tag {
+  position: absolute;
+  left: 20px;
+  bottom: 20px;
+  z-index: 5;
+  width: 128px;
+  transform: rotate(-2.4deg);
+  transform-origin: 20% 0;
+  padding: 9px 10px 8px;
+  color: #2c2b23;
+  background:
+    linear-gradient(178deg, #ece3c9 0%, #e3d8ba 55%, #d6c9a8 100%);
+  box-shadow:
+    0 10px 26px rgba(0, 0, 0, .5),
+    0 1px 0 rgba(255, 255, 255, .5) inset,
+    -1px 0 0 rgba(120, 105, 70, .25) inset;
+  pointer-events: none;
+  font-family: var(--serif);
+}
+
+.specimen-tag::before {
+  content: "";
+  position: absolute;
+  top: 5px;
+  left: 50%;
+  width: 6px;
+  height: 6px;
+  margin-left: -3px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #55503f, #211f19 70%);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, .6);
+}
+
+.specimen-tag::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: linear-gradient(120deg, rgba(255, 255, 255, .35), transparent 32%);
+  mix-blend-mode: soft-light;
+  pointer-events: none;
+}
+
+.specimen-tag b {
+  display: block;
+  margin: 4px 0 3px;
+  font-family: var(--mono);
+  font-weight: 400;
+  font-size: 6.5px;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: #6c6551;
+}
+
+.specimen-tag em {
+  display: block;
+  font-style: italic;
+  font-size: 10.5px;
+  line-height: 1.25;
+  color: #33322a;
+}
+
+.specimen-tag small {
+  display: block;
+  margin-top: 5px;
+  font-family: var(--mono);
+  font-size: 6.5px;
+  letter-spacing: .1em;
+  color: #655f4d;
+}
+
+/* anomaly announcement --------------------------------------------------- */
+.anomaly-banner {
+  position: absolute;
+  top: 23%;
+  left: 50%;
+  z-index: 8;
+  width: min(560px, 84%);
+  transform: translate(-50%, -8px);
+  text-align: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .55s ease, transform .55s cubic-bezier(.2, .7, .2, 1);
+  --anom: var(--amber);
+}
+
+.anomaly-banner.show { opacity: 1; transform: translate(-50%, 0); }
+
+.anomaly-banner .an-scrim {
+  position: absolute;
+  inset: -30px -70px;
+  z-index: -1;
+  background: radial-gradient(ellipse at 50% 50%, rgba(2, 9, 8, 0.72) 0%, rgba(2, 9, 8, 0.42) 54%, rgba(2, 9, 8, 0) 80%);
+  filter: blur(2px);
+  pointer-events: none;
+}
+
+.anomaly-banner::before,
+.anomaly-banner::after {
+  content: "";
+  display: block;
+  height: 1px;
+  margin: 0 auto 10px;
+  width: 100%;
+  background: linear-gradient(90deg, transparent, var(--anom), transparent);
+  opacity: .55;
+}
+
+.anomaly-banner::after { margin: 12px auto 0; }
+
+.an-kicker {
+  display: block;
+  font-family: var(--mono);
+  font-size: 8.5px;
+  letter-spacing: .38em;
+  text-transform: uppercase;
+  color: var(--anom);
+}
+
+.an-title {
+  display: block;
+  margin-top: 7px;
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: clamp(26px, 3.4vw, 44px);
+  line-height: 1;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--bone);
+  text-shadow: 0 0 34px rgba(0, 0, 0, .9), 0 0 22px var(--anom);
+}
+
+.an-note {
+  display: block;
+  margin-top: 10px;
+  font-size: 13.5px;
+  font-style: italic;
+  color: var(--bone-2);
+  opacity: .95;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, .9);
+}
+
+/* tint and event wash ---------------------------------------------------- */
+.screen-tint {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 1.6s ease;
+  mix-blend-mode: screen;
+  background: var(--wash, transparent);
+}
+
+.stage.event-drought .screen-tint {
+  opacity: .85;
+  background:
+    radial-gradient(90% 80% at 50% 40%, rgba(217, 166, 79, .17), transparent 72%),
+    linear-gradient(180deg, rgba(217, 166, 79, .05), rgba(120, 84, 30, .12));
+}
+
+.stage.event-plague .screen-tint {
+  opacity: .85;
+  background:
+    radial-gradient(80% 70% at 50% 46%, rgba(179, 147, 225, .16), transparent 70%),
+    linear-gradient(180deg, rgba(179, 147, 225, .04), rgba(90, 60, 130, .12));
+}
+
+.stage.event-eruption .screen-tint {
+  opacity: .9;
+  background:
+    radial-gradient(75% 75% at 50% 62%, rgba(229, 118, 79, .22), transparent 70%),
+    linear-gradient(180deg, rgba(229, 118, 79, .07), rgba(120, 48, 28, .16));
+}
+
+/* paused / ended notes --------------------------------------------------- */
+.paused-note {
+  position: absolute;
+  left: 50%;
+  bottom: 23%;
+  z-index: 7;
+  transform: translateX(-50%);
+  text-align: center;
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 14px;
+  letter-spacing: .16em;
+  color: var(--bone-2);
+  opacity: 0;
+  transition: opacity .5s ease;
+  pointer-events: none;
+  text-shadow: 0 2px 18px #000;
+}
+
+.paused-note span { display: block; padding: 0 14px; }
+.paused-note::before, .paused-note::after {
+  content: "";
+  display: block;
+  width: 180px;
+  height: 1px;
+  margin: 8px auto;
+  background: linear-gradient(90deg, transparent, rgba(233, 226, 206, .4), transparent);
+}
+
+.stage.is-paused .paused-note { opacity: .85; }
+body.is-ended .paused-note { display: none; }
+
+.end-badge {
+  position: absolute;
+  top: 15px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 8;
+  display: none;
+}
+
+body.is-ended .end-badge { display: block; }
+
+.end-badge button {
+  font-family: var(--mono);
+  font-size: 7.5px;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: var(--bone);
+  background: rgba(4, 14, 12, .72);
+  border: 1px solid var(--brass-dim);
+  border-radius: 2px;
+  padding: 7px 13px;
+  cursor: pointer;
+  backdrop-filter: blur(4px);
+  transition: .2s ease;
+}
+
+.end-badge button:hover {
+  border-color: var(--brass);
+  color: #fff;
+  box-shadow: 0 0 22px -4px rgba(168, 138, 90, .5);
+}
+
+/* ---------------------------------------------------------------- console -- */
+.console {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  border: 1px solid var(--line-2);
+  border-radius: var(--r);
+  overflow: hidden;
+  background:
+    linear-gradient(180deg, rgba(10, 32, 27, .94) 0%, rgba(6, 18, 15, .97) 55%, rgba(4, 13, 11, .98) 100%);
+  box-shadow:
+    0 30px 80px -40px #000,
+    inset 0 1px 0 rgba(233, 226, 206, .055),
+    inset 0 0 0 1px rgba(0, 0, 0, .35);
+}
+
+.console::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 8%;
+  right: 8%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(168, 138, 90, .55), transparent);
+  z-index: 1;
+}
+
+.console-head {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 7px 14px 6px;
+  border-bottom: 1px solid var(--line);
+  background: rgba(255, 255, 255, .012);
+}
+
+.console-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--mono);
+  font-size: 8px;
+  letter-spacing: .26em;
+  text-transform: uppercase;
+  color: var(--bone-2);
+}
+
+.console-title .lamp {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--aqua);
+  box-shadow: 0 0 8px var(--aqua);
+  animation: lamp 2.6s ease-in-out infinite;
+}
+
+.console-toggle {
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  border: 1px solid transparent;
+  border-radius: 2px;
+  background: transparent;
+  color: var(--mute);
+  cursor: pointer;
+  transition: .18s ease;
+}
+
+.console-toggle:hover { color: var(--bone); border-color: var(--line-2); }
+.console-toggle svg { width: 12px; height: 12px; transition: transform .25s ease; }
+
+.console.is-collapsed .console-toggle svg { transform: rotate(180deg); }
+.console.is-collapsed .console-body { display: none; }
+
+.console-body {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  flex: 1 1 auto;
+}
+
+/* chronometer ------------------------------------------------------------ */
+.chrono {
+  position: relative;
+  flex: none;
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 0 0;
+}
+
+.chrono canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.chrono-read {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  pointer-events: none;
+  transform: translateY(-1px);
+}
+
+.chrono-gen {
+  font-family: var(--mono);
+  font-size: 24px;
+  line-height: 1;
+  letter-spacing: .04em;
+  color: var(--bone);
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 0 18px rgba(113, 230, 198, .18);
+}
+
+.chrono-of {
+  font-family: var(--mono);
+  font-size: 8.5px;
+  letter-spacing: .3em;
+  text-transform: uppercase;
+  color: var(--mute);
+}
+
+.chrono-lab {
+  margin-top: 3px;
+  font-family: var(--mono);
+  font-size: 7px;
+  letter-spacing: .34em;
+  text-transform: uppercase;
+  color: var(--dim);
+}
+
+.chrono-meta {
+  position: absolute;
+  left: 17px;
+  right: 17px;
+  bottom: 3px;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-family: var(--mono);
+  font-size: 7.5px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--dim);
+  pointer-events: none;
+}
+
+.chrono-meta b {
+  font-weight: 400;
+  color: var(--bone-2);
+  letter-spacing: .1em;
+}
+
+.chrono-meta .next-type { color: var(--amber); }
+
+/* transport -------------------------------------------------------------- */
+.transport {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 14px 7px;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  background: rgba(0, 0, 0, .16);
+}
+
+.transport-btn {
+  width: 32px;
+  height: 25px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--line-2);
+  border-radius: 2px;
+  background: rgba(233, 226, 206, .025);
+  color: var(--bone-2);
+  cursor: pointer;
+  transition: border-color .16s ease, color .16s ease, background .16s ease, box-shadow .16s ease;
+}
+
+.transport-btn svg { width: 11px; height: 11px; }
+.transport-btn:hover { color: var(--bone); border-color: var(--line-3); background: rgba(113, 230, 198, .05); }
+.transport-btn:active { transform: translateY(1px); }
+
+.transport-btn.main {
+  width: 42px;
+  color: var(--aqua);
+  border-color: rgba(113, 230, 198, .38);
+  background: rgba(113, 230, 198, .06);
+}
+
+.transport-btn.main:hover { box-shadow: 0 0 18px -6px var(--aqua-glow); }
+
+.transport-meta {
+  margin-left: auto;
+  text-align: right;
+  font-family: var(--mono);
+  font-size: 7px;
+  line-height: 1.5;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--dim);
+  white-space: nowrap;
+}
+
+.transport-meta b { color: var(--bone-2); font-weight: 400; }
+.transport-meta .rate { color: var(--aqua); opacity: .8; }
+
+/* scrolling control well ------------------------------------------------- */
+.console-scroll-wrap {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+}
+
+.console-scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 2px 14px 2px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--line-3) transparent;
+}
+
+.scroll-cue {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 38px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 5px;
+  padding-bottom: 4px;
+  background: linear-gradient(180deg, rgba(5, 15, 13, 0) 0%, rgba(5, 15, 13, 0.86) 62%, rgba(5, 15, 13, 0.96) 100%);
+  font-family: var(--mono);
+  font-size: 6.5px;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--brass);
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity .3s ease, transform .3s ease;
+}
+
+.scroll-cue.show { opacity: 1; transform: none; }
+.scroll-cue b { font-size: 9px; line-height: .8; animation: cueNudge 2.2s ease-in-out infinite; }
+@keyframes cueNudge { 0%,100% { transform: translateY(-1px); } 50% { transform: translateY(2px); } }
+
+.console-scroll::-webkit-scrollbar { width: 6px; }
+.console-scroll::-webkit-scrollbar-thumb { background: var(--line-3); border-radius: 3px; }
+.console-scroll::-webkit-scrollbar-track { background: transparent; }
+
+.group { padding: 4px 0 5px; border-bottom: 1px solid rgba(20, 46, 39, .62); }
+.group:last-child { border-bottom: 0; }
+
+.group-title {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin: 0 0 5px;
+  font-family: var(--mono);
+  font-weight: 400;
+  font-size: 8px;
+  letter-spacing: .26em;
+  text-transform: uppercase;
+  color: var(--mute);
+}
+
+.group-title .roman {
+  color: var(--brass);
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  padding: 1px 4px 0;
+  font-size: 6.5px;
+  letter-spacing: .08em;
+}
+
+.group-title::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(20, 46, 39, .9), transparent);
+}
+
+/* faders ----------------------------------------------------------------- */
+.fader { padding: 0 0 2px; }
+
+.ctrl-top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 2px;
+}
+
+.ctrl-name {
+  font-family: var(--mono);
+  font-size: 8px;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--bone-2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ctrl-val {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: .04em;
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  transition: color .2s ease, text-shadow .2s ease;
+}
+
+.ctrl-val .unit {
+  margin-left: 2px;
+  font-size: 7px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--dim);
+}
+
+.ctrl-val.bump { text-shadow: 0 0 12px var(--accent); }
+
+.fader-row { display: flex; align-items: center; gap: 9px; }
+
+.fader-input {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 16px;
+  margin: 0;
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.fader-input::-webkit-slider-runnable-track {
+  height: 2px;
+  border-radius: 1px;
+  background:
+    repeating-linear-gradient(90deg, transparent 0, transparent calc(10% - 1px), rgba(233, 226, 206, .1) calc(10% - 1px), rgba(233, 226, 206, .1) 10%),
+    linear-gradient(90deg, var(--accent) 0%, var(--accent) var(--fill, 50%), rgba(233, 226, 206, .18) var(--fill, 50%), rgba(233, 226, 206, .18) 100%);
+}
+
+.fader-input::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 6px;
+  height: 13px;
+  margin-top: -5.5px;
+  border-radius: 1px;
+  border: 1px solid rgba(0, 0, 0, .65);
+  background: linear-gradient(180deg, #f0ead7 0%, #cfc8b2 100%);
+  box-shadow: 0 0 0 1px rgba(233, 226, 206, .2), 0 0 8px var(--accent);
+  transition: box-shadow .15s ease, height .15s ease;
+}
+
+.fader-input:hover::-webkit-slider-thumb { height: 15px; margin-top: -6.5px; box-shadow: 0 0 0 1px rgba(233, 226, 206, .32), 0 0 13px var(--accent); }
+.fader-input:active::-webkit-slider-thumb { background: var(--accent); }
+
+.fader-input::-moz-range-track {
+  height: 2px;
+  border-radius: 1px;
+  background: rgba(233, 226, 206, .13);
+}
+
+.fader-input::-moz-range-progress { height: 2px; background: var(--accent); border-radius: 1px; }
+
+.fader-input::-moz-range-thumb {
+  width: 6px;
+  height: 13px;
+  border-radius: 1px;
+  border: 1px solid rgba(0, 0, 0, .65);
+  background: #e7e1cd;
+  box-shadow: 0 0 8px var(--accent);
+}
+
+.fader-input:focus-visible { outline: none; }
+.fader-input:focus-visible::-webkit-slider-thumb {
+  height: 16px;
+  margin-top: -7px;
+  box-shadow: 0 0 0 3px rgba(113, 230, 198, .22), 0 0 16px var(--accent);
+  background: #fff;
+}
+.fader-input:focus-visible::-moz-range-thumb { box-shadow: 0 0 0 3px rgba(113, 230, 198, .22), 0 0 16px var(--accent); }
+
+.spark {
+  flex: none;
+  width: 58px;
+  height: 19px;
+  opacity: 1;
+}
+
+/* steppers --------------------------------------------------------------- */
+.stepper-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  padding: 0 0 4px;
+}
+
+.stepper-label {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 6px;
+  margin-bottom: 3px;
+  font-family: var(--mono);
+  font-size: 8px;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--bone-2);
+}
+
+.stepper-label .unit { font-size: 7px; color: var(--dim); letter-spacing: .1em; }
+
+.stepper {
+  display: flex;
+  align-items: stretch;
+  height: 28px;
+  border: 1px solid var(--line-2);
+  border-radius: 2px;
+  background: rgba(2, 8, 7, .55);
+  overflow: hidden;
+  transition: border-color .16s ease;
+}
+
+.stepper:focus-within { border-color: var(--aqua); box-shadow: 0 0 0 1px rgba(113, 230, 198, .18); }
+
+.stepper-btn {
+  flex: none;
+  width: 24px;
+  border: 0;
+  background: transparent;
+  color: var(--mute);
+  font-family: var(--mono);
+  font-size: 12px;
+  line-height: 1;
+  cursor: pointer;
+  transition: .15s ease;
+  padding: 0;
+}
+
+.stepper-btn:hover { color: var(--aqua); background: rgba(113, 230, 198, .07); }
+.stepper-btn:active { background: rgba(113, 230, 198, .14); }
+
+.stepper-val {
+  flex: 1 1 auto;
+  min-width: 0;
+  width: 100%;
+  border: 0;
+  background: transparent;
+  color: var(--bone);
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: .09em;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  padding: 0;
+  cursor: default;
+}
+
+.stepper-val:focus { outline: none; }
+
+.stepper .dice { border-left: 1px solid var(--line); color: var(--brass); }
+.stepper .dice:hover { color: var(--bone); background: rgba(168, 138, 90, .1); }
+.stepper .dice svg { width: 11px; height: 11px; }
+
+/* toggles ---------------------------------------------------------------- */
+.toggle {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+  flex: none;
+}
+
+.toggle input {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+}
+
+.toggle .track {
+  pointer-events: none;
+  width: 26px;
+  height: 13px;
+  border: 1px solid var(--line-3);
+  border-radius: 8px;
+  background: rgba(0, 0, 0, .4);
+  position: relative;
+  transition: border-color .2s ease, background .2s ease;
+}
+
+.toggle .track::after {
+  content: "";
+  position: absolute;
+  top: 1px;
+  left: 1px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--dim);
+  transition: left .2s cubic-bezier(.2, .8, .2, 1), background .2s ease, box-shadow .2s ease;
+}
+
+.toggle input:checked + .track { border-color: var(--accent); background: rgba(113, 230, 198, .10); }
+.toggle input:checked + .track::after { left: 14px; background: var(--accent); box-shadow: 0 0 8px var(--accent); }
+.toggle input:focus-visible + .track { outline: 1px solid var(--aqua); outline-offset: 2px; }
+.toggle input:disabled + .track { opacity: .4; }
+.toggle:hover .track { border-color: var(--accent); }
+
+/* anomaly rows ----------------------------------------------------------- */
+.anomaly { padding: 2px 0 0; border-bottom: 1px dashed rgba(20, 46, 39, .55); }
+.anomaly:last-of-type { border-bottom: 0; }
+
+.anomaly-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.anomaly-name {
+  font-family: var(--mono);
+  font-size: 8px;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--bone-2);
+}
+
+.anomaly-next {
+  margin-left: auto;
+  font-family: var(--mono);
+  font-size: 7.5px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--accent);
+  opacity: .85;
+  white-space: nowrap;
+}
+
+.anomaly .fader { padding: 0 0 1px; }
+
+/* console foot ----------------------------------------------------------- */
+.console-foot {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 4px 14px 5px;
+  border-top: 1px solid var(--line);
+  font-family: var(--mono);
+  font-size: 6.8px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--dim);
+  white-space: nowrap;
+}
+
+.foot-btn {
+  margin-left: 0;
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  background: transparent;
+  color: var(--mute);
+  font-family: var(--mono);
+  font-size: 6.5px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  padding: 2px 6px;
+  cursor: pointer;
+  transition: .18s ease;
+}
+
+.foot-btn:hover { color: var(--aqua); border-color: var(--line-3); }
+
+.console-foot kbd {
+  font-family: var(--mono);
+  font-size: 6.5px;
+  letter-spacing: .06em;
+  color: var(--mute);
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  padding: 1px 3px;
+  margin-right: 1px;
+}
+
+/* -------------------------------------------------------------- tooltip --- */
+.tooltip {
+  position: fixed;
+  z-index: 200;
+  max-width: 268px;
+  padding: 9px 11px 10px;
+  border: 1px solid var(--line-3);
+  border-radius: 3px;
+  background: rgba(5, 18, 15, .97);
+  box-shadow: 0 18px 44px -14px #000, inset 0 1px 0 rgba(233, 226, 206, .07);
+  backdrop-filter: blur(8px);
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity .16s ease, transform .16s ease;
+  pointer-events: none;
+}
+
+.tooltip.show { opacity: 1; transform: none; }
+
+.tooltip b {
+  display: block;
+  margin-bottom: 4px;
+  font-family: var(--mono);
+  font-weight: 400;
+  font-size: 7.5px;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: var(--aqua);
+}
+
+.tooltip p {
+  margin: 0;
+  font-size: 11.5px;
+  line-height: 1.45;
+  color: var(--bone-2);
+}
+
+.tooltip small {
+  display: block;
+  margin-top: 6px;
+  font-family: var(--mono);
+  font-size: 7.5px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--dim);
+}
+
+/* ------------------------------------------------------------ instruments -- */
+.instruments {
+  flex: 0 0 auto;
+  height: 98px;
+  display: grid;
+  grid-template-columns: 1.45fr 1fr;
+  gap: 12px;
+  min-height: 0;
+}
+
+.trace, .notes {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  overflow: hidden;
+  background: linear-gradient(180deg, rgba(8, 24, 20, .66), rgba(3, 11, 9, .55));
+}
+
+.ins-head {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 6px 12px 5px;
+  border-bottom: 1px solid rgba(20, 46, 39, .7);
+  font-family: var(--mono);
+  font-size: 8px;
+  letter-spacing: .24em;
+  text-transform: uppercase;
+  color: var(--bone-2);
+}
+
+.ins-sub { color: var(--dim); letter-spacing: .12em; font-size: 7px; }
+
+.ins-legend { display: flex; align-items: center; gap: 9px; font-size: 6px; letter-spacing: .12em; color: var(--mute); }
+.ins-legend i { display: inline-block; width: 7px; height: 1.5px; margin-right: 3px; vertical-align: 1px; }
+.ins-legend .g-prey { background: var(--aqua); }
+.ins-legend .g-pred { background: var(--amber); }
+.ins-legend .g-plant { background: var(--lichen); opacity: .7; }
+
+.trace canvas {
+  flex: 1 1 auto;
+  display: block;
+  width: 100%;
+  min-height: 0;
+}
+
+.note-list {
+  flex: 1 1 auto;
+  list-style: none;
+  margin: 0;
+  padding: 5px 12px 4px;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 1px;
+}
+
+.note {
+  display: flex;
+  align-items: baseline;
+  gap: 7px;
+  font-size: 10.5px;
+  line-height: 1.32;
+  color: var(--mute);
+  animation: noteIn .5s cubic-bezier(.2, .7, .2, 1) both;
+}
+
+@keyframes noteIn {
+  from { opacity: 0; transform: translateY(-3px); }
+  to { opacity: 1; transform: none; }
+}
+
+.note-gen {
+  flex: none;
+  width: 38px;
+  font-family: var(--mono);
+  font-size: 7.5px;
+  letter-spacing: .08em;
+  color: var(--dim);
+  font-variant-numeric: tabular-nums;
+}
+
+.note-type {
+  flex: none;
+  font-family: var(--mono);
+  font-size: 7.5px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--aqua);
+}
+
+.note-text {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-style: italic;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.note-text b { font-style: normal; font-weight: 400; color: var(--bone-2); }
+
+/* -------------------------------------------------- shared small elements -- */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+button { font: inherit; }
+
+btn, .btn { -webkit-tap-highlight-color: transparent; }
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 9px 15px;
+  border: 1px solid var(--line-2);
+  border-radius: 2px;
+  background: transparent;
+  color: var(--bone-2);
+  font-family: var(--mono);
+  font-size: 8px;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: .2s ease;
+  white-space: nowrap;
+}
+
+.btn:hover { color: var(--bone); border-color: var(--line-3); background: rgba(233, 226, 206, .04); }
+.btn:active { transform: translateY(1px); }
+
+.btn.outline { color: var(--aqua); border-color: rgba(113, 230, 198, .45); }
+.btn.outline:hover { background: rgba(113, 230, 198, .08); box-shadow: 0 0 24px -8px var(--aqua-glow); color: #d8fff4; }
+
+.btn.solid {
+  color: #032019;
+  background: var(--aqua);
+  border-color: var(--aqua);
+  box-shadow: 0 0 28px -10px var(--aqua-glow);
+}
+.btn.solid:hover { background: #a4f5df; border-color: #a4f5df; color: #021713; }
+
+:focus-visible { outline: 1px solid var(--aqua); outline-offset: 2px; }
+button:focus-visible { box-shadow: 0 0 0 3px rgba(113, 230, 198, .18); }
+
+/* ------------------------------------------------------------- dashboard -- */
+.dashboard {
+  position: fixed;
+  inset: 0;
+  z-index: 120;
+  display: flex;
+  padding: clamp(10px, 1.8vw, 26px);
+  background: rgba(2, 8, 7, .8);
+  backdrop-filter: blur(16px) saturate(.85);
+  -webkit-backdrop-filter: blur(16px) saturate(.85);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .55s ease;
+}
+
+.dashboard.show { opacity: 1; pointer-events: auto; }
+.dashboard[hidden] { display: none; }
+
+.dash-inner {
+  position: relative;
+  width: min(1580px, 100%);
+  height: 100%;
+  margin: auto;
+  padding: clamp(16px, 1.9vw, 26px) clamp(16px, 2vw, 30px);
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+  overflow: hidden;
+  border: 1px solid var(--line-2);
+  border-radius: 5px;
+  background:
+    radial-gradient(90% 80% at 15% -10%, rgba(22, 68, 57, .35), transparent 55%),
+    linear-gradient(180deg, rgba(9, 26, 22, .985), rgba(3, 10, 9, .992));
+  box-shadow: 0 70px 180px -40px #000, inset 0 1px 0 rgba(233, 226, 206, .06);
+  transform: translateY(12px) scale(.996);
+  transition: transform .7s cubic-bezier(.2, .75, .2, 1);
+}
+
+.dashboard.show .dash-inner { transform: none; }
+
+.dash-inner::before {
+  content: "";
+  position: absolute;
+  inset: 8px;
+  border: 1px solid rgba(168, 138, 90, .16);
+  border-radius: 3px;
+  pointer-events: none;
+}
+
+.dash-head {
+  flex: none;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 22px;
+  padding-bottom: 2px;
+}
+
+.dash-kicker {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-family: var(--mono);
+  font-size: 8px;
+  letter-spacing: .34em;
+  text-transform: uppercase;
+  color: var(--aqua);
+}
+
+.dash-kicker::before {
+  content: "";
+  width: 22px;
+  height: 1px;
+  background: var(--aqua);
+  opacity: .7;
+}
+
+.dash-title {
+  margin: 9px 0 0;
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: clamp(25px, 2.6vw, 38px);
+  line-height: 1.02;
+  letter-spacing: .02em;
+  color: var(--bone);
+}
+
+.dash-sub {
+  margin: 7px 0 0;
+  font-family: var(--mono);
+  font-size: 8px;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--mute);
+}
+
+.dash-actions { display: flex; align-items: center; gap: 8px; flex: none; padding-top: 6px; }
+
+.dash-prose {
+  flex: none;
+  margin: 0;
+  padding-left: 13px;
+  border-left: 1px solid var(--brass-dim);
+  max-width: 118ch;
+  font-size: clamp(12.5px, 1.05vw, 15px);
+  font-style: italic;
+  line-height: 1.5;
+  color: var(--bone-2);
+}
+
+.dash-prose b { font-style: normal; font-weight: 400; color: var(--bone); }
+
+.dash-stats {
+  flex: none;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  padding: 8px 0;
+}
+
+.stat { padding: 0 16px; border-left: 1px solid var(--line); min-width: 0; }
+.stat:first-child { border-left: 0; padding-left: 0; }
+
+.stat-k {
+  display: block;
+  font-family: var(--mono);
+  font-size: 7px;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: var(--dim);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.stat-v {
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+  margin-top: 2px;
+  font-family: var(--serif);
+  font-size: clamp(17px, 1.5vw, 23px);
+  line-height: 1.1;
+  color: var(--bone);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.stat-v small {
+  font-family: var(--mono);
+  font-size: 7px;
+  letter-spacing: .1em;
+  color: var(--mute);
+  text-transform: uppercase;
+}
+
+.stat-v.aqua { color: var(--aqua); }
+.stat-v.amber { color: var(--amber); }
+.stat-v.lichen { color: var(--lichen); }
+
+.dash-grid {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1.24fr) minmax(0, 1fr);
+  gap: 12px;
+}
+
+.chart-card {
+  position: relative;
+  margin: 0;
+  min-height: 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 10px 12px 8px;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  background: rgba(6, 19, 16, .55);
+  overflow: hidden;
+}
+
+.chart-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 10px;
+  height: 10px;
+  border-top: 1px solid var(--brass-dim);
+  border-left: 1px solid var(--brass-dim);
+  pointer-events: none;
+}
+
+.chart-card::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 10px;
+  height: 10px;
+  border-bottom: 1px solid var(--brass-dim);
+  border-right: 1px solid var(--brass-dim);
+  pointer-events: none;
+}
+
+.chart-card figcaption {
+  flex: none;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 0 0 7px;
+  min-width: 0;
+}
+
+.fig-no {
+  font-family: var(--mono);
+  font-size: 7.5px;
+  letter-spacing: .2em;
+  color: var(--aqua);
+  opacity: .8;
+  flex: none;
+}
+
+.fig-title {
+  font-family: var(--serif);
+  font-size: 13.5px;
+  color: var(--bone-2);
+  letter-spacing: .02em;
+  white-space: nowrap;
+}
+
+.key-dot { display: inline-block; width: 5px; height: 5px; border-radius: 50%; margin-right: 4px; vertical-align: 1px; }
+.key-dot.k-prey { background: var(--aqua); }
+.key-dot.k-pred { background: var(--amber); }
+.key-dot.k-plant { background: var(--lichen); opacity: .8; }
+
+.fig-note {
+  margin-left: auto;
+  font-family: var(--mono);
+  font-size: 7px;
+  font-style: normal;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--dim);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.canvas-wrap { position: relative; flex: 1 1 auto; min-height: 0; }
+.canvas-wrap canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+
+.genes-card .gene-grid {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 4px;
+}
+
+.gene-cell {
+  position: relative;
+  min-height: 0;
+  min-width: 0;
+  border-top: 1px solid rgba(20, 46, 39, .55);
+  border-left: 1px solid rgba(20, 46, 39, .55);
+  margin: 0;
+  padding: 0;
+}
+
+.gene-cell figcaption { display: none; }
+
+.gene-cell:nth-child(1), .gene-cell:nth-child(2) { border-top: 0; }
+.gene-cell:nth-child(1), .gene-cell:nth-child(3) { border-left: 0; }
+
+.gene-cell canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+
+.dash-foot {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  border-top: 1px solid var(--line);
+  padding-top: 7px;
+  font-family: var(--mono);
+  font-size: 7px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--dim);
+}
+
+.dash-foot .seed-note { color: var(--mute); }
+
+/* ------------------------------------------------------------- responsive -- */
+@media (max-height: 880px) {
+  .sheet { padding-top: 10px; padding-bottom: 8px; gap: 8px; }
+  .masthead { padding-bottom: 8px; }
+  .brand h1 { font-size: 20px; }
+  .brand-sub { font-size: 11.5px; margin-top: 5px; }
+  .masthead::after { height: 3px; }
+  .chrono { height: 100px; }
+  .chrono-gen { font-size: 21px; }
+  .chrono-meta { display: none; }
+  .console-head { padding: 6px 13px 5px; }
+  .transport { padding: 4px 13px 5px; }
+  .instruments { height: 82px; }
+  .fader { padding: 0 0 2px; }
+  .ctrl-top { margin-bottom: 1px; }
+  .group { padding: 3px 0 4px; }
+  .group-title { margin-bottom: 3px; }
+  .anomaly { padding: 1px 0 0; }
+  .anomaly .fader { padding: 0 0 1px; }
+  .stepper { height: 24px; }
+  .stepper-grid { padding-bottom: 2px; }
+  .console-foot { padding: 3px 13px 4px; }
+  .dash-inner { gap: 9px; }
+  .dash-prose { font-size: 12.5px; }
+}
+
+@media (max-width: 1180px) {
+  .workspace { grid-template-columns: minmax(0, 1fr) 332px; }
+  .brand h1 { letter-spacing: .18em; }
+}
+
+@media (max-width: 1120px) {
+  body { overflow: auto; }
+  .sheet { height: auto; min-height: 100vh; padding-bottom: 24px; }
+  .workspace { grid-template-columns: minmax(0, 1fr); }
+  .stage { height: 58vh; min-height: 340px; }
+  .console { height: auto; max-height: none; }
+  .console-body { max-height: none; }
+  .console-scroll-wrap { flex: none; min-height: auto; }
+  .console-scroll { overflow: visible; }
+  .scroll-cue { display: none; }
+  .instruments { height: auto; grid-template-columns: 1fr; gap: 10px; }
+  .trace { height: 96px; }
+  .notes { height: auto; min-height: 74px; }
+  .note-list { max-height: 72px; }
+  .masthead { flex-direction: column; align-items: flex-start; gap: 12px; }
+  .mast-meta { align-items: flex-start; }
+  .telemetry { flex-wrap: wrap; }
+  .dashboard { overflow-y: auto; align-items: flex-start; }
+  .dash-inner { height: auto; min-height: 100%; max-height: none; overflow: visible; }
+  .dash-grid { grid-template-columns: 1fr; overflow: visible; flex: 0 0 auto; }
+  .pop-card { min-height: 350px; }
+  .genes-card { min-height: 470px; }
+  .dash-stats { grid-template-columns: repeat(3, 1fr); row-gap: 8px; }
+  .stat:nth-child(4) { border-left: 0; padding-left: 0; }
+  .chart-card figcaption { flex-wrap: wrap; row-gap: 3px; }
+  .fig-note { white-space: normal; margin-left: 0; flex: 1 1 100%; }
+}
+
+@media (max-width: 680px) {
+  .sheet { padding: 12px 12px 18px; }
+  .dash-inner { padding: 14px 12px 18px; gap: 12px; }
+  .dash-stats { grid-template-columns: 1fr 1fr; }
+  .pop-card { min-height: 340px; }
+  .genes-card { min-height: 780px; }
+  .genes-card .gene-grid { gap: 8px; grid-template-columns: 1fr; grid-template-rows: repeat(4, 1fr); }
+  .gene-cell { min-height: 160px; }
+  .gene-cell:nth-child(2), .gene-cell:nth-child(4) { border-top: 1px solid rgba(20, 46, 39, .55); }
+  .gene-cell:nth-child(1), .gene-cell:nth-child(2), .gene-cell:nth-child(3), .gene-cell:nth-child(4) { border-left: 0; }
+  .dash-actions { gap: 7px; }
+  .dash-actions .btn { padding: 8px 11px; font-size: 7.5px; }
+  .brand h1 { font-size: 17px; letter-spacing: .14em; }
+  .brand-sub { white-space: normal; font-size: 11px; }
+  .brand-mark { width: 32px; height: 32px; }
+  .stage { height: 52vh; min-height: 300px; }
+  .species-key { display: none; }
+  .specimen-tag { width: 112px; left: 14px; bottom: 14px; }
+  .plate-title { font-size: 13px; }
+  .tele { min-width: 72px; padding: 4px 9px 5px; }
+  .tele-v { font-size: 9.5px; }
+  .dash-inner { padding: 14px 12px; }
+  .dash-head { flex-direction: column; gap: 10px; }
+  .dash-actions { flex-wrap: wrap; }
+  .dash-title { font-size: 24px; }
+  .dash-stats { grid-template-columns: 1fr 1fr; }
+  .stat { padding: 0 10px; }
+  .stat:nth-child(3) { border-left: 0; padding-left: 0; }
+  .stat:nth-child(4) { border-left: 1px solid var(--line); padding-left: 10px; }
+  .genes-card { min-height: 780px; }
+  .dash-grid { gap: 10px; }
+  .dash-foot { flex-direction: column; align-items: flex-start; gap: 4px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important;
+  }
+}
+
+/* hidden headless payload */
+#headless { display: none; }
+#headless.visible {
+  display: block;
+  position: fixed;
+  inset: 10px;
+  z-index: 300;
+  margin: 0;
+  padding: 16px;
+  overflow: auto;
+  background: #020908;
+  color: #a8ffdc;
+  border: 1px solid #2f5c4e;
+  font-family: monospace;
+  font-size: 11px;
+  white-space: pre-wrap;
+}
+
+</style>
+</head>
+<body>
+<div class="grain" aria-hidden="true"></div>
+
+<svg class="sr-only" aria-hidden="true" focusable="false" width="0" height="0">
+  <defs>
+    <symbol id="i-spiral" viewBox="0 0 32 32">
+      <circle cx="16" cy="16" r="14" fill="none" stroke="currentColor" stroke-width=".9" opacity=".65"/>
+      <path d="M16 4.8c6.9 0 11 5.2 11 10.3 0 5-3.9 9-8.7 9-4.1 0-7.2-3-7.2-6.7 0-3.2 2.4-5.7 5.4-5.7 2.5 0 4.3 1.8 4.3 3.9 0 1.8-1.3 3.1-2.9 3.1" fill="none" stroke="currentColor" stroke-width=".9" stroke-linecap="round"/>
+      <circle cx="16" cy="16" r="1.15" fill="#71e6c6"/>
+    </symbol>
+    <symbol id="g-bloom" viewBox="0 0 16 16">
+      <path d="M8 1.6c1.35 2.9 3.35 4.9 6.25 6.4-2.9 1.5-4.9 3.5-6.25 6.4-1.35-2.9-3.35-4.9-6.25-6.4C4.65 6.5 6.65 4.5 8 1.6Z" fill="currentColor" opacity=".9"/>
+      <circle cx="8" cy="8" r="1.1" fill="#04100e"/>
+    </symbol>
+    <symbol id="g-prey" viewBox="0 0 16 16">
+      <path d="M8.2 2.6c3.1 2.7 4 5.9.2 11.1-3.8-5.2-2.9-8.4.2-11.1Z" fill="currentColor"/>
+      <path d="M7 13c-1.5-2.1-2.5-4.1-2.7-6" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" opacity=".55"/>
+    </symbol>
+    <symbol id="g-pred" viewBox="0 0 16 16">
+      <path d="M2.6 13 8 3l5.4 10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
+      <path d="M5.6 13 8 8.6 10.4 13" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linejoin="round" stroke-linecap="round" opacity=".65"/>
+    </symbol>
+    <symbol id="i-pause" viewBox="0 0 16 16"><path d="M5 3v10M11 3v10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+    <symbol id="i-play" viewBox="0 0 16 16"><path d="M5.2 3.2 12.4 8l-7.2 4.8z" fill="currentColor"/></symbol>
+    <symbol id="i-step" viewBox="0 0 16 16"><path d="M3.6 3.4 10 8l-6.4 4.6z" fill="currentColor"/><path d="M12.4 3.4v9.2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></symbol>
+    <symbol id="i-reset" viewBox="0 0 16 16"><path d="M13.2 8A5.2 5.2 0 1 1 8 2.8c1.6 0 3 .7 4 1.8" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><path d="M12.4 2.2v2.9H9.5" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-dice" viewBox="0 0 16 16"><rect x="2.6" y="2.6" width="10.8" height="10.8" rx="1.6" fill="none" stroke="currentColor" stroke-width="1.2"/><circle cx="5.8" cy="5.8" r="1" fill="currentColor"/><circle cx="10.2" cy="5.8" r="1" fill="currentColor"/><circle cx="5.8" cy="10.2" r="1" fill="currentColor"/><circle cx="10.2" cy="10.2" r="1" fill="currentColor"/></symbol>
+    <symbol id="i-chevron" viewBox="0 0 16 16"><path d="M6 3.5 10.5 8 6 12.5" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-plate" viewBox="0 0 16 16"><rect x="2.2" y="2.2" width="11.6" height="11.6" rx="1" fill="none" stroke="currentColor" stroke-width="1.1"/><path d="M2.2 6h11.6M6 6v7.8" fill="none" stroke="currentColor" stroke-width=".8" opacity=".7"/></symbol>
+    <symbol id="i-replay" viewBox="0 0 16 16"><path d="M2.8 8a5.2 5.2 0 1 0 1.6-3.8" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><path d="M2.4 2.6v3.6h3.6" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 16 16"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></symbol>
+    <symbol id="i-close" viewBox="0 0 16 16"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></symbol>
+  </defs>
+</svg>
+
+<div class="sheet">
+  <header class="masthead">
+    <div class="brand">
+      <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true"><use href="#i-spiral"/></svg>
+      <div class="brand-text">
+        <h1>Abyssal Vivarium</h1>
+        <p class="brand-sub">A closed trophic vessel, kept under observation</p>
+      </div>
+    </div>
+    <div class="mast-meta">
+      <div class="plate-tag">Plate Nº 08 &nbsp;·&nbsp; Trophic drift in a seeded vessel</div>
+      <div class="telemetry">
+        <span class="tele"><span class="tele-k">Seed</span><span class="tele-v" id="teleSeed">0427</span></span>
+        <span class="tele"><span class="tele-k">Generation</span><span class="tele-v" id="teleGen">000 / 036</span></span>
+        <span class="tele"><span class="tele-k">State</span><span class="tele-v" id="teleState"><i class="lamp"></i><span id="teleStateText">Live</span></span></span>
+      </div>
+    </div>
+  </header>
+
+  <main class="workspace">
+    <section class="stage" id="stage" aria-label="Observation window: a living trophic field of bloom, grazers and hunters">
+      <canvas id="world" class="world-canvas" role="img" aria-label="Animated specimen field. Bloom appears as a pale green field, grazers as aquamarine droplets, hunters as amber chevrons."></canvas>
+      <div class="glass" aria-hidden="true"></div>
+      <div class="screen-tint" id="tint" aria-hidden="true"></div>
+      <i class="corner c-tl" aria-hidden="true"></i><i class="corner c-tr" aria-hidden="true"></i>
+      <i class="corner c-bl" aria-hidden="true"></i><i class="corner c-br" aria-hidden="true"></i>
+
+      <div class="stage-head">
+        <div class="plate-label">
+          <span class="plate-fig">Fig. 1 · Observation window</span>
+          <span class="plate-title">A trophic field under glass</span>
+          <span class="plate-sub">Closed vessel · 160 × 100 cells · seeded record</span>
+        </div>
+        <div class="species-key" aria-label="Species key">
+          <span class="key-item plants"><svg aria-hidden="true"><use href="#g-bloom"/></svg>Bloom</span>
+          <span class="key-item prey"><svg aria-hidden="true"><use href="#g-prey"/></svg>Grazers</span>
+          <span class="key-item pred"><svg aria-hidden="true"><use href="#g-pred"/></svg>Hunters</span>
+        </div>
+      </div>
+
+      <div class="anomaly-banner" id="banner" aria-live="polite">
+        <span class="an-scrim" aria-hidden="true"></span>
+        <span class="an-kicker" id="bannerKicker">Anomaly I · surface light fails</span>
+        <span class="an-title" id="bannerTitle">Drought</span>
+        <span class="an-note" id="bannerNote">The bloom recedes into the dark.</span>
+      </div>
+
+      <div class="paused-note" id="pausedNote"><span>Observation suspended</span></div>
+
+      <div class="probe" id="probe" aria-hidden="true">Probe · 000.0 / 000.0</div>
+
+      <div class="end-badge">
+        <button type="button" id="openPlateBtn" aria-label="Open the final specimen plate">
+          <svg width="10" height="10" style="vertical-align:-1px;margin-right:5px" aria-hidden="true"><use href="#i-plate"/></svg>
+          Observation complete · Open plate
+        </button>
+      </div>
+
+      <aside class="specimen-tag" aria-hidden="true">
+        <b>Specimen Nº 08 · do not open</b>
+        <em>Seeded vessel, sealed at generation zero. Lamp lit until the plate is drawn.</em>
+        <small id="tagMeta">SEED 0427 · 0 GEN</small>
+      </aside>
+    </section>
+
+    <aside class="console" id="console" aria-label="Instrument console">
+      <header class="console-head">
+        <span class="console-title"><i class="lamp" aria-hidden="true"></i>Instrument console</span>
+        <button class="console-toggle" type="button" id="consoleToggle" aria-expanded="true" aria-controls="consoleBody" aria-label="Collapse instrument console" title="Collapse / expand console">
+          <svg aria-hidden="true"><use href="#i-chevron"/></svg>
+        </button>
+      </header>
+
+      <div class="console-body" id="consoleBody">
+        <div class="chrono">
+          <canvas id="chrono" aria-hidden="true"></canvas>
+          <div class="chrono-read">
+            <span class="chrono-gen" id="chronoGen">000</span>
+            <span class="chrono-of" id="chronoOf">of 036</span>
+            <span class="chrono-lab">Generation</span>
+          </div>
+          <div class="chrono-meta">
+            <span>Next anomaly <b class="next-type" id="chronoNext">Drought</b> <b id="chronoNextGen">gen 12</b></span>
+            <span id="chronoElapsed">T+ 00:00</span>
+          </div>
+        </div>
+
+        <div class="transport">
+          <button class="transport-btn main" type="button" id="playBtn" aria-label="Pause observation" title="Pause / resume (Space)">
+            <svg aria-hidden="true"><use href="#i-pause" id="playIcon"/></svg>
+          </button>
+          <button class="transport-btn" type="button" id="stepBtn" aria-label="Advance one generation" title="Advance one generation (S)">
+            <svg aria-hidden="true"><use href="#i-step"/></svg>
+          </button>
+          <button class="transport-btn" type="button" id="resetBtn" aria-label="Recast specimen from seed" title="Recast specimen from seed (R)">
+            <svg aria-hidden="true"><use href="#i-reset"/></svg>
+          </button>
+          <button class="transport-btn" type="button" id="plateBtn" aria-label="Open final plate" title="Open final plate (G)">
+            <svg aria-hidden="true"><use href="#i-plate"/></svg>
+          </button>
+          <div class="transport-meta">
+            <div id="transportRate" class="rate">1.0 gen/s</div>
+            <div id="transportClock">T+ 00:00</div>
+          </div>
+        </div>
+
+        <div class="console-scroll-wrap">
+        <div class="console-scroll" id="consoleScroll">
+          <section class="group" aria-labelledby="grp-vessel">
+            <h2 class="group-title" id="grp-vessel"><span class="roman">I</span>Vessel</h2>
+            <div class="stepper-grid">
+              <div class="ctrl">
+                <div class="stepper-label" id="seedLabel">Seed <span class="unit">0000–9999</span></div>
+                <div class="stepper" role="group" aria-labelledby="seedLabel">
+                  <button class="stepper-btn" type="button" id="seedMinus" aria-label="Decrease seed">−</button>
+                  <input class="stepper-val" id="seedInput" type="text" inputmode="numeric" value="0427" autocomplete="off" spellcheck="false" aria-label="Seed, 0 to 9999" data-tip="seed">
+                  <button class="stepper-btn dice" type="button" id="seedDice" aria-label="Randomise seed and recast">
+                    <svg aria-hidden="true"><use href="#i-dice"/></svg>
+                  </button>
+                </div>
+              </div>
+              <div class="ctrl">
+                <div class="stepper-label" id="gensLabel">Generations <span class="unit">gen</span></div>
+                <div class="stepper" role="group" aria-labelledby="gensLabel">
+                  <button class="stepper-btn" type="button" id="gensMinus" aria-label="Fewer generations">−</button>
+                  <span class="stepper-val" id="gensValue" role="spinbutton" tabindex="0" aria-valuemin="12" aria-valuemax="240" aria-valuenow="36" aria-label="Generations observed before the plate is sealed" data-tip="generations">036</span>
+                  <button class="stepper-btn" type="button" id="gensPlus" aria-label="More generations">+</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="fader" style="--accent: var(--lichen)">
+              <div class="ctrl-top">
+                <label class="ctrl-name" for="f-speed" data-tip="speed">Time dilation</label>
+                <output class="ctrl-val" id="v-speed" for="f-speed">6<span class="unit">×</span></output>
+              </div>
+              <div class="fader-row">
+                <input class="fader-input" id="f-speed" type="range" min="1" max="48" step="1" value="6" aria-describedby="tip-speed">
+                <canvas class="spark" data-spark="speed" width="110" height="34" aria-hidden="true"></canvas>
+              </div>
+            </div>
+          </section>
+
+          <section class="group" aria-labelledby="grp-bio">
+            <h2 class="group-title" id="grp-bio"><span class="roman">II</span>Biosphere</h2>
+            <div class="fader" style="--accent: var(--aqua)">
+              <div class="ctrl-top">
+                <label class="ctrl-name" for="f-mutation" data-tip="mutation">Mutation rate</label>
+                <output class="ctrl-val" id="v-mutation" for="f-mutation">6.0<span class="unit">%</span></output>
+              </div>
+              <div class="fader-row">
+                <input class="fader-input" id="f-mutation" type="range" min="0" max="30" step="0.5" value="6" aria-describedby="tip-mutation">
+                <canvas class="spark" data-spark="mutation" width="110" height="34" aria-hidden="true"></canvas>
+              </div>
+            </div>
+            <div class="fader" style="--accent: var(--lichen)">
+              <div class="ctrl-top">
+                <label class="ctrl-name" for="f-food" data-tip="food">Nutrient flux</label>
+                <output class="ctrl-val" id="v-food" for="f-food">1.00<span class="unit">×</span></output>
+              </div>
+              <div class="fader-row">
+                <input class="fader-input" id="f-food" type="range" min="20" max="200" step="5" value="100" aria-describedby="tip-food">
+                <canvas class="spark" data-spark="food" width="110" height="34" aria-hidden="true"></canvas>
+              </div>
+            </div>
+          </section>
+
+          <section class="group" aria-labelledby="grp-anom">
+            <h2 class="group-title" id="grp-anom"><span class="roman">III</span>Anomalies</h2>
+
+            <div class="anomaly" style="--accent: var(--drought)">
+              <div class="anomaly-head">
+                <label class="toggle" data-tip="droughtOn">
+                  <input type="checkbox" id="t-drought" checked aria-label="Enable drought anomalies">
+                  <span class="track" aria-hidden="true"></span>
+                </label>
+                <span class="anomaly-name">Drought</span>
+                <span class="anomaly-next" id="next-drought">Next · gen 12</span>
+              </div>
+              <div class="fader">
+                <div class="ctrl-top">
+                  <label class="ctrl-name" for="f-drought" data-tip="drought">Interval</label>
+                  <output class="ctrl-val" id="v-drought" for="f-drought">12<span class="unit">gen</span></output>
+                </div>
+                <div class="fader-row">
+                  <input class="fader-input" id="f-drought" type="range" min="4" max="40" step="1" value="12" aria-label="Drought interval in generations" aria-describedby="tip-drought">
+                  <canvas class="spark" data-spark="drought" width="110" height="34" aria-hidden="true"></canvas>
+                </div>
+              </div>
+            </div>
+
+            <div class="anomaly" style="--accent: var(--plague)">
+              <div class="anomaly-head">
+                <label class="toggle" data-tip="plagueOn">
+                  <input type="checkbox" id="t-plague" checked aria-label="Enable plague anomalies">
+                  <span class="track" aria-hidden="true"></span>
+                </label>
+                <span class="anomaly-name">Plague</span>
+                <span class="anomaly-next" id="next-plague">Next · gen 17</span>
+              </div>
+              <div class="fader">
+                <div class="ctrl-top">
+                  <label class="ctrl-name" for="f-plague" data-tip="plague">Interval</label>
+                  <output class="ctrl-val" id="v-plague" for="f-plague">17<span class="unit">gen</span></output>
+                </div>
+                <div class="fader-row">
+                  <input class="fader-input" id="f-plague" type="range" min="4" max="40" step="1" value="17" aria-label="Plague interval in generations" aria-describedby="tip-plague">
+                  <canvas class="spark" data-spark="plague" width="110" height="34" aria-hidden="true"></canvas>
+                </div>
+              </div>
+            </div>
+
+            <div class="anomaly" style="--accent: var(--eruption)">
+              <div class="anomaly-head">
+                <label class="toggle" data-tip="eruptionOn">
+                  <input type="checkbox" id="t-eruption" checked aria-label="Enable vent surge anomalies">
+                  <span class="track" aria-hidden="true"></span>
+                </label>
+                <span class="anomaly-name">Vent surge</span>
+                <span class="anomaly-next" id="next-eruption">Next · gen 23</span>
+              </div>
+              <div class="fader">
+                <div class="ctrl-top">
+                  <label class="ctrl-name" for="f-eruption" data-tip="eruption">Interval</label>
+                  <output class="ctrl-val" id="v-eruption" for="f-eruption">23<span class="unit">gen</span></output>
+                </div>
+                <div class="fader-row">
+                  <input class="fader-input" id="f-eruption" type="range" min="4" max="40" step="1" value="23" aria-label="Vent surge interval in generations" aria-describedby="tip-eruption">
+                  <canvas class="spark" data-spark="eruption" width="110" height="34" aria-hidden="true"></canvas>
+                </div>
+              </div>
+            </div>
+
+            <div class="fader" style="--accent: var(--amber)">
+              <div class="ctrl-top">
+                <label class="ctrl-name" for="f-severity" data-tip="severity">Severity</label>
+                <output class="ctrl-val" id="v-severity" for="f-severity">1.00<span class="unit">×</span></output>
+              </div>
+              <div class="fader-row">
+                <input class="fader-input" id="f-severity" type="range" min="40" max="160" step="5" value="100" aria-describedby="tip-severity">
+                <canvas class="spark" data-spark="severity" width="110" height="34" aria-hidden="true"></canvas>
+              </div>
+            </div>
+          </section>
+        </div>
+        <div class="scroll-cue" id="scrollCue" aria-hidden="true"><span>More instruments</span><b>⌄</b></div>
+        </div>
+
+        <footer class="console-foot">
+          <span><kbd>Space</kbd> pause · <kbd>S</kbd> step · <kbd>R</kbd> recast</span>
+          <span><span id="consoleFootNote" class="sr-only">Deterministic core</span><button class="foot-btn" type="button" id="recordBtn" title="Download the deterministic record as JSON" aria-label="Download the deterministic record as JSON">Record ↓</button></span>
+        </footer>
+      </div>
+    </aside>
+  </main>
+
+  <footer class="instruments">
+    <section class="trace" aria-label="Trophic trace">
+      <header class="ins-head"><span>Trophic trace</span><span class="ins-legend"><span><i class="g-prey"></i>GRAZERS</span><span><i class="g-pred"></i>HUNTERS</span><span><i class="g-plant"></i>BLOOM</span></span><span class="ins-sub" id="traceSub">live · generation 000 of 036</span></header>
+      <canvas id="ribbon" aria-label="Population trace for bloom, grazers and hunters over the run"></canvas>
+    </section>
+    <section class="notes" aria-label="Field notes">
+      <header class="ins-head"><span>Field notes</span><span class="ins-sub">marginalia</span></header>
+      <ol class="note-list" id="notes"></ol>
+    </section>
+  </footer>
+</div>
+
+<div class="tooltip" id="tooltip" role="tooltip" aria-hidden="true"></div>
+
+<section class="dashboard" id="dashboard" role="dialog" aria-modal="true" aria-labelledby="dashTitle" hidden>
+  <div class="dash-inner">
+    <header class="dash-head">
+      <div>
+        <div class="dash-kicker">Observation complete · the plate is drawn</div>
+        <h2 class="dash-title" id="dashTitle">The Final Plate</h2>
+        <p class="dash-sub" id="dashSub">Specimen Nº 08 · seed 0427 · 36 generations</p>
+      </div>
+      <div class="dash-actions">
+        <button class="btn ghost" type="button" id="closeDash" aria-label="Return to the living vessel">Return to vessel</button>
+        <button class="btn outline" type="button" id="replayBtn" aria-label="Replay this seed from generation zero"><svg width="11" height="11" aria-hidden="true"><use href="#i-replay"/></svg>Replay seed</button>
+        <button class="btn solid" type="button" id="newBtn" aria-label="Start a new specimen with a random seed"><svg width="11" height="11" aria-hidden="true"><use href="#i-plus"/></svg>New specimen</button>
+      </div>
+    </header>
+
+    <p class="dash-prose" id="dashProse">The vessel completed its observation.</p>
+
+    <div class="dash-stats" id="dashStats">
+      <div class="stat"><span class="stat-k">Peak grazers</span><span class="stat-v aqua" id="statPrey">—</span></div>
+      <div class="stat"><span class="stat-k">Peak hunters</span><span class="stat-v amber" id="statPred">—</span></div>
+      <div class="stat"><span class="stat-k">Final bloom</span><span class="stat-v lichen" id="statPlant">—</span></div>
+      <div class="stat"><span class="stat-k">Anomalies passed</span><span class="stat-v" id="statEvents">—</span></div>
+      <div class="stat"><span class="stat-k">Strongest drift</span><span class="stat-v" id="statDrift">—</span></div>
+    </div>
+
+    <div class="dash-grid">
+      <figure class="chart-card pop-card">
+        <figcaption>
+          <span class="fig-no">Fig. 2</span>
+          <span class="fig-title">Population history</span>
+          <span class="fig-note"><i class="key-dot k-prey"></i>grazers <i class="key-dot k-pred"></i>hunters <i class="key-dot k-plant"></i>bloom &nbsp;·&nbsp; counts · log &nbsp;·&nbsp; D/P/V anomalies</span>
+        </figcaption>
+        <div class="canvas-wrap"><canvas id="popChart" aria-label="Population curves for bloom, grazers and hunters across generations, with anomaly markers"></canvas></div>
+      </figure>
+
+      <figure class="chart-card genes-card">
+        <figcaption>
+          <span class="fig-no">Fig. 3</span>
+          <span class="fig-title">Trait drift</span>
+          <span class="fig-note"><i class="key-dot k-prey"></i>grazers &nbsp;<i class="key-dot k-pred"></i>hunters &nbsp;·&nbsp; mean ± 1σ</span>
+        </figcaption>
+        <div class="gene-grid">
+          <figure class="gene-cell"><canvas id="gene-speed" aria-label="Speed gene drift: mean and spread for grazers and hunters"></canvas></figure>
+          <figure class="gene-cell"><canvas id="gene-vision" aria-label="Vision gene drift: mean and spread for grazers and hunters"></canvas></figure>
+          <figure class="gene-cell"><canvas id="gene-metabolism" aria-label="Metabolism gene drift: mean and spread for grazers and hunters"></canvas></figure>
+          <figure class="gene-cell"><canvas id="gene-threshold" aria-label="Reproduction threshold gene drift: mean and spread for grazers and hunters"></canvas></figure>
+        </div>
+      </figure>
+    </div>
+
+    <footer class="dash-foot">
+      <span class="seed-note" id="dashSeedNote">Seed 0427 reproduces this plate exactly; the core also runs headless, faster than real time.</span>
+      <span id="dashStepNote">Deterministic record · — steps</span>
+    </footer>
+  </div>
+</section>
+
+<pre id="headless" aria-hidden="true"></pre>
+
+<noscript>
+  <div style="position:fixed;inset:0;z-index:999;display:grid;place-items:center;background:#04100e;color:#e9e2ce;font-family:Georgia,serif;padding:40px;text-align:center">
+    The Abyssal Vivarium is a living script; JavaScript is required to keep the specimen alive.
+  </div>
+</noscript>
+
+<script>
+/* ============================================================================
+   THE ABYSSAL VIVARIUM — deterministic ecosystem core
+   ----------------------------------------------------------------------------
+   This module is deliberately free of DOM, timers, Date and Math.random, so it
+   can run headless in Node or a worker, faster than real time, and reproduce a
+   run exactly from its seed. Rendering lives elsewhere and never touches the
+   simulation RNG.
+   ========================================================================== */
+/* @core-begin */
+(function (root) {
+  'use strict';
+
+  var TPS = 24;                    // simulation ticks per second of sim-time
+  var DT = 1 / TPS;
+  var TICKS_PER_GEN = 144;         // 6 sim-seconds per generation
+  var W = 160, H = 100;            // vessel, in cells (1 cell = 1 world unit)
+  var COLS = W, ROWS = H, CELLS = COLS * ROWS;
+
+  var GENE_KEYS = ['speed', 'vision', 'metabolism', 'threshold'];
+  var GENE = {
+    speed:      { min: 0.8,  max: 7.0,  sigma: 0.16,  prey: [1.5, 3.1], pred: [2.7, 3.94] },
+    vision:     { min: 0.9,  max: 9.0,  sigma: 0.30,  prey: [1.8, 5.0], pred: [1.7, 5.15] },
+    metabolism: { min: 0.55, max: 1.9,  sigma: 0.055, prey: [0.75, 1.30], pred: [0.85, 1.55] },
+    threshold:  { min: 22,   max: 260,  sigma: 4.5,   prey: [55, 91],   pred: [168, 223] }
+  };
+
+  var TUNING = {
+    preyStart: 260,
+    predStart: 26,
+    preyEnergy: [30, 52],
+    predEnergy: [54, 92],
+    preyMaxAge: 58 * TPS,
+    predMaxAge: 112 * TPS,
+    regrow: 0.00025,            // per tick, before config multipliers
+    graze: 0.1123,              // food units / sim-second, per unit metabolism
+    energyPerFood: 40,
+    preyCostBase: 1.85,
+    preyCostSpeed: 0.09,
+    predCostBase: 4.08,
+    predCostSpeed: 0.06,
+    visionCost: 0.05,
+    preyTurn: 5.2,
+    predTurn: 6.0,
+    preyKillRange: 1.1,
+    predatorGainFraction: 0.636,
+    predatorGainFlat: 8,
+    predatorGainCap: 68,
+    digestTicks: 1.9 * TPS,     // after a kill the hunter must digest
+    preyGrace: 4 * TPS,
+    predGrace: 8 * TPS,
+    preyBirthChild: 0.364,
+    preyBirthParent: 0.341,
+    predBirthChild: 0.33,
+    predBirthParent: 0.37,
+    initFoodMin: 0.12,
+    initFoodSpan: 0.56
+  };
+
+  var PREY_CAP = 720;   // hard safety
+  var PRED_CAP = 240;   // hard safety
+  var PREY_SOFT = 320;  // density-dependent reproduction ceiling
+  var PRED_SOFT = 82;
+
+  var DEFAULTS = {
+    seed: 427,
+    generations: 36,
+    speed: 8,
+    mutation: 0.06,
+    food: 1.0,
+    severity: 1.0,
+    droughtOn: true,   droughtEvery: 12,
+    plagueOn: true,    plagueEvery: 17,
+    eruptionOn: true,  eruptionEvery: 23,
+    trails: true
+  };
+
+  var ANOMALY = {
+    drought: {
+      label: 'Drought',
+      kicker: 'Anomaly I · surface light fails',
+      note: 'The bloom recedes into the dark; grazers range further and eat what they can find.'
+    },
+    plague: {
+      label: 'Plague',
+      kicker: 'Anomaly II · a violet fever',
+      note: 'A drifting fever moves through the shoal. Density becomes its own executioner.'
+    },
+    eruption: {
+      label: 'Vent Surge',
+      kicker: 'Anomaly III · the vent wakes',
+      note: 'Vent heat scorches the shelf. The dead settle as ash, and the ash feeds new growth.'
+    }
+  };
+
+  /* ----------------------------------------------------------- seeded PRNG -- */
+  function xmur3(str) {
+    var h = 1779033703 ^ str.length;
+    for (var i = 0; i < str.length; i++) {
+      h = Math.imul(h ^ str.charCodeAt(i), 3432918353);
+      h = (h << 13) | (h >>> 19);
+    }
+    return function () {
+      h = Math.imul(h ^ (h >>> 16), 2246822507);
+      h = Math.imul(h ^ (h >>> 13), 3266489909);
+      h ^= h >>> 16;
+      return h >>> 0;
+    };
+  }
+  function sfc32(a, b, c, d) {
+    return function () {
+      a |= 0; b |= 0; c |= 0; d |= 0;
+      var t = (a + b) | 0;
+      a = b ^ (b >>> 9);
+      b = (c + (c << 3)) | 0;
+      c = (c << 21) | (c >>> 11);
+      d = (d + 1) | 0;
+      t = (t + d) | 0;
+      c = (c + t) | 0;
+      return (t >>> 0) / 4294967296;
+    };
+  }
+  function RNG(seed) {
+    var s = xmur3(String(seed) + '::abyssal-vivarium::v1');
+    this._f = sfc32(s(), s(), s(), s());
+    this._spare = null;
+  }
+  RNG.prototype.next = function () { return this._f(); };
+  RNG.prototype.range = function (a, b) { return a + (b - a) * this._f(); };
+  RNG.prototype.int = function (n) { return Math.floor(this._f() * n); };
+  RNG.prototype.pick = function (arr) { return arr[Math.floor(this._f() * arr.length)]; };
+  RNG.prototype.gauss = function () {
+    if (this._spare !== null) { var v = this._spare; this._spare = null; return v; }
+    var u = 0, v = 0;
+    while (u === 0) u = this._f();
+    v = this._f();
+    var r = Math.sqrt(-2 * Math.log(u));
+    var out = r * Math.cos(2 * Math.PI * v);
+    this._spare = r * Math.sin(2 * Math.PI * v);
+    return out;
+  };
+
+  /* -------------------------------------------------------------- helpers -- */
+  function clamp(v, a, b) { return v < a ? a : v > b ? b : v; }
+  function lerp(a, b, t) { return a + (b - a) * t; }
+  function angDiff(a, b) {
+    var d = (b - a) % (Math.PI * 2);
+    if (d > Math.PI) d -= Math.PI * 2;
+    if (d < -Math.PI) d += Math.PI * 2;
+    return d;
+  }
+
+  /* --------------------------------------------------------------- world -- */
+  function Ecosystem(seed, cfg) {
+    this.seed = (seed === undefined || seed === null) ? DEFAULTS.seed : seed;
+    this.cfg = Object.assign({}, DEFAULTS, cfg || {});
+    this.rng = new RNG(this.seed);
+    this.tick = 0;
+    this.totalTicks = 0;
+    this.gen = 0;
+    this.done = false;
+    this.endReason = null;
+    this.events = [];
+    this.pulses = [];
+    this.pulseHead = 0;
+    this.births = 0;
+    this.deaths = 0;
+    this.anomaly = null;
+    this.nextDue = { drought: Infinity, plague: Infinity, eruption: Infinity };
+    this._initWorld();
+    this._initAgents();
+    this._resetSchedule();
+    this.history = [];
+    this.series = [];
+    this._record();
+    this._sampleSeries();
+  }
+
+  Ecosystem.prototype._initWorld = function () {
+    var rng = this.rng;
+    this.food = new Float32Array(CELLS);
+    this.fert = new Float32Array(CELLS);
+    /* Static fertility: two octaves of smooth value noise. Seeded, so the
+       terrain itself is part of the reproducible specimen. */
+    var gw = 21, gh = 13;
+    var coarseA = new Float32Array(gw * gh);
+    var coarseB = new Float32Array(Math.ceil(gw / 2 + 1) * Math.ceil(gh / 2 + 1));
+    var i, j, k = 0;
+    for (i = 0; i < coarseA.length; i++) coarseA[i] = rng.next();
+    for (i = 0; i < coarseB.length; i++) coarseB[i] = rng.next();
+
+    function noise2(coarse, cw, ch, u, v) {
+      var fx = u * (cw - 1), fy = v * (ch - 1);
+      var x0 = Math.floor(fx), y0 = Math.floor(fy);
+      var x1 = Math.min(cw - 1, x0 + 1), y1 = Math.min(ch - 1, y0 + 1);
+      var tx = fx - x0, ty = fy - y0;
+      tx = tx * tx * (3 - 2 * tx); ty = ty * ty * (3 - 2 * ty);
+      var a = coarse[y0 * cw + x0], b = coarse[y0 * cw + x1];
+      var c = coarse[y1 * cw + x0], d = coarse[y1 * cw + x1];
+      return lerp(lerp(a, b, tx), lerp(c, d, tx), ty);
+    }
+    for (j = 0; j < ROWS; j++) {
+      for (i = 0; i < COLS; i++) {
+        var n = noise2(coarseA, gw, gh, i / COLS, j / ROWS) * 0.72 +
+                noise2(coarseB, Math.ceil(gw / 2 + 1), Math.ceil(gh / 2 + 1), i / COLS, j / ROWS) * 0.28;
+        this.fert[j * COLS + i] = 0.55 + n * 0.95;
+      }
+    }
+    for (i = 0; i < CELLS; i++) {
+      var f = TUNING.initFoodMin + (rng.next() * 0.55 + this.fert[i] * 0.22) * TUNING.initFoodSpan;
+      this.food[i] = clamp(f, 0, 0.95);
+    }
+  };
+
+  Ecosystem.prototype._initAgents = function () {
+    var rng = this.rng, i;
+    this.prey = [];
+    this.pred = [];
+    for (i = 0; i < TUNING.preyStart; i++) this.prey.push(this._spawn('prey', rng.next() * W, rng.next() * H));
+    for (i = 0; i < TUNING.predStart; i++) this.pred.push(this._spawn('pred', rng.next() * W, rng.next() * H));
+  };
+
+  Ecosystem.prototype._spawn = function (kind, x, y) {
+    var rng = this.rng, g = {}, roles = kind === 'prey' ? 'prey' : 'pred';
+    for (var i = 0; i < GENE_KEYS.length; i++) {
+      var key = GENE_KEYS[i], meta = GENE[key], lo = meta[roles][0], hi = meta[roles][1];
+      g[key] = clamp(rng.range(lo, hi), meta.min, meta.max);
+    }
+    var maxE = kind === 'prey' ? TUNING.preyEnergy : TUNING.predEnergy;
+    return {
+      kind: kind,
+      x: x, y: y,
+      dir: rng.next() * Math.PI * 2,
+      energy: rng.range(maxE[0], maxE[1]),
+      age: rng.range(0, kind === 'prey' ? 26 * TPS : 52 * TPS),
+      speed: g.speed, vision: g.vision, metabolism: g.metabolism, threshold: g.threshold,
+      digest: 0,
+      dead: false
+    };
+  };
+
+  Ecosystem.prototype._resetSchedule = function () {
+    var c = this.cfg, g = this.gen;
+    this.nextDue.drought  = c.droughtOn  ? g + Math.max(1, c.droughtEvery)  : Infinity;
+    this.nextDue.plague   = c.plagueOn   ? g + Math.max(1, c.plagueEvery)   : Infinity;
+    this.nextDue.eruption = c.eruptionOn ? g + Math.max(1, c.eruptionEvery) : Infinity;
+    if (this.anomaly) this.anomaly = null;
+  };
+
+  /* Live config edits. Interval changes re-plan only future deadlines. */
+  Ecosystem.prototype.setConfig = function (patch) {
+    var old = this.cfg;
+    var merged = Object.assign({}, old, patch);
+    this.cfg = merged;
+    ['drought', 'plague', 'eruption'].forEach(function (type) {
+      var onKey = type + 'On', everyKey = type + 'Every';
+      if (!merged[onKey]) { this.nextDue[type] = Infinity; return; }
+      if (patch[everyKey] !== undefined && patch[everyKey] !== old[everyKey]) {
+        this.nextDue[type] = this.gen + Math.max(1, Math.round(merged[everyKey]));
+      } else if (this.nextDue[type] === Infinity) {
+        this.nextDue[type] = this.gen + Math.max(1, Math.round(merged[everyKey]));
+      }
+    }, this);
+  };
+
+  Ecosystem.prototype._regrow = function () {
+    var food = this.food, fert = this.fert;
+    var flux = this.cfg.food;
+    var rate = TUNING.regrow * flux;
+    var dry = 1, rot = 0;
+    if (this.anomaly && this.anomaly.type === 'drought') { dry = 0.055; rot = 0.00045; }
+    if (this.anomaly && this.anomaly.type === 'eruption') { rate *= 1.75; }
+    for (var i = 0; i < CELLS; i++) {
+      var f = food[i];
+      if (f < 0.999) {
+        f += rate * fert[i] * (1 - f) * dry;
+        if (f > 0.999) f = 0.999;
+        food[i] = f;
+      }
+      if (rot > 0 && f > 0) food[i] = Math.max(0, f - rot);
+    }
+  };
+
+  Ecosystem.prototype._anomalyCostMul = function () {
+    var a = this.anomaly;
+    if (!a) return 1;
+    if (a.type === 'plague') return 1.12;
+    if (a.type === 'eruption') return 1.10;
+    return 1;
+  };
+
+  /* ------------------------------------------------------------- creatures -- */
+  Ecosystem.prototype._stepPrey = function () {
+    var prey = this.prey, rng = this.rng, food = this.food;
+    var cfg = this.cfg;
+    var plague = this.anomaly && this.anomaly.type === 'plague';
+    var sev = cfg.severity;
+    var costMul = this._anomalyCostMul();
+    var n = prey.length;
+    for (var i = 0; i < n; i++) {
+      var p = prey[i];
+      if (p.dead) continue;
+      p.age++;
+
+      /* Sense the richest cell near the edge of vision; wander now and then. */
+      var vis = p.vision;
+      var best = food[((p.y | 0) % ROWS + ROWS) % ROWS * COLS + (((p.x | 0) % COLS + COLS) % COLS)];
+      var bestAng = p.dir;
+      if (rng.next() < 0.022) {
+        bestAng = rng.next() * Math.PI * 2;
+      } else if (vis > 0.4) {
+        var radius = vis;
+        for (var a = 0; a < 8; a++) {
+          var ang = p.dir + a * (Math.PI / 4);
+          for (var rr = 0; rr < 2; rr++) {
+            var rd = radius * (rr === 0 ? 0.55 : 1.0);
+            var cx = Math.floor(p.x + Math.cos(ang) * rd);
+            var cy = Math.floor(p.y + Math.sin(ang) * rd);
+            cx = ((cx % COLS) + COLS) % COLS;
+            cy = ((cy % ROWS) + ROWS) % ROWS;
+            var val = food[cy * COLS + cx];
+            if (val > best + 0.02) { best = val; bestAng = ang; }
+          }
+        }
+      }
+      var turn = clamp(angDiff(p.dir, bestAng), -TUNING.preyTurn * DT, TUNING.preyTurn * DT);
+      p.dir += turn;
+      var step = p.speed * DT;
+      p.x += Math.cos(p.dir) * step;
+      p.y += Math.sin(p.dir) * step;
+      if (p.x < 0) p.x += W; else if (p.x >= W) p.x -= W;
+      if (p.y < 0) p.y += H; else if (p.y >= H) p.y -= H;
+
+      /* Graze. */
+      var cell = (p.y | 0) * COLS + (p.x | 0);
+      var bite = Math.min(food[cell], TUNING.graze * p.metabolism * DT);
+      if (bite > 0) {
+        food[cell] -= bite;
+        p.energy += bite * TUNING.energyPerFood;
+      }
+
+      /* Metabolism. */
+      p.energy -= (TUNING.preyCostBase * p.metabolism *
+        (0.62 + TUNING.preyCostSpeed * p.speed * p.speed) +
+        TUNING.visionCost * p.vision) * DT * costMul;
+
+      if (plague && rng.next() < 0.0023 * sev) { p.dead = true; }
+      if (p.energy <= 0 || p.age > TUNING.preyMaxAge) p.dead = true;
+
+      var crowd = prey.length / PREY_SOFT;
+      var need = p.threshold * (1 + Math.max(0, crowd - 0.8) * 3.0);
+      if (!p.dead && p.age > TUNING.preyGrace && p.energy >= need && prey.length < PREY_CAP) {
+        var childE = p.energy * TUNING.preyBirthChild;
+        p.energy *= TUNING.preyBirthParent;
+        this.births++;
+        prey.push(this._child(p, childE));
+      }
+    }
+  };
+
+  Ecosystem.prototype._buildHash = function () {
+    if (!this.hashGrid) {
+      this.hashGrid = [];
+      for (var g = 0; g < 20 * 13; g++) this.hashGrid.push([]);
+    }
+    var grid = this.hashGrid, prey = this.prey;
+    for (var i = 0; i < grid.length; i++) grid[i].length = 0;
+    for (i = 0; i < prey.length; i++) {
+      var p = prey[i];
+      if (p.dead) continue;
+      var cx = Math.min(19, Math.max(0, Math.floor(p.x / 8)));
+      var cy = Math.min(12, Math.max(0, Math.floor(p.y / 8)));
+      grid[cy * 20 + cx].push(p);
+    }
+  };
+
+  Ecosystem.prototype._stepPredators = function () {
+    var pred = this.pred, rng = this.rng;
+    var plague = this.anomaly && this.anomaly.type === 'plague';
+    var sev = this.cfg.severity;
+    var costMul = this._anomalyCostMul();
+    var n = pred.length;
+    for (var i = 0; i < n; i++) {
+      var h = pred[i];
+      if (h.dead) continue;
+      h.age++;
+      if (h.digest > 0) h.digest--;
+
+      /* Hunt: nearest living prey within vision (sated hunters digest). */
+      var target = null, bestD = Infinity;
+      var vis = h.vision;
+      if (vis > 0.5 && h.digest <= 0) {
+        var cx = Math.min(19, Math.max(0, Math.floor(h.x / 8)));
+        var cy = Math.min(12, Math.max(0, Math.floor(h.y / 8)));
+        var rc = Math.max(1, Math.ceil(vis / 8));
+        var v2 = vis * vis;
+        for (var gy = Math.max(0, cy - rc); gy <= Math.min(12, cy + rc); gy++) {
+          for (var gx = Math.max(0, cx - rc); gx <= Math.min(19, cx + rc); gx++) {
+            var bucket = this.hashGrid[gy * 20 + gx];
+            for (var b = 0; b < bucket.length; b++) {
+              var q = bucket[b];
+              if (q.dead) continue;
+              var dx = q.x - h.x, dy = q.y - h.y;
+              var d2 = dx * dx + dy * dy;
+              if (d2 < v2 && d2 < bestD) { bestD = d2; target = q; }
+            }
+          }
+        }
+      }
+      var desired = h.dir;
+      if (target) desired = Math.atan2(target.y - h.y, target.x - h.x);
+      else if (rng.next() < 0.03) desired = rng.next() * Math.PI * 2;
+      var turn = clamp(angDiff(h.dir, desired), -TUNING.predTurn * DT, TUNING.predTurn * DT);
+      h.dir += turn;
+      var step = h.speed * DT;
+      h.x += Math.cos(h.dir) * step;
+      h.y += Math.sin(h.dir) * step;
+      if (h.x < 0) h.x += W; else if (h.x >= W) h.x -= W;
+      if (h.y < 0) h.y += H; else if (h.y >= H) h.y -= H;
+
+      if (target && !target.dead) {
+        var ddx = target.x - h.x, ddy = target.y - h.y;
+        if (ddx * ddx + ddy * ddy <= TUNING.preyKillRange * TUNING.preyKillRange) {
+          target.dead = true;
+          this.deaths++;
+          h.energy += Math.min(TUNING.predatorGainCap,
+            target.energy * TUNING.predatorGainFraction + TUNING.predatorGainFlat);
+          this._pulse(target.x, target.y, 'kill');
+          h.digest = TUNING.digestTicks;
+        }
+      }
+
+      h.energy -= (TUNING.predCostBase * h.metabolism *
+        (0.58 + TUNING.predCostSpeed * h.speed * h.speed) +
+        TUNING.visionCost * h.vision) * DT * costMul;
+
+      if (plague && rng.next() < 0.0015 * sev) h.dead = true;
+      if (h.energy <= 0 || h.age > TUNING.predMaxAge) h.dead = true;
+
+      var crowdP = pred.length / PRED_SOFT;
+      var needP = h.threshold * (1 + Math.max(0, crowdP - 0.8) * 3.0);
+      if (!h.dead && h.age > TUNING.predGrace && h.energy >= needP && pred.length < PRED_CAP) {
+        var childE = h.energy * TUNING.predBirthChild;
+        h.energy *= TUNING.predBirthParent;
+        this.births++;
+        pred.push(this._child(h, childE));
+      }
+    }
+  };
+
+  Ecosystem.prototype._child = function (parent, energy) {
+    var rng = this.rng;
+    var mut = this.cfg.mutation;
+    var scale = mut / 0.06;
+    var child = {
+      kind: parent.kind,
+      x: parent.x + rng.range(-1.6, 1.6),
+      y: parent.y + rng.range(-1.6, 1.6),
+      dir: rng.next() * Math.PI * 2,
+      energy: Math.max(6, energy),
+      age: 0,
+      digest: 0,
+      dead: false
+    };
+    if (child.x < 0) child.x += W; else if (child.x >= W) child.x -= W;
+    if (child.y < 0) child.y += H; else if (child.y >= H) child.y -= H;
+    for (var i = 0; i < GENE_KEYS.length; i++) {
+      var key = GENE_KEYS[i], meta = GENE[key];
+      var delta = rng.gauss() * meta.sigma * scale;
+      child[key] = clamp(parent[key] + delta, meta.min, meta.max);
+    }
+    return child;
+  };
+
+  Ecosystem.prototype._purgeDead = function () {
+    var lists = [this.prey, this.pred];
+    for (var l = 0; l < 2; l++) {
+      var arr = lists[l];
+      for (var i = arr.length - 1; i >= 0; i--) {
+        if (arr[i].dead) {
+          arr[i] = arr[arr.length - 1];
+          arr.pop();
+          this.deaths++;
+        }
+      }
+    }
+  };
+
+  Ecosystem.prototype._pulse = function (x, y, type) {
+    var p = { x: x, y: y, type: type, t: this.totalTicks };
+    if (this.pulses.length < 120) { this.pulses.push(p); return; }
+    this.pulses[this.pulseHead] = p;
+    this.pulseHead = (this.pulseHead + 1) % 120;
+  };
+
+  /* ------------------------------------------------------------- anomalies -- */
+  Ecosystem.prototype._fireAnomaly = function (type) {
+    var cfg = this.cfg, sev = cfg.severity;
+    var meta = ANOMALY[type];
+    var dur = type === 'drought' ? Math.round(TICKS_PER_GEN * 1.05)
+            : type === 'plague' ? Math.round(TICKS_PER_GEN * 0.8)
+            : Math.round(TICKS_PER_GEN * 1.15);
+    this.anomaly = { type: type, until: this.totalTicks + dur, severity: sev };
+    var ev = {
+      gen: this.gen,
+      type: type,
+      label: meta.label,
+      kicker: meta.kicker,
+      note: meta.note,
+      severity: sev
+    };
+
+    if (type === 'eruption') {
+      var prey = this.prey, pred = this.pred;
+      var i, pPrey = Math.min(0.30, 0.17 * sev), pPred = Math.min(0.22, 0.11 * sev);
+      for (i = prey.length - 1; i >= 0; i--) {
+        if (this.rng.next() < pPrey) {
+          this._pulse(prey[i].x, prey[i].y, 'kill');
+          prey.splice(i, 1); this.deaths++;
+        }
+      }
+      for (i = pred.length - 1; i >= 0; i--) {
+        if (this.rng.next() < pPred) {
+          this._pulse(pred[i].x, pred[i].y, 'kill');
+          pred.splice(i, 1); this.deaths++;
+        }
+      }
+      for (i = 0; i < this.food.length; i++) this.food[i] *= 0.58;
+    }
+    this.events.push(ev);
+    return ev;
+  };
+
+  Ecosystem.prototype._checkSchedule = function () {
+    if (this.gen >= this.cfg.generations) return;
+    var order = ['drought', 'plague', 'eruption'];
+    for (var i = 0; i < order.length; i++) {
+      var type = order[i];
+      if (this.anomaly) return;
+      if (!this.cfg[type + 'On']) continue;
+      if (this.gen >= this.nextDue[type]) {
+        this._fireAnomaly(type);
+        this.nextDue[type] = this.gen + Math.max(1, Math.round(this.cfg[type + 'Every']));
+        return;
+      }
+    }
+  };
+
+  /* ------------------------------------------------------------- recording -- */
+  function geneStats(list) {
+    var out = {};
+    for (var k = 0; k < GENE_KEYS.length; k++) {
+      var key = GENE_KEYS[k], n = list.length, sum = 0, sum2 = 0;
+      for (var i = 0; i < n; i++) { var v = list[i][key]; sum += v; sum2 += v * v; }
+      if (n === 0) { out[key] = null; continue; }
+      var mean = sum / n;
+      var variance = Math.max(0, sum2 / n - mean * mean);
+      out[key] = { mean: mean, sd: Math.sqrt(variance) };
+    }
+    return out;
+  }
+
+  Ecosystem.prototype.plantBiomass = function () {
+    var sum = 0, cover = 0, food = this.food;
+    for (var i = 0; i < CELLS; i++) { sum += food[i]; if (food[i] > 0.08) cover++; }
+    return { biomass: sum / CELLS, cover: cover / CELLS };
+  };
+
+  Ecosystem.prototype._record = function () {
+    var plants = this.plantBiomass();
+    var entry = {
+      gen: this.gen,
+      tick: this.totalTicks,
+      prey: this.prey.length,
+      pred: this.pred.length,
+      biomass: plants.biomass,
+      cover: plants.cover,
+      births: this.births,
+      deaths: this.deaths,
+      preyGenes: geneStats(this.prey),
+      predGenes: geneStats(this.pred)
+    };
+    this.history.push(entry);
+    return entry;
+  };
+
+  Ecosystem.prototype._sampleSeries = function () {
+    var plants = this.plantBiomass();
+    this.series.push({
+      t: this.totalTicks,
+      gen: this.gen + (this.tick % TICKS_PER_GEN) / TICKS_PER_GEN,
+      prey: this.prey.length,
+      pred: this.pred.length,
+      plant: plants.biomass
+    });
+    if (this.series.length > 4000) this.series.splice(0, this.series.length - 4000);
+  };
+
+  Ecosystem.prototype._advanceGeneration = function () {
+    this.gen++;
+    this._record();
+    if (this.gen >= this.cfg.generations) {
+      this.done = true;
+      this.endReason = 'complete';
+      return;
+    }
+    this._checkSchedule();
+    if (this.prey.length === 0 && this.pred.length === 0) {
+      this.done = true;
+      this.endReason = 'collapse';
+      return;
+    }
+  };
+
+  Ecosystem.prototype.step = function () {
+    if (this.done) return false;
+    this.tick++;
+    this.totalTicks++;
+    if (this.anomaly && this.totalTicks >= this.anomaly.until) this.anomaly = null;
+    this._regrow();
+    this._stepPrey();
+    this._buildHash();
+    this._stepPredators();
+    this._purgeDead();
+    if (this.totalTicks % 8 === 0) this._sampleSeries();
+    if (this.tick >= TICKS_PER_GEN) {
+      this.tick = 0;
+      this._advanceGeneration();
+      return 'generation';
+    }
+    return true;
+  };
+
+  Ecosystem.prototype.nextAnomaly = function () {
+    var best = Infinity, type = null;
+    for (var i = 0; i < 3; i++) {
+      var t = ['drought', 'plague', 'eruption'][i];
+      if (this.cfg[t + 'On'] && this.nextDue[t] < best) { best = this.nextDue[t]; type = t; }
+    }
+    return type ? { type: type, gen: best } : null;
+  };
+
+  Ecosystem.prototype.hash = function () {
+    var h = 2166136261 >>> 0, i;
+    function mix(v) {
+      h ^= (v | 0) & 0xffff;
+      h = Math.imul(h, 16777619) >>> 0;
+    }
+    mix(this.gen); mix(this.totalTicks);
+    mix(this.prey.length); mix(this.pred.length);
+    for (i = 0; i < this.prey.length; i++) {
+      var p = this.prey[i];
+      mix(p.x * 1000); mix(p.y * 1000); mix(p.energy * 100); mix(p.speed * 1000); mix(p.vision * 1000);
+    }
+    for (i = 0; i < this.pred.length; i += 1) {
+      var q = this.pred[i];
+      mix(q.x * 1000); mix(q.y * 1000); mix(q.energy * 100); mix(q.speed * 1000); mix(q.vision * 1000);
+    }
+    for (i = 0; i < this.food.length; i += 13) mix(this.food[i] * 1000);
+    for (i = 0; i < this.events.length; i++) mix(this.events[i].gen * 31 + this.events[i].type.length);
+    return h >>> 0;
+  };
+
+  Ecosystem.prototype.summary = function () {
+    var h = this.history;
+    var first = h[0], last = h[h.length - 1];
+    var peakPrey = 0, peakPred = 0, peakPlant = 0, minPrey = Infinity, minPred = Infinity;
+    for (var i = 0; i < h.length; i++) {
+      peakPrey = Math.max(peakPrey, h[i].prey);
+      peakPred = Math.max(peakPred, h[i].pred);
+      peakPlant = Math.max(peakPlant, h[i].biomass);
+      minPrey = Math.min(minPrey, h[i].prey);
+      minPred = Math.min(minPred, h[i].pred);
+    }
+    function drift(species) {
+      var out = {};
+      GENE_KEYS.forEach(function (key) {
+        var a = first[species][key], b = last[species][key];
+        var va = first[species + 'Genes'][key], vb = last[species + 'Genes'][key];
+        out[key] = (va && vb) ? { mean: vb.mean - va.mean, from: va.mean, to: vb.mean, sdFrom: va.sd, sdTo: vb.sd } : null;
+      });
+      return out;
+    }
+    return {
+      seed: this.seed,
+      generations: this.gen,
+      planned: this.cfg.generations,
+      ticks: this.totalTicks,
+      done: this.done,
+      endReason: this.endReason,
+      events: this.events.length,
+      births: this.births,
+      deaths: this.deaths,
+      peakPrey: peakPrey, peakPred: peakPred, peakPlant: peakPlant,
+      minPrey: minPrey === Infinity ? 0 : minPrey,
+      minPred: minPred === Infinity ? 0 : minPred,
+      finalPrey: last ? last.prey : 0,
+      finalPred: last ? last.pred : 0,
+      finalPlant: last ? last.biomass : 0,
+      extinctPrey: this.prey.length === 0,
+      extinctPred: this.pred.length === 0,
+      drift: { prey: drift('prey'), pred: drift('pred') },
+      hash: this.hash()
+    };
+  };
+
+  /* ------------------------------------------------------------- headless -- */
+  function runHeadless(opts) {
+    opts = opts || {};
+    var cfg = Object.assign({}, DEFAULTS, opts.config || {});
+    if (opts.seed !== undefined) cfg.seed = opts.seed;
+    if (opts.generations !== undefined) cfg.generations = opts.generations;
+    var eco = new Ecosystem(cfg.seed, cfg);
+    var guard = (cfg.generations + 2) * TICKS_PER_GEN + 16;
+    while (!eco.done && guard-- > 0) eco.step();
+    return {
+      seed: eco.seed,
+      generations: eco.gen,
+      planned: cfg.generations,
+      ticks: eco.totalTicks,
+      done: eco.done,
+      endReason: eco.endReason,
+      hash: eco.hash(),
+      events: eco.events.slice(),
+      history: eco.history,
+      summary: eco.summary()
+    };
+  }
+
+  var API = {
+    Ecosystem: Ecosystem,
+    RNG: RNG,
+    DEFAULTS: DEFAULTS,
+    GENE: GENE,
+    GENE_KEYS: GENE_KEYS,
+    ANOMALY: ANOMALY,
+    TUNING: TUNING,
+    TPS: TPS,
+    DT: DT,
+    TICKS_PER_GEN: TICKS_PER_GEN,
+    W: W, H: H, COLS: COLS, ROWS: ROWS,
+    runHeadless: runHeadless
+  };
+  root.AbyssalCore = API;
+  if (typeof module !== 'undefined' && module.exports) module.exports = API;
+})(typeof globalThis !== 'undefined' ? globalThis : this);
+/* @core-end */
+
+
+/* ============================================================================
+   THE ABYSSAL VIVARIUM — rendering
+   The simulation core never learns that pixels exist. This file owns every
+   visual concern: the specimen window, its glyph languages, the chronometer,
+   and the live trophic trace.
+   ========================================================================== */
+(function (root) {
+  'use strict';
+  var C = root.AbyssalCore;
+  var TAU = Math.PI * 2;
+
+  var COL = {
+    bloom: '184, 223, 164',
+    prey: '113, 230, 198',
+    pred: '232, 181, 107',
+    bone: '233, 226, 206',
+    lichen: '#b8dfa4',
+    line: '20, 46, 39',
+    line2: '32, 67, 57',
+    drought: '#d9a64f',
+    plague: '#b393e1',
+    eruption: '#e5764f'
+  };
+  var MONO = '"SFMono-Regular", "SF Mono", ui-monospace, Menlo, Consolas, monospace';
+
+  function dpr() { return Math.min(root.devicePixelRatio || 1, 2); }
+
+  function fit(canvas, wCss, hCss) {
+    var d = dpr();
+    var w = Math.max(1, Math.round(wCss * d));
+    var h = Math.max(1, Math.round(hCss * d));
+    if (canvas.width !== w || canvas.height !== h) {
+      canvas.width = w;
+      canvas.height = h;
+    }
+    var ctx = canvas.getContext('2d');
+    ctx.setTransform(d, 0, 0, d, 0, 0);
+    return ctx;
+  }
+
+  function rgba(rgb, a) { return 'rgba(' + rgb + ',' + a + ')'; }
+
+  function glowSprite(rgb, size) {
+    var c = document.createElement('canvas');
+    var d = size * 2;
+    c.width = d; c.height = d;
+    var g = c.getContext('2d');
+    var grd = g.createRadialGradient(size, size, 0, size, size, size);
+    grd.addColorStop(0, rgba(rgb, 0.55));
+    grd.addColorStop(0.35, rgba(rgb, 0.16));
+    grd.addColorStop(1, rgba(rgb, 0));
+    g.fillStyle = grd;
+    g.fillRect(0, 0, d, d);
+    return c;
+  }
+
+  /* ---------------------------------------------------------------- world -- */
+  function Renderer(canvas, stage) {
+    this.canvas = canvas;
+    this.ctx = canvas.getContext('2d');
+    this.stage = stage;
+    this.cssW = 0;
+    this.cssH = 0;
+    this.time = 0;
+    this.lastTime = 0;
+    this.probe = { x: -1, y: -1, on: false };
+    this.motes = [];
+    this.embers = [];
+    this.flash = null;
+    this.visRng = new C.RNG('visual::' + ((Date.now() ^ ((root.performance && root.performance.now()) * 1000)) | 0));
+    this.trail = document.createElement('canvas');
+    this.trailCtx = this.trail.getContext('2d');
+    this.foodCanvas = document.createElement('canvas');
+    this.foodCanvas.width = C.COLS;
+    this.foodCanvas.height = C.ROWS;
+    this.foodCtx = this.foodCanvas.getContext('2d');
+    this.foodImage = this.foodCtx.createImageData(C.COLS, C.ROWS);
+    this.glowPrey = glowSprite(COL.prey, 16);
+    this.glowPred = glowSprite(COL.pred, 22);
+    this.bloomExp = 2.2;
+    this.bloomAlpha = 1.0;
+    this.bloomLift = 34;
+    this.underlay = document.createElement('canvas');
+    this.resize();
+  }
+
+  Renderer.prototype.resize = function () {
+    var rect = this.stage.getBoundingClientRect();
+    var w = Math.max(2, Math.round(rect.width));
+    var h = Math.max(2, Math.round(rect.height));
+    if (w === this.cssW && h === this.cssH) return;
+    this.cssW = w;
+    this.cssH = h;
+    fit(this.canvas, w, h);
+    this.trail.width = w;
+    this.trail.height = h;
+    this.trailCtx = this.trail.getContext('2d');
+    this.trailCtx.clearRect(0, 0, w, h);
+    this._buildUnderlay();
+    if (!this.motes.length) {
+      for (var i = 0; i < 84; i++) {
+        this.motes.push({
+          x: this.visRng.next(), y: this.visRng.next(),
+          r: 0.4 + this.visRng.next() * 1.1,
+          s: 0.004 + this.visRng.next() * 0.014,
+          a: 0.06 + this.visRng.next() * 0.16,
+          drift: this.visRng.next() * TAU
+        });
+      }
+    }
+  };
+
+  Renderer.prototype._buildUnderlay = function () {
+    var w = this.cssW, h = this.cssH;
+    if (!w || !h) return;
+    var d = dpr();
+    this.underlay.width = Math.round(w * d);
+    this.underlay.height = Math.round(h * d);
+    var ctx = this.underlay.getContext('2d');
+    ctx.setTransform(d, 0, 0, d, 0, 0);
+    var sx = w / C.W, sy = h / C.H;
+
+    var bg = ctx.createLinearGradient(0, 0, 0, h);
+    bg.addColorStop(0, '#051512');
+    bg.addColorStop(0.55, '#030d0b');
+    bg.addColorStop(1, '#010706');
+    ctx.fillStyle = bg;
+    ctx.fillRect(0, 0, w, h);
+
+    var halo = ctx.createRadialGradient(w * 0.5, h * 0.2, 0, w * 0.5, h * 0.2, Math.max(w, h) * 0.7);
+    halo.addColorStop(0, 'rgba(44, 150, 124, 0.10)');
+    halo.addColorStop(0.4, 'rgba(24, 92, 76, 0.035)');
+    halo.addColorStop(1, 'rgba(0, 0, 0, 0)');
+    ctx.fillStyle = halo;
+    ctx.fillRect(0, 0, w, h);
+
+    ctx.globalCompositeOperation = 'lighter';
+    for (var sh = 0; sh < 3; sh++) {
+      var bx = w * (0.16 + sh * 0.3);
+      var shaft = ctx.createLinearGradient(bx - w * 0.05, 0, bx + w * 0.24, h);
+      shaft.addColorStop(0, 'rgba(86, 196, 164, 0.017)');
+      shaft.addColorStop(0.55, 'rgba(86, 196, 164, 0.005)');
+      shaft.addColorStop(1, 'rgba(86, 196, 164, 0)');
+      ctx.fillStyle = shaft;
+      ctx.beginPath();
+      ctx.moveTo(bx - w * 0.16, 0);
+      ctx.lineTo(bx + w * 0.10, 0);
+      ctx.lineTo(bx + w * 0.34, h);
+      ctx.lineTo(bx - w * 0.02, h);
+      ctx.closePath();
+      ctx.fill();
+    }
+    ctx.globalCompositeOperation = 'source-over';
+
+    /* survey grid */
+    ctx.lineWidth = 0.6;
+    for (var gx = 0; gx <= C.W; gx += 16) {
+      var X = gx * sx;
+      ctx.strokeStyle = gx % 48 === 0 ? 'rgba(113, 230, 198, 0.075)' : 'rgba(113, 230, 198, 0.038)';
+      ctx.beginPath(); ctx.moveTo(X, 0); ctx.lineTo(X, h); ctx.stroke();
+    }
+    for (var gy = 0; gy <= C.H; gy += 16) {
+      var Y = gy * sy;
+      ctx.strokeStyle = gy % 48 === 0 ? 'rgba(113, 230, 198, 0.075)' : 'rgba(113, 230, 198, 0.038)';
+      ctx.beginPath(); ctx.moveTo(0, Y); ctx.lineTo(w, Y); ctx.stroke();
+    }
+
+    /* side rulers */
+    ctx.font = '6px ' + MONO;
+    ctx.textAlign = 'left';
+    for (var cy = 0; cy <= C.H; cy += 10) {
+      var y = cy * sy;
+      var major = cy % 40 === 0;
+      ctx.strokeStyle = 'rgba(233, 226, 206, ' + (major ? 0.2 : 0.09) + ')';
+      ctx.lineWidth = 0.7;
+      ctx.beginPath();
+      ctx.moveTo(0, y); ctx.lineTo(major ? 8 : 4, y);
+      ctx.moveTo(w, y); ctx.lineTo(w - (major ? 8 : 4), y);
+      ctx.stroke();
+    }
+
+    /* vignette */
+    var vin = ctx.createRadialGradient(w / 2, h * 0.46, Math.min(w, h) * 0.28, w / 2, h * 0.5, Math.max(w, h) * 0.75);
+    vin.addColorStop(0, 'rgba(0, 0, 0, 0)');
+    vin.addColorStop(1, 'rgba(0, 0, 0, 0.42)');
+    ctx.fillStyle = vin;
+    ctx.fillRect(0, 0, w, h);
+
+    /* lower ruler + scale bar */
+    ctx.font = '6.5px ' + MONO;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'alphabetic';
+    for (var cell = 0; cell <= C.W; cell += 10) {
+      var rx = cell * sx;
+      var major2 = cell % 40 === 0;
+      ctx.strokeStyle = 'rgba(233, 226, 206, ' + (major2 ? 0.24 : 0.12) + ')';
+      ctx.lineWidth = 0.7;
+      ctx.beginPath();
+      ctx.moveTo(rx, h - (major2 ? 8 : 4));
+      ctx.lineTo(rx, h - 1);
+      ctx.stroke();
+      if (major2 && cell > 0 && cell < C.W) {
+        ctx.fillStyle = 'rgba(233, 226, 206, 0.28)';
+        ctx.fillText(String(cell), rx, h - 11);
+      }
+    }
+    var sbx = w / 2 - 28, sby = h - 18;
+    ctx.strokeStyle = 'rgba(233, 226, 206, 0.42)';
+    ctx.lineWidth = 0.8;
+    ctx.beginPath();
+    ctx.moveTo(sbx, sby); ctx.lineTo(sbx + 10 * sx, sby);
+    ctx.moveTo(sbx, sby - 2.5); ctx.lineTo(sbx, sby + 2.5);
+    ctx.moveTo(sbx + 10 * sx, sby - 2.5); ctx.lineTo(sbx + 10 * sx, sby + 2.5);
+    ctx.stroke();
+    ctx.fillStyle = 'rgba(233, 226, 206, 0.42)';
+    ctx.font = '6px ' + MONO;
+    ctx.textAlign = 'center';
+    ctx.fillText('10 CELLS', sbx + 5 * sx, sby - 4);
+    ctx.textAlign = 'left';
+  };
+
+  Renderer.prototype.announce = function (type) {
+    this.flash = { type: type, start: this.time, dur: 2.6 };
+    var n = type === 'eruption' ? 46 : type === 'plague' ? 38 : 30;
+    for (var i = 0; i < n; i++) {
+      var col = type === 'drought' ? '217, 166, 79' : type === 'plague' ? '179, 147, 225' : '229, 118, 79';
+      this.embers.push({
+        x: this.visRng.next() * this.cssW,
+        y: type === 'eruption' ? this.cssH * (0.62 + this.visRng.next() * 0.3) : this.visRng.next() * this.cssH,
+        vx: (this.visRng.next() - 0.5) * (type === 'drought' ? 26 : 14),
+        vy: type === 'eruption' ? -(18 + this.visRng.next() * 44) : -(4 + this.visRng.next() * 16),
+        life: 0,
+        max: 1.4 + this.visRng.next() * 1.6,
+        r: 0.7 + this.visRng.next() * 1.5,
+        col: col
+      });
+    }
+  };
+
+  Renderer.prototype.draw = function (eco, dt, paused) {
+    var ctx = this.ctx;
+    var w = this.cssW, h = this.cssH;
+    if (!w || !h) return;
+    this.lastTime = this.time;
+    this.time += dt;
+    var sx = w / C.W, sy = h / C.H;
+    var t = this.time;
+
+    ctx.setTransform(dpr(), 0, 0, dpr(), 0, 0);
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.globalAlpha = 1;
+
+    /* cached water, grid, rulers and vignette ---------------------------- */
+    if (this.underlay.width) {
+      ctx.drawImage(this.underlay, 0, 0, w, h);
+    }
+
+    /* bloom field -------------------------------------------------------- */
+    var data = this.foodImage.data;
+    var food = eco.food, fertility = eco.fert;
+    var drought = eco.anomaly && eco.anomaly.type === 'drought';
+    for (var i = 0; i < C.COLS * C.ROWS; i++) {
+      var e = food[i];
+      var k = i * 4;
+      if (e <= 0.015) { data[k + 3] = 0; continue; }
+      var bright = Math.pow(e, this.bloomExp);
+      var patch = 0.16 + 0.84 * Math.min(1, Math.pow(Math.min(1.6, fertility[i]) / 1.55, 2.4));
+      if (drought) {
+        data[k] = 124 + bright * 104;
+        data[k + 1] = 108 + bright * 76;
+        data[k + 2] = 62 + bright * 38;
+      } else {
+        data[k] = 92 + bright * 116;
+        data[k + 1] = 168 + bright * 76;
+        data[k + 2] = 128 + bright * 62;
+      }
+      data[k + 3] = Math.min(252, (this.bloomLift + bright * 320) * patch);
+    }
+    this.foodCtx.putImageData(this.foodImage, 0, 0);
+    ctx.globalCompositeOperation = 'lighter';
+    ctx.globalAlpha = drought ? this.bloomAlpha * 0.68 : this.bloomAlpha;
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'low';
+    ctx.drawImage(this.foodCanvas, 0, 0, w, h);
+    ctx.globalAlpha = 1;
+
+    /* bloom sprigs — the glyph language of plants ------------------------ */
+    ctx.lineCap = 'round';
+    var sprigCol = drought ? 'rgba(210, 170, 98, 0.46)' : 'rgba(203, 246, 190, 0.44)';
+    var sprigGlow = drought ? 'rgba(205, 164, 92, 0.09)' : 'rgba(150, 236, 190, 0.10)';
+    for (var pass = 0; pass < 2; pass++) {
+      ctx.strokeStyle = pass === 0 ? sprigGlow : sprigCol;
+      ctx.lineWidth = pass === 0 ? 2.6 : 0.85;
+      ctx.beginPath();
+      for (var cy = 2; cy < C.ROWS; cy += 3) {
+        for (var cx = 2; cx < C.COLS; cx += 4) {
+          var idx = cy * C.COLS + cx;
+          var fe = food[idx];
+          if (fe < 0.56) continue;
+          var px = cx * sx, py = cy * sy;
+          var n = 1 + Math.floor(fe * 2.4);
+          ctx.moveTo(px, py);
+          ctx.lineTo(px, py - (2.2 + n * 0.55));
+          if (fe > 0.78) {
+            ctx.moveTo(px, py - 1.8);
+            ctx.lineTo(px - 1.6, py - 3.3);
+            ctx.moveTo(px, py - 1.4);
+            ctx.lineTo(px + 1.5, py - 2.9);
+          }
+        }
+      }
+      ctx.stroke();
+    }
+
+    /* bloom stars — the plant glyph, scattered through the richest patches */
+    ctx.strokeStyle = drought ? 'rgba(219, 180, 102, 0.42)' : 'rgba(198, 242, 186, 0.44)';
+    ctx.lineWidth = 0.8;
+    ctx.beginPath();
+    var starCount = 0;
+    for (var syc = 4; syc < C.ROWS && starCount < 260; syc += 7) {
+      var rowOff = (syc * 37 + 11) % 7;
+      for (var sxc = rowOff + 3; sxc < C.COLS && starCount < 260; sxc += 7) {
+        var se = food[syc * C.COLS + sxc];
+        if (se < 0.78) continue;
+        var jx = (((sxc * 73 + syc * 151) % 17) - 8) / 20;
+        var jy = (((sxc * 191 + syc * 29) % 17) - 8) / 20;
+        var spx = (sxc + jx) * sx, spy = (syc + jy) * sy;
+        var arm = 2.0 + se * 2.6;
+        ctx.moveTo(spx - arm, spy); ctx.lineTo(spx + arm, spy);
+        ctx.moveTo(spx, spy - arm); ctx.lineTo(spx, spy + arm);
+        ctx.moveTo(spx - arm * 0.55, spy - arm * 0.55); ctx.lineTo(spx + arm * 0.55, spy + arm * 0.55);
+        ctx.moveTo(spx + arm * 0.55, spy - arm * 0.55); ctx.lineTo(spx - arm * 0.55, spy + arm * 0.55);
+        starCount++;
+      }
+    }
+    ctx.stroke();
+
+    /* spore motes — the bloom respiring ---------------------------------- */
+    if (!this.spores) this.spores = [];
+    if (!this.spores.length) {
+      for (var spn = 0; spn < 44; spn++) {
+        this.spores.push({
+          x: this.visRng.next(), y: this.visRng.next(),
+          s: 0.006 + this.visRng.next() * 0.016,
+          r: 0.8 + this.visRng.next() * 1.6,
+          ph: this.visRng.next() * TAU,
+          a: 0.10 + this.visRng.next() * 0.22
+        });
+      }
+    }
+    if (!paused) {
+      for (var si = 0; si < this.spores.length; si++) {
+        var sp3 = this.spores[si];
+        sp3.y -= sp3.s * dt * 4.5;
+        sp3.x += Math.sin(t * 0.4 + sp3.ph) * 0.00018;
+        if (sp3.y < -0.02) { sp3.y = 1.02; sp3.x = this.visRng.next(); }
+        if (sp3.x < -0.02) sp3.x = 1.02; else if (sp3.x > 1.02) sp3.x = -0.02;
+      }
+    }
+    ctx.globalCompositeOperation = 'lighter';
+    for (si = 0; si < this.spores.length; si++) {
+      var sp4 = this.spores[si];
+      var sxp = sp4.x * w, syp = sp4.y * h;
+      var sa = sp4.a * (0.55 + 0.45 * Math.sin(t * 0.8 + sp4.ph));
+      ctx.fillStyle = drought ? 'rgba(214, 176, 104,' + (sa * 0.75) + ')' : 'rgba(206, 255, 205,' + (sa * 0.8) + ')';
+      ctx.beginPath();
+      ctx.arc(sxp, syp, sp4.r * 0.8, 0, TAU);
+      ctx.fill();
+    }
+    ctx.globalCompositeOperation = 'source-over';
+
+    /* trails ------------------------------------------------------------- */
+    var tc = this.trailCtx;
+    var tw = this.trail.width, th = this.trail.height;
+    if (!paused) {
+      tc.globalCompositeOperation = 'destination-out';
+      tc.fillStyle = 'rgba(0, 0, 0, 0.085)';
+      tc.fillRect(0, 0, tw, th);
+      tc.globalCompositeOperation = 'source-over';
+    }
+    var prey = eco.prey, pred = eco.pred, j;
+    if (!paused) {
+      tc.fillStyle = 'rgba(113, 230, 198, 0.32)';
+      for (j = 0; j < prey.length; j++) {
+        tc.fillRect(prey[j].x * sx - 0.7, prey[j].y * sy - 0.7, 1.5, 1.5);
+      }
+      tc.fillStyle = 'rgba(232, 181, 107, 0.26)';
+      for (j = 0; j < pred.length; j++) {
+        tc.fillRect(pred[j].x * sx - 1, pred[j].y * sy - 1, 2, 2);
+      }
+    }
+    ctx.globalCompositeOperation = 'lighter';
+    ctx.globalAlpha = 0.82;
+    ctx.drawImage(this.trail, 0, 0, w, h);
+    ctx.globalAlpha = 1;
+
+    /* marine snow -------------------------------------------------------- */
+    ctx.fillStyle = 'rgba(233, 226, 206, 0.55)';
+    for (j = 0; j < this.motes.length; j++) {
+      var m = this.motes[j];
+      if (!paused) {
+        m.y -= m.s * dt * 8;
+        m.x += Math.sin(t * 0.35 + m.drift) * 0.00009;
+        if (m.y < -0.02) { m.y = 1.02; m.x = this.visRng.next(); }
+      }
+      ctx.globalAlpha = m.a * (0.6 + 0.4 * Math.sin(t * 0.6 + m.drift));
+      ctx.beginPath();
+      ctx.arc(m.x * w, m.y * h, m.r, 0, TAU);
+      ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+
+    /* kill pulses -------------------------------------------------------- */
+    ctx.globalCompositeOperation = 'lighter';
+    var pulses = eco.pulses;
+    for (j = 0; j < pulses.length; j++) {
+      var p = pulses[j];
+      if (!p) continue;
+      var age = eco.totalTicks - p.t;
+      if (age < 0 || age > 42) continue;
+      var q = age / 42;
+      var rr = 2 + q * 10;
+      ctx.strokeStyle = 'rgba(232, 181, 107, ' + (0.55 * (1 - q)) + ')';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.arc(p.x * sx, p.y * sy, rr, 0, TAU);
+      ctx.stroke();
+      ctx.fillStyle = 'rgba(255, 226, 178, ' + (0.75 * (1 - q)) + ')';
+      ctx.beginPath();
+      ctx.arc(p.x * sx, p.y * sy, 1.1, 0, TAU);
+      ctx.fill();
+    }
+
+    /* grazers ------------------------------------------------------------ */
+    ctx.globalCompositeOperation = 'lighter';
+    var dScale = Math.min(sx, sy);
+    for (j = 0; j < prey.length; j++) {
+      var p1 = prey[j];
+      var x1 = p1.x * sx, y1 = p1.y * sy;
+      var gs = 14 + p1.speed * 2.2;
+      ctx.globalAlpha = 0.5;
+      ctx.drawImage(this.glowPrey, x1 - gs / 2, y1 - gs / 2, gs, gs);
+      ctx.globalAlpha = 0.9;
+      ctx.save();
+      ctx.translate(x1, y1);
+      ctx.rotate(p1.dir + Math.PI / 2);
+      var sz = (0.74 + Math.min(1, p1.energy / 150) * 0.62) * dScale * 0.40;
+      ctx.beginPath();
+      ctx.moveTo(0, -2.9 * sz);
+      ctx.quadraticCurveTo(2.3 * sz, 0.5 * sz, 0.4 * sz, 2.5 * sz);
+      ctx.quadraticCurveTo(-1.5 * sz, 0.5 * sz, 0, -2.9 * sz);
+      ctx.fillStyle = 'rgba(176, 252, 228, 0.95)';
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(130, 242, 212, 0.62)';
+      ctx.lineWidth = Math.max(0.5, 0.45 * dScale);
+      ctx.beginPath();
+      ctx.moveTo(0.2 * sz, 2.3 * sz);
+      ctx.lineTo(-0.6 * sz, 4.6 * sz);
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    /* hunters ------------------------------------------------------------ */
+    for (j = 0; j < pred.length; j++) {
+      var p2 = pred[j];
+      var x2 = p2.x * sx, y2 = p2.y * sy;
+      var gs2 = 20 + p2.speed * 2.4;
+      ctx.globalAlpha = 0.65;
+      ctx.drawImage(this.glowPred, x2 - gs2 / 2, y2 - gs2 / 2, gs2, gs2);
+      ctx.globalAlpha = 0.95;
+      ctx.save();
+      ctx.translate(x2, y2);
+      ctx.rotate(p2.dir);
+      var s2 = dScale * 0.5;
+      ctx.strokeStyle = p2.digest > 0 ? 'rgba(232, 181, 107, 0.6)' : 'rgba(255, 214, 150, 0.97)';
+      ctx.lineWidth = Math.max(0.6, 0.55 * dScale);
+      ctx.lineJoin = 'round';
+      ctx.beginPath();
+      ctx.moveTo(-2.6 * s2, -2.8 * s2);
+      ctx.lineTo(1.7 * s2, 0);
+      ctx.lineTo(-2.6 * s2, 2.8 * s2);
+      ctx.stroke();
+      ctx.globalAlpha = 0.6;
+      ctx.beginPath();
+      ctx.moveTo(-0.7 * s2, -1.9 * s2);
+      ctx.lineTo(1.8 * s2, 0);
+      ctx.lineTo(-0.7 * s2, 1.9 * s2);
+      ctx.stroke();
+      ctx.restore();
+    }
+    ctx.globalAlpha = 1;
+
+    /* anomaly particles -------------------------------------------------- */
+    if (eco.anomaly && !paused) {
+      var spawnN = Math.floor(dt * 11) + (this.visRng.next() < (dt * 11) % 1 ? 1 : 0);
+      for (var sp2 = 0; sp2 < spawnN; sp2++) {
+        var at = eco.anomaly.type;
+        var acol = at === 'drought' ? '217, 166, 79' : at === 'plague' ? '179, 147, 225' : '229, 118, 79';
+        this.embers.push({
+          x: this.visRng.next() * w,
+          y: at === 'eruption' ? h * (0.55 + this.visRng.next() * 0.45) : at === 'drought' ? -6 : this.visRng.next() * h,
+          vx: (this.visRng.next() - 0.5) * (at === 'drought' ? 22 : 10),
+          vy: at === 'eruption' ? -(10 + this.visRng.next() * 26) : at === 'drought' ? 8 + this.visRng.next() * 10 : -(3 + this.visRng.next() * 10),
+          life: 0,
+          max: 2.2 + this.visRng.next() * 2.4,
+          r: 0.5 + this.visRng.next() * 1.3,
+          col: acol
+        });
+      }
+      if (this.embers.length > 220) this.embers.splice(0, this.embers.length - 220);
+    }
+    if (this.embers.length) {
+      for (j = this.embers.length - 1; j >= 0; j--) {
+        var em = this.embers[j];
+        em.life += dt;
+        if (em.life > em.max) { this.embers.splice(j, 1); continue; }
+        em.x += em.vx * dt;
+        em.y += em.vy * dt;
+        em.vy += (this.flash && this.flash.type === 'eruption' ? -10 : 4) * dt;
+        var lifeQ = em.life / em.max;
+        ctx.fillStyle = 'rgba(' + em.col + ',' + (0.5 * (1 - lifeQ)) + ')';
+        ctx.beginPath();
+        ctx.arc(em.x, em.y, em.r * (1 - lifeQ * 0.4), 0, TAU);
+        ctx.fill();
+      }
+    }
+
+    if (this.flash) {
+      var fq = (t - this.flash.start) / this.flash.dur;
+      if (fq >= 1) { this.flash = null; }
+      else {
+        var col = this.flash.type === 'drought' ? '217, 166, 79' : this.flash.type === 'plague' ? '179, 147, 225' : '229, 118, 79';
+        var rad = ctx.createRadialGradient(w / 2, h * 0.56, 0, w / 2, h * 0.56, Math.max(w, h) * (0.35 + fq * 0.5));
+        rad.addColorStop(0, 'rgba(' + col + ',' + (0.16 * (1 - fq)) + ')');
+        rad.addColorStop(1, 'rgba(' + col + ',0)');
+        ctx.globalCompositeOperation = 'lighter';
+        ctx.fillStyle = rad;
+        ctx.fillRect(0, 0, w, h);
+        ctx.globalCompositeOperation = 'source-over';
+      }
+    }
+
+    /* ambient anomaly wash ----------------------------------------------- */
+    if (eco.anomaly) {
+      var type = eco.anomaly.type;
+      var wash = ctx.createLinearGradient(0, h, 0, 0);
+      if (type === 'drought') {
+        wash.addColorStop(0, 'rgba(217, 166, 79, 0.055)');
+        wash.addColorStop(0.6, 'rgba(160, 110, 50, 0.02)');
+        wash.addColorStop(1, 'rgba(0,0,0,0)');
+      } else if (type === 'plague') {
+        wash.addColorStop(0, 'rgba(179, 147, 225, 0.06)');
+        wash.addColorStop(1, 'rgba(60, 36, 90, 0.01)');
+      } else {
+        wash.addColorStop(0, 'rgba(229, 118, 79, 0.1)');
+        wash.addColorStop(0.5, 'rgba(229, 118, 79, 0.025)');
+        wash.addColorStop(1, 'rgba(0,0,0,0)');
+      }
+      ctx.fillStyle = wash;
+      ctx.fillRect(0, 0, w, h);
+    }
+
+    /* hover probe -------------------------------------------------------- */
+    if (this.probe.on) {
+      var px2 = this.probe.x, py2 = this.probe.y;
+      ctx.strokeStyle = 'rgba(113, 230, 198, 0.32)';
+      ctx.lineWidth = 0.7;
+      ctx.beginPath();
+      ctx.arc(px2, py2, 6.5, 0, TAU);
+      ctx.moveTo(px2 - 13, py2); ctx.lineTo(px2 - 8, py2);
+      ctx.moveTo(px2 + 8, py2); ctx.lineTo(px2 + 13, py2);
+      ctx.moveTo(px2, py2 - 13); ctx.lineTo(px2, py2 - 8);
+      ctx.moveTo(px2, py2 + 8); ctx.lineTo(px2, py2 + 13);
+      ctx.stroke();
+    }
+  };
+
+  /* ------------------------------------------------------------ chronometer -- */
+  function Chrono(canvas, panel) {
+    this.canvas = canvas;
+    this.panel = panel;
+    this.cssW = 0;
+    this.cssH = 0;
+    this.flash = null;
+    this.time = 0;
+    this.resize();
+  }
+
+  Chrono.prototype.resize = function () {
+    var rect = this.canvas.getBoundingClientRect();
+    var w = Math.max(2, Math.round(rect.width));
+    var h = Math.max(2, Math.round(rect.height));
+    if (w === this.cssW && h === this.cssH) return;
+    this.cssW = w; this.cssH = h;
+    fit(this.canvas, w, h);
+  };
+
+  Chrono.prototype.announce = function (type) {
+    this.flash = { type: type, start: this.time };
+  };
+
+  Chrono.prototype.draw = function (eco, planned, dt) {
+    if (!this.cssW || !this.cssH) { this.resize(); if (!this.cssW) return; }
+    var ctx = this.canvas.getContext('2d');
+    var w = this.cssW, h = this.cssH;
+    this.time += dt;
+    ctx.setTransform(dpr(), 0, 0, dpr(), 0, 0);
+    ctx.clearRect(0, 0, w, h);
+
+    var cx = w / 2, cy = h / 2 - 6;
+    var R = Math.min(w * 0.40, h * 0.43) - 4;
+    var N = Math.max(1, planned);
+    var progress = Math.min(1, eco.gen / N);
+    var a0 = -Math.PI / 2;
+    var aNow = a0 + TAU * progress;
+    var evColors = { drought: COL.drought, plague: COL.plague, eruption: COL.eruption };
+
+    /* rings */
+    ctx.strokeStyle = 'rgba(52, 99, 84, 0.95)';
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.arc(cx, cy, R, 0, TAU); ctx.stroke();
+    ctx.strokeStyle = 'rgba(52, 99, 84, 0.55)';
+    ctx.beginPath(); ctx.arc(cx, cy, R - 7, 0, TAU); ctx.stroke();
+    ctx.strokeStyle = 'rgba(168, 138, 90, 0.18)';
+    ctx.beginPath(); ctx.arc(cx, cy, R + 2.5, 0, TAU); ctx.stroke();
+
+    /* 72 ticks */
+    for (var i = 0; i < 72; i++) {
+      var a = a0 + (i / 72) * TAU;
+      var major = i % 6 === 0;
+      var r1 = R - (major ? 6.5 : 4);
+      var r2 = R - 1.5;
+      ctx.strokeStyle = 'rgba(168, 138, 90, ' + (major ? 0.72 : 0.34) + ')';
+      ctx.lineWidth = major ? 0.95 : 0.6;
+      ctx.beginPath();
+      ctx.moveTo(cx + Math.cos(a) * r1, cy + Math.sin(a) * r1);
+      ctx.lineTo(cx + Math.cos(a) * r2, cy + Math.sin(a) * r2);
+      ctx.stroke();
+    }
+
+    /* completed arc */
+    ctx.strokeStyle = 'rgba(140, 246, 218, 0.95)';
+    ctx.lineWidth = 2;
+    ctx.shadowColor = 'rgba(113, 230, 198, 0.85)';
+    ctx.shadowBlur = 11;
+    ctx.beginPath();
+    ctx.arc(cx, cy, R - 3.2, a0, aNow, false);
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+
+    /* scheduled anomaly notches */
+    var types = ['drought', 'plague', 'eruption'];
+    for (var ti = 0; ti < types.length; ti++) {
+      var type = types[ti];
+      var everyKey = type + 'Every', onKey = type + 'On';
+      if (!eco.cfg[onKey]) continue;
+      var interval = Math.max(1, eco.cfg[everyKey]);
+      var due = eco.nextDue[type];
+      if (!isFinite(due)) continue;
+      var col = evColors[type];
+      var g = due, guard = 0;
+      while (g <= N && guard++ < 40) {
+        var a2 = a0 + TAU * (g / N);
+        var isNext = g === due;
+        var rr = isNext ? 4.2 : 2.3;
+        ctx.save();
+        ctx.translate(cx + Math.cos(a2) * R, cy + Math.sin(a2) * R);
+        ctx.rotate(a2 + Math.PI / 4);
+        ctx.fillStyle = col;
+        ctx.globalAlpha = isNext ? 0.95 : 0.38;
+        if (isNext) { ctx.shadowColor = col; ctx.shadowBlur = 8; }
+        ctx.fillRect(-rr / 2, -rr / 2, rr, rr);
+        ctx.restore();
+        g += interval;
+      }
+    }
+
+    /* flash on an event */
+    if (this.flash) {
+      var fq = (this.time - this.flash.start) / 1.8;
+      if (fq > 1) this.flash = null;
+      else {
+        var fc = this.flash.type === 'drought' ? '217,166,79' : this.flash.type === 'plague' ? '179,147,225' : '229,118,79';
+        ctx.strokeStyle = 'rgba(' + fc + ',' + (0.5 * (1 - fq)) + ')';
+        ctx.lineWidth = 1.2;
+        ctx.beginPath();
+        ctx.arc(cx, cy, R - 3.2 + fq * 6, a0, a0 + TAU * Math.min(1, progress + 0.04), false);
+        ctx.stroke();
+      }
+    }
+
+    /* hand — kept outside the engraved centre so the numerals stay clear */
+    var hx = Math.cos(aNow), hy = Math.sin(aNow);
+    ctx.strokeStyle = 'rgba(233, 226, 206, 0.6)';
+    ctx.lineWidth = 0.9;
+    ctx.beginPath();
+    ctx.moveTo(cx + hx * (R * 0.80), cy + hy * (R * 0.80));
+    ctx.lineTo(cx + hx * (R - 0.5), cy + hy * (R - 0.5));
+    ctx.stroke();
+    ctx.fillStyle = 'rgba(140, 246, 218, 0.95)';
+    ctx.shadowColor = 'rgba(113, 230, 198, 0.8)';
+    ctx.shadowBlur = 7;
+    ctx.beginPath();
+    ctx.arc(cx + hx * (R * 0.80), cy + hy * (R * 0.80), 1.9, 0, TAU);
+    ctx.fill();
+    ctx.shadowBlur = 0;
+
+    /* centre engraving ring */
+    ctx.strokeStyle = 'rgba(168, 138, 90, 0.16)';
+    ctx.lineWidth = 0.7;
+    ctx.beginPath(); ctx.arc(cx, cy, R * 0.62, 0, TAU); ctx.stroke();
+  };
+
+  /* --------------------------------------------------------------- ribbon -- */
+  function Ribbon(canvas) {
+    this.canvas = canvas;
+    this.cssW = 0; this.cssH = 0;
+    this.resize();
+  }
+
+  Ribbon.prototype.resize = function () {
+    var rect = this.canvas.getBoundingClientRect();
+    var w = Math.max(2, Math.round(rect.width));
+    var h = Math.max(2, Math.round(rect.height));
+    if (w === this.cssW && h === this.cssH) return;
+    this.cssW = w; this.cssH = h;
+    fit(this.canvas, w, h);
+  };
+
+  Ribbon.prototype.draw = function (eco, planned, cfg) {
+    if (!this.cssW) { this.resize(); if (!this.cssW) return; }
+    var ctx = this.canvas.getContext('2d');
+    var w = this.cssW, h = this.cssH;
+    ctx.setTransform(dpr(), 0, 0, dpr(), 0, 0);
+    ctx.clearRect(0, 0, w, h);
+
+    var padL = 30, padR = 10, padT = 7, padB = 13;
+    var pw = w - padL - padR, ph = h - padT - padB;
+    if (pw < 20 || ph < 8) return;
+    var series = eco.series;
+    var lastGen = series.length ? series[series.length - 1].gen : 0;
+    var N = Math.max(1, Math.max(planned, Math.ceil(lastGen)));
+
+    /* baseline & faint horizontal rules */
+    ctx.strokeStyle = 'rgba(20, 46, 39, 0.8)';
+    ctx.lineWidth = 0.7;
+    for (var r = 0; r <= 2; r++) {
+      var yy = padT + (ph * r) / 2;
+      ctx.beginPath();
+      ctx.moveTo(padL, yy + 0.5); ctx.lineTo(w - padR, yy + 0.5);
+      ctx.strokeStyle = r === 2 ? 'rgba(20, 46, 39, 0.9)' : 'rgba(20, 46, 39, 0.4)';
+      ctx.stroke();
+    }
+
+    /* population scale */
+    var maxPop = 1;
+    for (var i = 0; i < series.length; i++) {
+      if (series[i].prey > maxPop) maxPop = series[i].prey;
+      if (series[i].pred > maxPop) maxPop = series[i].pred;
+    }
+    maxPop = Math.ceil(maxPop / 50) * 50;
+    var xOf = function (g) { return padL + (Math.min(N, g) / N) * pw; };
+    var yPop = function (v) { return padT + ph - (v / maxPop) * ph * 0.92; };
+    var yBloom = function (b) { return padT + ph - b * ph * 0.55; };
+
+    /* bloom area */
+    ctx.beginPath();
+    ctx.moveTo(padL, padT + ph);
+    for (i = 0; i < series.length; i++) ctx.lineTo(xOf(series[i].gen), yBloom(series[i].plant));
+    ctx.lineTo(xOf(series.length ? series[series.length - 1].gen : 0), padT + ph);
+    ctx.closePath();
+    ctx.fillStyle = 'rgba(184, 223, 164, 0.075)';
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(184, 223, 164, 0.32)';
+    ctx.lineWidth = 0.8;
+    ctx.beginPath();
+    for (i = 0; i < series.length; i++) {
+      var xb = xOf(series[i].gen), yb = yBloom(series[i].plant);
+      if (i === 0) ctx.moveTo(xb, yb); else ctx.lineTo(xb, yb);
+    }
+    ctx.stroke();
+
+    /* event markers */
+    for (i = 0; i < eco.events.length; i++) {
+      var ev = eco.events[i];
+      var ex = xOf(ev.gen);
+      var col = ev.type === 'drought' ? '217,166,79' : ev.type === 'plague' ? '179,147,225' : '229,118,79';
+      ctx.strokeStyle = 'rgba(' + col + ',0.45)';
+      ctx.setLineDash([2, 3]);
+      ctx.lineWidth = 0.7;
+      ctx.beginPath();
+      ctx.moveTo(ex, padT); ctx.lineTo(ex, padT + ph);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = 'rgba(' + col + ',0.85)';
+      ctx.fillRect(ex - 1.5, padT - 2, 3, 3);
+      ctx.font = '6px ' + MONO;
+      ctx.textAlign = 'center';
+      ctx.fillText(ev.type === 'eruption' ? 'V' : ev.type === 'plague' ? 'P' : 'D', ex, padT + 5.5);
+    }
+
+    /* population lines */
+    function line(key, rgb, width) {
+      ctx.beginPath();
+      for (var i2 = 0; i2 < series.length; i2++) {
+        var s = series[i2];
+        var x2 = xOf(s.gen), y2 = yPop(s[key]);
+        if (i2 === 0) ctx.moveTo(x2, y2); else ctx.lineTo(x2, y2);
+      }
+      ctx.strokeStyle = 'rgba(' + rgb + ',0.9)';
+      ctx.lineWidth = width;
+      ctx.shadowColor = 'rgba(' + rgb + ',0.35)';
+      ctx.shadowBlur = 5;
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+    }
+    line('prey', '113, 230, 198', 1.15);
+    line('pred', '232, 181, 107', 1.15);
+
+    /* end dots */
+    if (series.length) {
+      var last = series[series.length - 1];
+      ctx.fillStyle = 'rgba(113, 230, 198, 0.95)';
+      ctx.beginPath(); ctx.arc(xOf(last.gen), yPop(last.prey), 1.8, 0, TAU); ctx.fill();
+      ctx.fillStyle = 'rgba(232, 181, 107, 0.95)';
+      ctx.beginPath(); ctx.arc(xOf(last.gen), yPop(last.pred), 1.8, 0, TAU); ctx.fill();
+    }
+
+    /* axes labels */
+    ctx.font = '6px ' + MONO;
+    ctx.fillStyle = 'rgba(94, 113, 103, 0.95)';
+    ctx.textAlign = 'right';
+    ctx.fillText(String(maxPop), padL - 4, padT + 5);
+    ctx.fillText('0', padL - 4, padT + ph - 1);
+    ctx.textAlign = 'left';
+    ctx.fillStyle = 'rgba(184, 223, 164, 0.55)';
+    ctx.fillText('BLOOM', padL + 2, padT + 6);
+    ctx.fillStyle = 'rgba(94, 113, 103, 0.8)';
+    ctx.textAlign = 'right';
+    ctx.fillText('GEN ' + String(eco.gen).padStart(3, '0'), w - padR, padT + 6);
+  };
+
+  root.AbyssalRender = { Renderer: Renderer, Chrono: Chrono, Ribbon: Ribbon, fit: fit, COL: COL, MONO: MONO };
+})(window);
+
+
+/* ============================================================================
+   THE ABYSSAL VIVARIUM — final plate
+   Every curve on the observation plate is drawn on canvas in the same ink as
+   the living window: aqua grazers, amber hunters, lichen bloom.
+   ========================================================================== */
+(function (root) {
+  'use strict';
+  var C = root.AbyssalCore;
+  var R = root.AbyssalRender;
+  var COL = R.COL;
+  var MONO = R.MONO;
+  var TAU = Math.PI * 2;
+
+  var GENE_META = {
+    speed: { label: 'Speed', short: 'SPEED', unit: 'cells / sec', fmt: function (v) { return v.toFixed(1); } },
+    vision: { label: 'Vision', short: 'VISION', unit: 'cells', fmt: function (v) { return v.toFixed(1); } },
+    metabolism: { label: 'Metabolism', short: 'METAB.', unit: 'energy ×', fmt: function (v) { return v.toFixed(2); } },
+    threshold: { label: 'Reproductive threshold', short: 'THRESHOLD', unit: 'energy', fmt: function (v) { return v.toFixed(0); } }
+  };
+  var EVENT_COL = { drought: '217,166,79', plague: '179,147,225', eruption: '229,118,79' };
+  var EVENT_LETTER = { drought: 'D', plague: 'P', eruption: 'V' };
+
+  function px() { return Math.min(root.devicePixelRatio || 1, 2); }
+
+  function prep(canvas) {
+    var rect = canvas.getBoundingClientRect();
+    var w = Math.max(2, Math.round(rect.width));
+    var h = Math.max(2, Math.round(rect.height));
+    var d = px();
+    if (canvas.width !== w * d || canvas.height !== h * d) {
+      canvas.width = w * d;
+      canvas.height = h * d;
+    }
+    var ctx = canvas.getContext('2d');
+    ctx.setTransform(d, 0, 0, d, 0, 0);
+    ctx.clearRect(0, 0, w, h);
+    return { ctx: ctx, w: w, h: h };
+  }
+
+  function mono(size, weight) {
+    return (weight || 400) + ' ' + size + 'px ' + MONO;
+  }
+
+  function spaced(ctx, v) {
+    if ('letterSpacing' in ctx) ctx.letterSpacing = v;
+  }
+
+  function roundRect(ctx, x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+    ctx.closePath();
+  }
+
+  function niceCeil(v, step) {
+    return Math.max(step, Math.ceil(v / step) * step);
+  }
+
+  function legendItem(ctx, x, y, color, shape, label) {
+    ctx.save();
+    ctx.fillStyle = color;
+    ctx.strokeStyle = color;
+    if (shape === 'dot') {
+      ctx.beginPath(); ctx.arc(x, y - 2.5, 2.2, 0, TAU); ctx.fill();
+    } else if (shape === 'diamond') {
+      ctx.beginPath();
+      ctx.moveTo(x, y - 5); ctx.lineTo(x + 2.4, y - 2.5); ctx.lineTo(x, y); ctx.lineTo(x - 2.4, y - 2.5);
+      ctx.closePath(); ctx.fill();
+    } else {
+      ctx.lineWidth = 1.2;
+      if (shape === 'dash') ctx.setLineDash([2, 2]);
+      ctx.beginPath(); ctx.moveTo(x - 4, y - 2.5); ctx.lineTo(x + 4, y - 2.5); ctx.stroke();
+      ctx.setLineDash([]);
+    }
+    ctx.restore();
+    ctx.fillStyle = 'rgba(200, 195, 176, 0.72)';
+    ctx.font = mono(6.5);
+    spaced(ctx, '0.6px');
+    ctx.textAlign = 'left';
+    ctx.fillText(label, x + 7, y);
+    spaced(ctx, '0px');
+  }
+
+  /* ------------------------------------------------------ population plate -- */
+  function drawPopulation(canvas, eco, reveal, hover) {
+    var P = prep(canvas);
+    var ctx = P.ctx, w = P.w, h = P.h;
+    var hist = eco.history;
+    if (!hist.length) return;
+    var planned = Math.max(12, hist[hist.length - 1].gen);
+    var L = Math.max(w < 440 ? 44 : 36, w * 0.055), Rm = Math.max(w < 440 ? 42 : 34, w * 0.05);
+    var T = 26, B = 25;
+    var PW = w - L - Rm, PH = h - T - B;
+    if (PW < 40 || PH < 30) return;
+
+    var maxPop = 10, maxBloom = 20;
+    for (var i = 0; i < hist.length; i++) {
+      maxPop = Math.max(maxPop, hist[i].prey, hist[i].pred);
+      maxBloom = Math.max(maxBloom, hist[i].biomass * 100);
+    }
+    var popFloor = 10;
+    var popTop = Math.pow(10, Math.ceil(Math.log10(Math.max(maxPop, 20))));
+    maxBloom = niceCeil(maxBloom * 1.1, 10);
+
+    var X = function (g) { return L + (g / planned) * PW; };
+    var logSpan = Math.log10(popTop) - Math.log10(popFloor);
+    var Y = function (v) {
+      if (v <= 0) return T + PH + 8;
+      var q = (Math.log10(Math.max(v, popFloor)) - Math.log10(popFloor)) / logSpan;
+      return T + PH - Math.max(0, Math.min(1, q)) * PH;
+    };
+    var Yb = function (b) { return T + PH - (b / maxBloom) * PH; };
+
+    /* log ticks for individuals */
+    var tickVals = [10, 30, 100, 300, 1000, 3000].filter(function (v) {
+      return v >= popFloor && v <= popTop;
+    });
+    if (!tickVals.length) tickVals = [popFloor, popTop];
+
+    /* grid */
+    ctx.save();
+    ctx.strokeStyle = 'rgba(20, 46, 39, 0.55)';
+    ctx.lineWidth = 0.6;
+    ctx.setLineDash([1, 3]);
+    ctx.font = mono(6.5);
+    ctx.fillStyle = 'rgba(94, 113, 103, 0.9)';
+    ctx.textAlign = 'right';
+    spaced(ctx, '0.4px');
+    tickVals.forEach(function (val) {
+      var y = Y(val);
+      ctx.beginPath(); ctx.moveTo(L, y + 0.5); ctx.lineTo(L + PW, y + 0.5); ctx.stroke();
+      ctx.fillText(val >= 1000 ? (val / 1000) + 'k' : String(val), L - 6, y + 2.4);
+    });
+    ctx.textAlign = 'left';
+    ctx.fillStyle = 'rgba(184, 223, 164, 0.65)';
+    var rows = 5;
+    for (var r = 0; r <= rows; r++) {
+      var bv = (maxBloom / rows) * r;
+      ctx.fillText(bv.toFixed(0), L + PW + 6, Yb(bv) + 2.4);
+    }
+    spaced(ctx, '0px');
+    ctx.setLineDash([]);
+
+    /* axis rules */
+    ctx.strokeStyle = 'rgba(32, 67, 57, 0.85)';
+    ctx.lineWidth = 0.8;
+    ctx.beginPath();
+    ctx.moveTo(L, T); ctx.lineTo(L, T + PH); ctx.lineTo(L + PW, T + PH);
+    ctx.stroke();
+    ctx.strokeStyle = 'rgba(184, 223, 164, 0.22)';
+    ctx.beginPath();
+    ctx.moveTo(L + PW, T); ctx.lineTo(L + PW, T + PH);
+    ctx.stroke();
+
+    /* x ticks */
+    var stepG = planned <= 24 ? 6 : planned <= 60 ? 12 : 24;
+    ctx.font = mono(6.5);
+    ctx.fillStyle = 'rgba(94, 113, 103, 0.9)';
+    ctx.textAlign = 'center';
+    ctx.strokeStyle = 'rgba(32, 67, 57, 0.85)';
+    for (var g = 0; g <= planned; g += stepG) {
+      var gx = X(g);
+      ctx.beginPath(); ctx.moveTo(gx, T + PH); ctx.lineTo(gx, T + PH + 3.5); ctx.stroke();
+      ctx.fillText(String(g), gx, T + PH + 12);
+    }
+    ctx.fillStyle = 'rgba(94, 113, 103, 0.8)';
+    ctx.font = mono(6.5);
+    ctx.textAlign = 'left';
+    spaced(ctx, '1.2px');
+    ctx.fillText('GENERATION', L, T + PH + 21);
+    ctx.textAlign = 'left';
+    ctx.fillStyle = 'rgba(200, 195, 176, 0.62)';
+    ctx.fillText('INDIVIDUALS · LOG', 2, T - 9);
+    ctx.textAlign = 'right';
+    ctx.fillStyle = 'rgba(184, 223, 164, 0.66)';
+    ctx.fillText('BLOOM %', w - 2, T - 9);
+    spaced(ctx, '0px');
+
+    /* bloom area */
+    var revealW = PW * reveal;
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(L, T - 2, Math.max(0, revealW + 1), PH + 4);
+    ctx.clip();
+    ctx.beginPath();
+    ctx.moveTo(X(hist[0].gen), T + PH);
+    for (i = 0; i < hist.length; i++) ctx.lineTo(X(hist[i].gen), Yb(hist[i].biomass * 100));
+    ctx.lineTo(X(hist[hist.length - 1].gen), T + PH);
+    ctx.closePath();
+    var bloomGrad = ctx.createLinearGradient(0, T, 0, T + PH);
+    bloomGrad.addColorStop(0, 'rgba(184, 223, 164, 0.04)');
+    bloomGrad.addColorStop(1, 'rgba(184, 223, 164, 0.006)');
+    ctx.fillStyle = bloomGrad;
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(184, 223, 164, 0.45)';
+    ctx.lineWidth = 0.9;
+    ctx.setLineDash([3, 2.5]);
+    ctx.beginPath();
+    for (i = 0; i < hist.length; i++) {
+      var bx = X(hist[i].gen), by = Yb(hist[i].biomass * 100);
+      if (i === 0) ctx.moveTo(bx, by); else ctx.lineTo(bx, by);
+    }
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.restore();
+
+    /* event markers */
+    for (i = 0; i < eco.events.length; i++) {
+      var ev = eco.events[i];
+      var ex = X(ev.gen);
+      if (ex > L + revealW + 1) continue;
+      var ec = EVENT_COL[ev.type];
+      ctx.strokeStyle = 'rgba(' + ec + ',0.32)';
+      ctx.lineWidth = 0.7;
+      ctx.setLineDash([2, 4]);
+      ctx.beginPath(); ctx.moveTo(ex, T); ctx.lineTo(ex, T + PH); ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = 'rgba(' + ec + ',0.9)';
+      ctx.beginPath();
+      ctx.moveTo(ex, T - 1); ctx.lineTo(ex + 2.6, T + 3); ctx.lineTo(ex, T + 7); ctx.lineTo(ex - 2.6, T + 3);
+      ctx.closePath(); ctx.fill();
+      ctx.font = mono(6);
+      ctx.textAlign = 'center';
+      ctx.fillStyle = 'rgba(' + ec + ',0.85)';
+      ctx.fillText(EVENT_LETTER[ev.type], ex, T - 3);
+    }
+
+    /* population lines */
+    function speciesLine(key, rgb, fill) {
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(L, T - 2, Math.max(0, revealW + 1), PH + 4);
+      ctx.clip();
+      if (fill) {
+        ctx.beginPath();
+        ctx.moveTo(X(hist[0].gen), T + PH);
+        var firstDrawn = false;
+        for (var ii = 0; ii < hist.length; ii++) {
+          if (hist[ii][key] <= 0) continue;
+          var px0 = X(hist[ii].gen), py0 = Y(hist[ii][key]);
+          if (!firstDrawn) { ctx.lineTo(px0, T + PH); ctx.lineTo(px0, py0); firstDrawn = true; }
+          else ctx.lineTo(px0, py0);
+        }
+        ctx.lineTo(X(hist[hist.length - 1].gen), T + PH);
+        ctx.closePath();
+        var grd = ctx.createLinearGradient(0, T, 0, T + PH);
+        grd.addColorStop(0, 'rgba(' + rgb + ',0.10)');
+        grd.addColorStop(1, 'rgba(' + rgb + ',0.005)');
+        ctx.fillStyle = grd;
+        ctx.fill();
+      }
+      ctx.beginPath();
+      var drawing = false;
+      for (var j = 0; j < hist.length; j++) {
+        if (hist[j][key] <= 0) { drawing = false; continue; }
+        var xx = X(hist[j].gen), yy = Y(hist[j][key]);
+        if (!drawing) { ctx.moveTo(xx, yy); drawing = true; } else ctx.lineTo(xx, yy);
+      }
+      ctx.strokeStyle = 'rgba(' + rgb + ',0.95)';
+      ctx.lineWidth = 1.5;
+      ctx.shadowColor = 'rgba(' + rgb + ',0.45)';
+      ctx.shadowBlur = 6;
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+      /* end dot */
+      var lastI = hist.length - 1;
+      if (lastI >= 0 && reveal > 0.98) {
+        ctx.fillStyle = 'rgba(' + rgb + ',0.95)';
+        ctx.beginPath();
+        ctx.arc(X(hist[lastI].gen), Y(hist[lastI][key]), 2.1, 0, TAU);
+        ctx.fill();
+      }
+      ctx.restore();
+    }
+    speciesLine('prey', '113, 230, 198', true);
+    speciesLine('pred', '232, 181, 107', true);
+
+    /* hover crosshair */
+    if (hover && hover.gen !== null && reveal > 0.9) {
+      var gi = Math.max(0, Math.min(hist.length - 1, hover.index));
+      var hx = X(hist[gi].gen);
+      ctx.strokeStyle = 'rgba(233, 226, 206, 0.28)';
+      ctx.lineWidth = 0.7;
+      ctx.setLineDash([2, 3]);
+      ctx.beginPath(); ctx.moveTo(hx, T); ctx.lineTo(hx, T + PH); ctx.stroke();
+      ctx.setLineDash([]);
+      var entry = hist[gi];
+      var dots = [['prey', '113, 230, 198'], ['pred', '232, 181, 107']];
+      for (var d = 0; d < dots.length; d++) {
+        ctx.fillStyle = 'rgba(' + dots[d][1] + ',1)';
+        ctx.beginPath(); ctx.arc(hx, Y(entry[dots[d][0]]), 2.2, 0, TAU); ctx.fill();
+      }
+      var lines = [
+        'GEN ' + String(entry.gen).padStart(3, '0'),
+        'GRAZERS  ' + entry.prey,
+        'HUNTERS  ' + entry.pred,
+        'BLOOM  ' + (entry.biomass * 100).toFixed(0) + '%'
+      ];
+      var bw = 104, bh = 58;
+      var bx2 = hx + 10;
+      if (bx2 + bw > L + PW) bx2 = hx - bw - 10;
+      var by2 = T + 14;
+      ctx.fillStyle = 'rgba(4, 14, 12, 0.94)';
+      ctx.strokeStyle = 'rgba(47, 92, 78, 0.9)';
+      ctx.lineWidth = 0.8;
+      roundRect(ctx, bx2, by2, bw, bh, 2);
+      ctx.fill(); ctx.stroke();
+      ctx.font = mono(6.5);
+      ctx.textAlign = 'left';
+      for (var li = 0; li < lines.length; li++) {
+        ctx.fillStyle = li === 0 ? 'rgba(113, 230, 198, 0.95)' : 'rgba(200, 195, 176, 0.85)';
+        spaced(ctx, li === 0 ? '1px' : '0.3px');
+        ctx.fillText(lines[li], bx2 + 7, by2 + 13 + li * 11);
+      }
+      spaced(ctx, '0px');
+      if (hover && hover.gen === null) { /* noop */ }
+      /* corner marks */
+      ctx.strokeStyle = 'rgba(168, 138, 90, 0.5)';
+      ctx.beginPath(); ctx.moveTo(hx - 3, T); ctx.lineTo(hx + 3, T); ctx.stroke();
+    }
+  }
+
+  /* ---------------------------------------------------------- trait plate -- */
+  function geneDomain(hist, key) {
+    var meta = C.GENE[key];
+    var lo = Infinity, hi = -Infinity, any = false;
+    for (var i = 0; i < hist.length; i++) {
+      var sets = [hist[i].preyGenes[key], hist[i].predGenes[key]];
+      for (var s = 0; s < 2; s++) {
+        var st = sets[s];
+        if (!st) continue;
+        any = true;
+        lo = Math.min(lo, st.mean - st.sd);
+        hi = Math.max(hi, st.mean + st.sd);
+      }
+    }
+    if (!any) return null;
+    var span = Math.max(hi - lo, (meta.max - meta.min) * 0.06, 0.06);
+    var pad = span * 0.24;
+    return {
+      lo: Math.max(meta.min, lo - pad),
+      hi: Math.min(meta.max, hi + pad)
+    };
+  }
+
+  function drawGene(canvas, eco, key, reveal) {
+    var P = prep(canvas);
+    var ctx = P.ctx, w = P.w, h = P.h;
+    var meta = GENE_META[key];
+    var hist = eco.history;
+    var planned = Math.max(12, hist.length ? hist[hist.length - 1].gen : 0);
+    var L = w < 220 ? 30 : 33, Rm = 8, T = 19, B = 16;
+    var PW = w - L - Rm, PH = h - T - B;
+    if (PW < 30 || PH < 24) return;
+
+    /* header — measured so it never collides in narrow cells */
+    var title = (w < 250 ? meta.short : meta.label.toUpperCase());
+    ctx.font = mono(w < 250 ? 7 : 7.5, 600);
+    spaced(ctx, '.8px');
+    ctx.fillStyle = 'rgba(233, 226, 206, 0.88)';
+    ctx.textAlign = 'left';
+    var titleW = ctx.measureText(title).width;
+    var unit = meta.unit.toUpperCase();
+    ctx.font = mono(6);
+    var unitW = ctx.measureText(unit).width;
+    if (L - 1 + titleW + 10 + unitW <= w - Rm) {
+      ctx.fillStyle = 'rgba(126, 145, 134, 0.95)';
+      ctx.textAlign = 'right';
+      ctx.fillText(unit, w - Rm, 11);
+    }
+    ctx.font = mono(w < 250 ? 7 : 7.5, 600);
+    ctx.fillStyle = 'rgba(233, 226, 206, 0.88)';
+    ctx.textAlign = 'left';
+    ctx.fillText(title, L - 1, 11);
+    spaced(ctx, '0px');
+
+    var domain = geneDomain(hist, key);
+    var X = function (g) { return L + (g / planned) * PW; };
+    if (!domain) {
+      ctx.strokeStyle = 'rgba(32, 67, 57, 0.7)';
+      ctx.strokeRect(L + 0.5, T + 0.5, PW - 1, PH - 1);
+      ctx.fillStyle = 'rgba(94, 113, 103, 0.7)';
+      ctx.font = mono(7);
+      ctx.textAlign = 'center';
+      ctx.fillText('NO LIVING SPECIMENS', L + PW / 2, T + PH / 2);
+      return;
+    }
+    var Y = function (v) { return T + PH - ((v - domain.lo) / (domain.hi - domain.lo)) * PH; };
+
+    /* grid */
+    ctx.strokeStyle = 'rgba(20, 46, 39, 0.6)';
+    ctx.lineWidth = 0.6;
+    ctx.setLineDash([1, 3]);
+    ctx.font = mono(6.5);
+    ctx.fillStyle = 'rgba(126, 145, 134, 0.9)';
+    ctx.textAlign = 'right';
+    for (var r = 0; r <= 2; r++) {
+      var val = domain.lo + ((domain.hi - domain.lo) * r) / 2;
+      var yy = Y(val);
+      ctx.beginPath(); ctx.moveTo(L, yy); ctx.lineTo(L + PW, yy); ctx.stroke();
+      ctx.fillText(meta.fmt(val), L - 4, yy + 2.2);
+    }
+    ctx.setLineDash([]);
+
+    ctx.strokeStyle = 'rgba(32, 67, 57, 0.8)';
+    ctx.lineWidth = 0.7;
+    ctx.beginPath();
+    ctx.moveTo(L, T); ctx.lineTo(L, T + PH); ctx.lineTo(L + PW, T + PH);
+    ctx.stroke();
+
+    ctx.fillStyle = 'rgba(94, 113, 103, 0.68)';
+    ctx.font = mono(5.8);
+    ctx.textAlign = 'right';
+    spaced(ctx, '0.6px');
+    ctx.fillText('GEN 0→' + planned, L + PW, T + 8);
+    spaced(ctx, '0px');
+
+    /* anomaly markers on the trait record */
+    var revealW = PW * Math.max(0, Math.min(1, reveal));
+    for (var ev = 0; ev < eco.events.length; ev++) {
+      var evx = X(eco.events[ev].gen);
+      if (evx > L + revealW + 1) continue;
+      var evc = EVENT_COL[eco.events[ev].type];
+      ctx.strokeStyle = 'rgba(' + evc + ',0.2)';
+      ctx.lineWidth = 0.6;
+      ctx.setLineDash([1.5, 3]);
+      ctx.beginPath(); ctx.moveTo(evx, T); ctx.lineTo(evx, T + PH); ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = 'rgba(' + evc + ',0.9)';
+      ctx.fillRect(evx - 1.4, T - 0.5, 2.8, 2.8);
+    }
+    var species = [
+      { key: 'preyGenes', rgb: '113, 230, 198' },
+      { key: 'predGenes', rgb: '232, 181, 107' }
+    ];
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(L, T - 1, Math.max(0, revealW + 1), PH + 2);
+    ctx.clip();
+
+    for (var s = 0; s < species.length; s++) {
+      var sp = species[s];
+      var entries = hist.map(function (e) { return e[sp.key][key]; });
+      /* band */
+      ctx.beginPath();
+      var started = false;
+      for (var i = 0; i < entries.length; i++) {
+        if (!entries[i]) continue;
+        var xb = X(hist[i].gen), yb = Y(Math.min(domain.hi, entries[i].mean + entries[i].sd));
+        if (!started) { ctx.moveTo(xb, yb); started = true; } else ctx.lineTo(xb, yb);
+      }
+      for (i = entries.length - 1; i >= 0; i--) {
+        if (!entries[i]) continue;
+        ctx.lineTo(X(hist[i].gen), Y(Math.max(domain.lo, entries[i].mean - entries[i].sd)));
+      }
+      ctx.closePath();
+      ctx.fillStyle = 'rgba(' + sp.rgb + ',0.13)';
+      ctx.fill();
+
+      /* mean */
+      ctx.beginPath();
+      var on = false;
+      for (i = 0; i < entries.length; i++) {
+        if (!entries[i]) { on = false; continue; }
+        var xx = X(hist[i].gen), yy = Y(entries[i].mean);
+        if (!on) { ctx.moveTo(xx, yy); on = true; } else ctx.lineTo(xx, yy);
+      }
+      ctx.strokeStyle = 'rgba(' + sp.rgb + ',0.94)';
+      ctx.lineWidth = 1.5;
+      ctx.shadowColor = 'rgba(' + sp.rgb + ',0.4)';
+      ctx.shadowBlur = 4;
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+
+      /* final dots */
+      var lastE = null;
+      for (i = entries.length - 1; i >= 0; i--) { if (entries[i]) { lastE = entries[i]; break; } }
+      if (lastE && reveal > 0.98) {
+        ctx.fillStyle = 'rgba(' + sp.rgb + ',0.95)';
+        ctx.beginPath(); ctx.arc(X(hist[hist.length - 1].gen), Y(lastE.mean), 1.8, 0, TAU); ctx.fill();
+      }
+    }
+    ctx.restore();
+
+  }
+
+  /* ------------------------------------------------------------- dashboard -- */
+  function Dashboard(els) {
+    this.els = els;
+    this.eco = null;
+    this.reveal = 0;
+    this.anim = null;
+    this.hover = null;
+    this.visible = false;
+    var self = this;
+    els.popChart.addEventListener('mousemove', function (e) {
+      if (!self.eco) return;
+      var rect = els.popChart.getBoundingClientRect();
+      var x = e.clientX - rect.left;
+      var hist = self.eco.history;
+      var planned = Math.max(12, hist[hist.length - 1].gen);
+      var L = Math.max(36, rect.width * 0.055), Rm = Math.max(34, rect.width * 0.05);
+      var PW = rect.width - L - Rm;
+      if (x < L || x > L + PW) { self.hover = null; self.draw(); return; }
+      var gen = Math.round(((x - L) / PW) * planned);
+      var idx = 0, best = Infinity;
+      for (var i = 0; i < hist.length; i++) {
+        var d = Math.abs(hist[i].gen - gen);
+        if (d < best) { best = d; idx = i; }
+      }
+      self.hover = { gen: hist[idx].gen, index: idx };
+      self.draw();
+    });
+    els.popChart.addEventListener('mouseleave', function () {
+      self.hover = null;
+      if (self.visible) self.draw();
+    });
+  }
+
+  Dashboard.prototype.show = function (eco) {
+    this.eco = eco;
+    this.reveal = 0;
+    this.hover = null;
+    this.visible = true;
+    var self = this;
+    if (this.anim) cancelAnimationFrame(this.anim);
+    var start = null;
+    function tick(ts) {
+      if (start === null) start = ts;
+      var q = Math.min(1, (ts - start) / 900);
+      self.reveal = 1 - Math.pow(1 - q, 3);
+      self.draw();
+      if (q < 1) self.anim = requestAnimationFrame(tick);
+      else { self.anim = null; self.reveal = 1; self.draw(); }
+    }
+    this.anim = requestAnimationFrame(tick);
+  };
+
+  Dashboard.prototype.draw = function () {
+    if (!this.eco || !this.visible) return;
+    var e = this.els, eco = this.eco;
+    drawPopulation(e.popChart, eco, this.reveal, this.hover);
+    drawGene(e.geneSpeed, eco, 'speed', this.reveal);
+    drawGene(e.geneVision, eco, 'vision', this.reveal);
+    drawGene(e.geneMetabolism, eco, 'metabolism', this.reveal);
+    drawGene(e.geneThreshold, eco, 'threshold', this.reveal);
+  };
+
+  Dashboard.prototype.resize = function () { if (this.visible) this.draw(); };
+
+  Dashboard.prototype.hide = function () {
+    this.visible = false;
+    if (this.anim) { cancelAnimationFrame(this.anim); this.anim = null; }
+  };
+
+  root.AbyssalDashboard = { Dashboard: Dashboard, GENE_META: GENE_META, drawPopulation: drawPopulation, drawGene: drawGene };
+})(window);
+
+
+/* ============================================================================
+   THE ABYSSAL VIVARIUM — instrument panel & observation log
+   ========================================================================== */
+(function (root) {
+  'use strict';
+  var C = root.AbyssalCore;
+  var R = root.AbyssalRender;
+  var D = root.AbyssalDashboard;
+  var doc = document;
+  var $ = function (id) { return doc.getElementById(id); };
+
+  /* ------------------------------------------------------------------ tips -- */
+  var TIPS = {
+    seed: {
+      title: 'Seed · the vessel’s origin',
+      body: 'Every random draw in the ecosystem descends from this number — terrain, births, mutations, catastrophes. The same seed and settings always reproduce the same plate.',
+      meta: 'Sequence 0000–9999 · changing it recasts the specimen'
+    },
+    generations: {
+      title: 'Generations · the observation span',
+      body: 'How many generations the vessel runs before the plate is sealed. Raise it mid-run to extend the observation; lower it to close the record early.',
+      meta: '12–240 generations · one generation is six seconds of sim-time'
+    },
+    speed: {
+      title: 'Time dilation · observation rate',
+      body: 'Multiplies simulated time against wall-clock time. Rendering is independent of the core, so the vessel can be watched slowly or raced past the eye.',
+      meta: '1×–48× · the same run, only sooner'
+    },
+    mutation: {
+      title: 'Mutation rate · hereditary drift',
+      body: 'The standard deviation of genetic change applied to each gene when a creature reproduces. Small values refine adaptation; large values explore wildly and shake old solutions apart.',
+      meta: '0–30% · scales speed, vision, metabolism and threshold'
+    },
+    food: {
+      title: 'Nutrient flux · the bloom’s ceiling',
+      body: 'Multiplies how quickly plant matter regrows across the vessel floor. Lean flux turns the world into a famine; rich flux permits booms and the crashes that follow.',
+      meta: '0.2×–2.0× regrowth rate'
+    },
+    drought: {
+      title: 'Drought · interval & schedule',
+      body: 'At each interval a drought closes the vessel’s light: plant regrowth collapses for about a generation and the bloom recedes into the dark.',
+      meta: 'Fires every 4–40 generations while enabled'
+    },
+    plague: {
+      title: 'Plague · interval & schedule',
+      body: 'A density-dependent fever moves through the shoal, killing a small fraction of creatures each tick. Crowding becomes its own executioner.',
+      meta: 'Fires every 4–40 generations while enabled'
+    },
+    eruption: {
+      title: 'Vent surge · interval & schedule',
+      body: 'The seafloor vent wakes. A fraction of creatures die at once, the bloom is scorched, and the ash briefly fertilises new growth.',
+      meta: 'Fires every 4–40 generations while enabled'
+    },
+    severity: {
+      title: 'Severity · anomaly intensity',
+      body: 'Scales the force of every catastrophe: how deep the bloom falls, how many are taken by fever, how much the vent scorches at once.',
+      meta: '0.4×–1.6× · applies to all three anomalies'
+    },
+    droughtOn: {
+      title: 'Enable drought',
+      body: 'Let droughts fire on their own schedule. Disable an anomaly to observe the vessel without it; the recorded run remains deterministic for its seed.',
+      meta: 'Toggle · schedule keeps its interval'
+    },
+    plagueOn: {
+      title: 'Enable plague',
+      body: 'Let plagues fire on their own schedule. Disable an anomaly to observe the vessel without it; the recorded run remains deterministic for its seed.',
+      meta: 'Toggle · schedule keeps its interval'
+    },
+    eruptionOn: {
+      title: 'Enable vent surge',
+      body: 'Let vent surges fire on their own schedule. Disable an anomaly to observe the vessel without it; the recorded run remains deterministic for its seed.',
+      meta: 'Toggle · schedule keeps its interval'
+    }
+  };
+
+  var MONO = R.MONO;
+  var PAD2 = function (n) { return String(Math.max(0, n | 0)).padStart(2, '0'); };
+  var PAD3 = function (n) { return String(Math.max(0, n | 0)).padStart(3, '0'); };
+  var PAD4 = function (n) { return String(Math.max(0, n | 0)).padStart(4, '0'); };
+
+  function clamp(v, a, b) { return v < a ? a : v > b ? b : v; }
+
+  /* ------------------------------------------------------------------ state -- */
+  var cfg = {
+    seed: C.DEFAULTS.seed,
+    generations: C.DEFAULTS.generations,
+    speed: C.DEFAULTS.speed,
+    mutation: 6,          // % on the dial, 0.06 in the core
+    food: 100,            // % on the dial, 1.0 in the core
+    severity: 100,        // % on the dial, 1.0 in the core
+    droughtOn: true, droughtEvery: 12,
+    plagueOn: true, plagueEvery: 17,
+    eruptionOn: true, eruptionEvery: 23
+  };
+
+  var state = {
+    paused: false,
+    ended: false,
+    plateOpen: false,
+    running: false,
+    acc: 0,
+    lastGen: -1,
+    seenEvents: 0,
+    lastSync: 0,
+    lastRibbon: 0,
+    lastTs: 0
+  };
+
+  var uiClock = (function () {
+    var seed = Date.now() >>> 0;
+    return function () {
+      seed = (seed * 1664525 + 1013904223) >>> 0;
+      return seed / 4294967296;
+    };
+  })();
+
+  function simCfg() {
+    return {
+      generations: cfg.generations,
+      mutation: cfg.mutation / 100,
+      food: cfg.food / 100,
+      severity: cfg.severity / 100,
+      droughtOn: cfg.droughtOn, droughtEvery: cfg.droughtEvery,
+      plagueOn: cfg.plagueOn, plagueEvery: cfg.plagueEvery,
+      eruptionOn: cfg.eruptionOn, eruptionEvery: cfg.eruptionEvery
+    };
+  }
+
+  var eco = null;
+  var renderer = null;
+  var chrono = null;
+  var ribbon = null;
+  var dashboard = null;
+  var els = {};
+
+  function pickEls() {
+    var ids = ['stage', 'world', 'chrono', 'ribbon', 'banner', 'bannerKicker', 'bannerTitle', 'bannerNote',
+      'tint', 'probe', 'pausedNote', 'teleSeed', 'teleGen', 'teleState', 'teleStateText',
+      'chronoGen', 'chronoOf', 'chronoNext', 'chronoNextGen', 'chronoElapsed',
+      'playBtn', 'playIcon', 'stepBtn', 'resetBtn', 'plateBtn', 'openPlateBtn',
+      'transportRate', 'transportClock', 'traceSub', 'tagMeta', 'notes',
+      'tooltip', 'console', 'consoleToggle', 'consoleBody', 'consoleFootNote',
+      'f-speed', 'v-speed', 'f-mutation', 'v-mutation', 'f-food', 'v-food',
+      'f-drought', 'v-drought', 'f-plague', 'v-plague', 'f-eruption', 'v-eruption',
+      'f-severity', 'v-severity', 'seedInput', 'seedMinus', 'seedDice', 'gensMinus', 'gensPlus', 'gensValue',
+      't-drought', 't-plague', 't-eruption', 'next-drought', 'next-plague', 'next-eruption',
+      'dashboard', 'closeDash', 'replayBtn', 'newBtn', 'dashSub', 'dashProse', 'dashStats',
+      'statPrey', 'statPred', 'statPlant', 'statEvents', 'statDrift',
+      'dashSeedNote', 'dashStepNote', 'popChart', 'gene-speed', 'gene-vision', 'gene-metabolism', 'gene-threshold',
+      'headless'];
+    ids.forEach(function (id) { els[id] = $(id); });
+  }
+
+  /* -------------------------------------------------------------- sparklines -- */
+  var SPARK_W = 110, SPARK_H = 34;
+  function sparkCtx(canvas) {
+    var ctx = canvas.getContext('2d');
+    if (canvas.width !== SPARK_W) { canvas.width = SPARK_W; canvas.height = SPARK_H; }
+    ctx.clearRect(0, 0, SPARK_W, SPARK_H);
+    return ctx;
+  }
+  function polySpark(ctx, pts, color, fill, width) {
+    var pad = 2;
+    ctx.beginPath();
+    for (var i = 0; i < pts.length; i++) {
+      var x = pad + (i / (pts.length - 1)) * (SPARK_W - pad * 2);
+      var y = SPARK_H - pad - pts[i] * (SPARK_H - pad * 2);
+      if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+    }
+    ctx.strokeStyle = color;
+    ctx.lineWidth = width || 1.4;
+    ctx.stroke();
+    if (fill) {
+      ctx.lineTo(SPARK_W - pad, SPARK_H - pad);
+      ctx.lineTo(pad, SPARK_H - pad);
+      ctx.closePath();
+      ctx.fillStyle = fill;
+      ctx.fill();
+    }
+  }
+  function marker(ctx, xq, yq, color) {
+    var x = 2 + xq * (SPARK_W - 4), y = SPARK_H - 2 - yq * (SPARK_H - 4);
+    ctx.fillStyle = 'rgba(4, 14, 12, 0.9)';
+    ctx.beginPath(); ctx.arc(x, y, 3.2, 0, Math.PI * 2); ctx.fill();
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 1.2;
+    ctx.beginPath(); ctx.arc(x, y, 2.6, 0, Math.PI * 2); ctx.stroke();
+  }
+  function baseLine(ctx) {
+    ctx.strokeStyle = 'rgba(32, 67, 57, 0.95)';
+    ctx.lineWidth = 0.8;
+    ctx.beginPath();
+    ctx.moveTo(1, SPARK_H - 2.5); ctx.lineTo(SPARK_W - 1, SPARK_H - 2.5);
+    ctx.stroke();
+  }
+
+  function drawSpark(kind) {
+    var canvas = doc.querySelector('[data-spark="' + kind + '"]');
+    if (!canvas) return;
+    var ctx = sparkCtx(canvas);
+    var i, pts = [];
+    baseLine(ctx);
+    if (kind === 'seed') {
+      var r = new C.RNG('spark::' + cfg.seed);
+      for (i = 0; i < 22; i++) {
+        var v = r.next();
+        ctx.fillStyle = i % 2 ? 'rgba(140,246,218,0.9)' : 'rgba(198,168,112,0.8)';
+        ctx.fillRect(3 + i * 4.8, 4 + v * 18, 2, SPARK_H - 8 - v * 18);
+      }
+      return;
+    }
+    if (kind === 'generations') {
+      var N = cfg.generations;
+      var prev = 0;
+      for (i = 0; i <= 20; i++) pts.push(0.15 + 0.7 * (i / 20));
+      polySpark(ctx, pts, 'rgba(113,230,198,0.75)', null, 1.3);
+      var kinds = [['drought', cfg.droughtEvery, cfg.droughtOn, 'rgba(217,166,79,0.9)'],
+        ['plague', cfg.plagueEvery, cfg.plagueOn, 'rgba(179,147,225,0.9)'],
+        ['eruption', cfg.eruptionEvery, cfg.eruptionOn, 'rgba(229,118,79,0.9)']];
+      var maxX = Math.max(N, 1);
+      kinds.forEach(function (k) {
+        if (!k[2]) return;
+        for (var g = k[1]; g <= maxX; g += Math.max(1, k[1])) {
+          var x = 2 + (g / maxX) * (SPARK_W - 4);
+          ctx.fillStyle = k[3];
+          ctx.fillRect(x - 0.8, 5, 1.6, 7);
+        }
+      });
+      return;
+    }
+    if (kind === 'speed') {
+      var fill = clamp((cfg.speed - 1) / 47, 0, 1);
+      for (i = 0; i < 12; i++) {
+        var q = i / 11;
+        var hgt = 3 + Math.pow(q, 0.7) * (SPARK_H - 12);
+        ctx.fillStyle = q <= fill ? 'rgba(200,238,170,0.95)' : 'rgba(184,223,164,0.34)';
+        ctx.fillRect(3 + i * 8.8, SPARK_H - 3 - hgt, 5, hgt);
+      }
+      return;
+    }
+    if (kind === 'mutation') {
+      var s = 0.05 + (cfg.mutation / 30) * 0.24;
+      for (i = 0; i <= 30; i++) {
+        var xq = i / 30;
+        pts.push(clamp(Math.exp(-((xq - 0.5) * (xq - 0.5)) / (2 * s * s)) * 0.92, 0, 1));
+      }
+      polySpark(ctx, pts, 'rgba(140,246,218,0.9)', 'rgba(113,230,198,0.10)', 1.3);
+      marker(ctx, 0.5, 0.92, 'rgba(113,230,198,0.75)');
+      return;
+    }
+    if (kind === 'food') {
+      var flux = cfg.food / 100;
+      for (i = 0; i <= 26; i++) {
+        var t = i / 26;
+        pts.push(clamp(0.12 + (1 - Math.exp(-t * 3.4 * flux)) * 0.82, 0, 1));
+      }
+      polySpark(ctx, pts, 'rgba(202,240,172,0.95)', 'rgba(184,223,164,0.08)', 1.4);
+      marker(ctx, clamp(0.08 + 0.84 * (flux / 2), 0, 1), clamp(0.12 + (1 - Math.exp(-3.4 * flux * 0.5)) * 0.82, 0, 1), 'rgba(184,223,164,0.9)');
+      return;
+    }
+    if (kind === 'drought' || kind === 'plague' || kind === 'eruption' || kind === 'severity') {
+      var col = kind === 'drought' ? 'rgba(217,166,79,0.9)' : kind === 'plague' ? 'rgba(179,147,225,0.9)'
+        : kind === 'eruption' ? 'rgba(229,118,79,0.9)' : 'rgba(232,181,107,0.9)';
+      if (kind === 'severity') {
+        for (i = 0; i <= 30; i++) {
+          var t2 = i / 30;
+          pts.push(clamp(0.5 + Math.sin(t2 * Math.PI * 3.2) * (0.16 + cfg.severity / 100 * 0.22) * (1 - t2 * 0.4), 0, 1));
+        }
+        polySpark(ctx, pts, col, 'rgba(232,181,107,0.07)', 1.4);
+        return;
+      }
+      var interval = kind === 'drought' ? cfg.droughtEvery : kind === 'plague' ? cfg.plagueEvery : cfg.eruptionEvery;
+      var on = kind === 'drought' ? cfg.droughtOn : kind === 'plague' ? cfg.plagueOn : cfg.eruptionOn;
+      var span = 40;
+      for (var g2 = Math.max(1, interval); g2 <= span; g2 += Math.max(1, interval)) {
+        var x3 = 2 + (g2 / span) * (SPARK_W - 4);
+        ctx.fillStyle = col;
+        ctx.globalAlpha = on ? 1 : 0.3;
+        ctx.fillRect(x3 - 1, SPARK_H - 22, 2, 19);
+        ctx.fillRect(x3 - 3.5, SPARK_H - 5, 7, 2);
+      }
+      ctx.globalAlpha = 1;
+      return;
+    }
+  }
+
+  function drawAllSparks() {
+    ['seed', 'generations', 'speed', 'mutation', 'food', 'drought', 'plague', 'eruption', 'severity'].forEach(drawSpark);
+  }
+
+  /* ------------------------------------------------------------- readouts -- */
+  function bump(el) {
+    if (!el) return;
+    el.classList.remove('bump');
+    void el.offsetWidth;
+    el.classList.add('bump');
+    clearTimeout(el._bumpT);
+    el._bumpT = setTimeout(function () { el.classList.remove('bump'); }, 420);
+  }
+
+  var READOUTS = {
+    speed: function () { return cfg.speed + '<span class="unit">×</span>'; },
+    mutation: function () { return (cfg.mutation / 1).toFixed(1) + '<span class="unit">%</span>'; },
+    food: function () { return (cfg.food / 100).toFixed(2) + '<span class="unit">×</span>'; },
+    drought: function () { return cfg.droughtEvery + '<span class="unit">gen</span>'; },
+    plague: function () { return cfg.plagueEvery + '<span class="unit">gen</span>'; },
+    eruption: function () { return cfg.eruptionEvery + '<span class="unit">gen</span>'; },
+    severity: function () { return (cfg.severity / 100).toFixed(2) + '<span class="unit">×</span>'; }
+  };
+
+  function refreshReadout(kind) {
+    var el = $('v-' + kind);
+    if (!el) return;
+    el.innerHTML = READOUTS[kind]();
+    bump(el);
+  }
+
+  function setFill(input) {
+    var min = +input.min, max = +input.max, v = +input.value;
+    input.style.setProperty('--fill', (((v - min) / (max - min)) * 100).toFixed(1) + '%');
+  }
+
+  /* --------------------------------------------------------------- console -- */
+  function bindFaders() {
+    var map = [
+      { id: 'speed', get: function () { return cfg.speed; }, set: function (v) { cfg.speed = v; } },
+      { id: 'mutation', get: function () { return cfg.mutation; }, set: function (v) { cfg.mutation = v; applyCore(); } },
+      { id: 'food', get: function () { return cfg.food; }, set: function (v) { cfg.food = v; applyCore(); } },
+      { id: 'drought', get: function () { return cfg.droughtEvery; }, set: function (v) { cfg.droughtEvery = v; applyCore(); } },
+      { id: 'plague', get: function () { return cfg.plagueEvery; }, set: function (v) { cfg.plagueEvery = v; applyCore(); } },
+      { id: 'eruption', get: function () { return cfg.eruptionEvery; }, set: function (v) { cfg.eruptionEvery = v; applyCore(); } },
+      { id: 'severity', get: function () { return cfg.severity; }, set: function (v) { cfg.severity = v; applyCore(); } }
+    ];
+    map.forEach(function (m) {
+      var input = $('f-' + m.id);
+      if (!input) return;
+      function commit() {
+        m.set(+input.value);
+        setFill(input);
+        refreshReadout(m.id);
+        drawSpark(m.id);
+        syncConsole();
+        persistUrl();
+      }
+      input.addEventListener('input', commit);
+      input.addEventListener('change', commit);
+      input.value = m.get();
+      setFill(input);
+      refreshReadout(m.id);
+    });
+  }
+
+  function applyCore() {
+    if (eco) eco.setConfig(simCfg());
+    syncConsole();
+  }
+
+  function bindSteppers() {
+    function stepSeed(delta) {
+      cfg.seed = (cfg.seed + delta + 10000) % 10000;
+      els.seedInput.value = PAD4(cfg.seed);
+      drawSpark('seed');
+      recast();
+    }
+    els.seedMinus.addEventListener('click', function () { stepSeed(-1); });
+    els.seedInput.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') { e.preventDefault(); applySeedInput(); els.seedInput.blur(); }
+      else if (e.key === 'ArrowUp') { e.preventDefault(); stepSeed(1); }
+      else if (e.key === 'ArrowDown') { e.preventDefault(); stepSeed(-1); }
+    });
+    els.seedInput.addEventListener('blur', applySeedInput);
+    els.seedDice.addEventListener('click', function () {
+      cfg.seed = Math.floor(uiClock() * 10000);
+      els.seedInput.value = PAD4(cfg.seed);
+      drawSpark('seed');
+      recast();
+    });
+
+    function applySeedInput() {
+      var raw = els.seedInput.value.replace(/[^0-9]/g, '');
+      var v = raw === '' ? 0 : clamp(parseInt(raw, 10) || 0, 0, 9999);
+      els.seedInput.value = PAD4(v);
+      if (v !== cfg.seed) { cfg.seed = v; drawSpark('seed'); recast(); }
+    }
+
+    function setGens(v) {
+      v = clamp(Math.round(v / 6) * 6 || 12, 12, 240);
+      if (v === cfg.generations) return;
+      cfg.generations = v;
+      els.gensValue.textContent = PAD3(v);
+      els.gensValue.setAttribute('aria-valuenow', String(v));
+      els.chronoOf.textContent = 'of ' + PAD3(v);
+      if (eco) {
+        eco.setConfig(simCfg());
+        if (state.ended && v > eco.gen) resumeRun();
+        else if (!state.ended && v <= eco.gen) sealRun(true);
+      }
+      drawSpark('generations');
+      syncConsole();
+      persistUrl();
+      bump(els.gensValue);
+    }
+    els.gensMinus.addEventListener('click', function () { setGens(cfg.generations - 6); });
+    els.gensPlus.addEventListener('click', function () { setGens(cfg.generations + 6); });
+    els.gensValue.addEventListener('keydown', function (e) {
+      if (e.key === 'ArrowUp' || e.key === 'ArrowRight') { e.preventDefault(); setGens(cfg.generations + 6); }
+      else if (e.key === 'ArrowDown' || e.key === 'ArrowLeft') { e.preventDefault(); setGens(cfg.generations - 6); }
+      else if (e.key === 'Home') { e.preventDefault(); setGens(12); }
+      else if (e.key === 'End') { e.preventDefault(); setGens(240); }
+    });
+    els.gensValue.textContent = PAD3(cfg.generations);
+    els.gensValue.setAttribute('aria-valuenow', String(cfg.generations));
+    els.seedInput.value = PAD4(cfg.seed);
+
+    ['drought', 'plague', 'eruption'].forEach(function (type) {
+      var t = $('t-' + type);
+      t.checked = cfg[type + 'On'];
+      t.addEventListener('change', function () {
+        cfg[type + 'On'] = t.checked;
+        applyCore();
+        drawSpark(type);
+        syncConsole();
+        persistUrl();
+      });
+    });
+  }
+
+  /* ---------------------------------------------------------------- events -- */
+  var bannerTimer = null;
+  var activeEventType = null;
+
+  function showEvent(ev, index) {
+    var colors = { drought: 'var(--drought)', plague: 'var(--plague)', eruption: 'var(--eruption)' };
+    var col = colors[ev.type] || 'var(--amber)';
+    els.banner.style.setProperty('--anom', col);
+    els.bannerKicker.textContent = ev.kicker;
+    els.bannerTitle.textContent = ev.label;
+    els.bannerNote.textContent = ev.note;
+    els.banner.classList.add('show');
+    clearTimeout(bannerTimer);
+    bannerTimer = setTimeout(function () {
+      els.banner.classList.remove('show');
+    }, 3200);
+    addNote(ev.gen, ev.label.toUpperCase(), ev.note, ev.type);
+    renderer.announce(ev.type);
+    chrono.announce(ev.type);
+    syncConsole();
+  }
+
+  function consumeEvents() {
+    if (!eco || eco.events.length <= state.seenEvents) return;
+    var fresh = eco.events.slice(state.seenEvents);
+    state.seenEvents = eco.events.length;
+    fresh.forEach(showEvent);
+    syncRibbon();
+  }
+
+  function clearEventWash() {
+    var types = ['drought', 'plague', 'eruption'];
+    var active = eco && eco.anomaly ? eco.anomaly.type : null;
+    if (active === activeEventType) return;
+    for (var i = 0; i < types.length; i++) {
+      if (types[i] !== active) els.stage.classList.remove('event-' + types[i]);
+    }
+    if (active) els.stage.classList.add('event-' + active);
+    activeEventType = active;
+  }
+
+  /* ----------------------------------------------------------------- notes -- */
+  function addNote(gen, type, text, tone) {
+    var li = doc.createElement('li');
+    li.className = 'note';
+    var g = doc.createElement('span');
+    g.className = 'note-gen';
+    g.textContent = 'GEN ' + PAD3(gen);
+    var t = doc.createElement('span');
+    t.className = 'note-type';
+    t.textContent = type;
+    var colors = { drought: 'var(--drought)', plague: 'var(--plague)', eruption: 'var(--eruption)', seal: 'var(--aqua)', plate: 'var(--amber)' };
+    if (colors[tone]) t.style.color = colors[tone];
+    var s = doc.createElement('span');
+    s.className = 'note-text';
+    s.textContent = text;
+    li.appendChild(g); li.appendChild(t); li.appendChild(s);
+    els.notes.insertBefore(li, els.notes.firstChild);
+    while (els.notes.children.length > 4) els.notes.removeChild(els.notes.lastChild);
+  }
+
+  function resetNotes() {
+    els.notes.innerHTML = '';
+    addNote(0, 'VESSEL', 'Sealed at generation zero · ' + eco.prey.length + ' grazers, ' + eco.pred.length + ' hunters, 16 000 sparophytes.', 'seal');
+  }
+
+  /* --------------------------------------------------------------- tooltip -- */
+  var tipEl = null;
+  function showTip(anchor) {
+    var key = anchor.getAttribute('data-tip');
+    var tip = TIPS[key];
+    if (!tip || !tipEl) return;
+    tipEl.innerHTML = '<b>' + tip.title + '</b><p>' + tip.body + '</p><small>' + tip.meta + '</small>';
+    tipEl.classList.add('show');
+    tipEl.setAttribute('aria-hidden', 'false');
+    var rect = anchor.getBoundingClientRect();
+    tipEl.style.left = '0px';
+    tipEl.style.top = '0px';
+    var tr = tipEl.getBoundingClientRect();
+    var x = clamp(rect.left + rect.width / 2 - tr.width / 2, 10, root.innerWidth - tr.width - 10);
+    var y = rect.bottom + 9;
+    if (y + tr.height > root.innerHeight - 10) y = rect.top - tr.height - 9;
+    tipEl.style.left = x + 'px';
+    tipEl.style.top = Math.max(8, y) + 'px';
+  }
+  function hideTip() {
+    if (!tipEl) return;
+    tipEl.classList.remove('show');
+    tipEl.setAttribute('aria-hidden', 'true');
+  }
+  function bindTips() {
+    tipEl = els.tooltip;
+    Object.keys(TIPS).forEach(function (key) {
+      var span = doc.createElement('span');
+      span.className = 'sr-only';
+      span.id = 'tip-' + key;
+      span.textContent = TIPS[key].title + '. ' + TIPS[key].body + ' ' + TIPS[key].meta;
+      doc.body.appendChild(span);
+    });
+    doc.querySelectorAll('[data-tip]').forEach(function (el) {
+      var key = el.getAttribute('data-tip');
+      var target = el.matches('input, button, select, textarea') ? el
+        : (el.closest('.ctrl') ? el.closest('.ctrl').querySelector('input') : null);
+      if (target && !target.getAttribute('aria-describedby') && TIPS[key]) {
+        target.setAttribute('aria-describedby', 'tip-' + key);
+      }
+      el.addEventListener('mouseenter', function () { showTip(el); });
+      el.addEventListener('mouseleave', hideTip);
+    });
+    /* hovering anywhere on a fader row / anomaly card shows its tooltip */
+    doc.querySelectorAll('.fader, .anomaly, .stepper-grid').forEach(function (group) {
+      var anchor = group.querySelector('[data-tip]');
+      if (!anchor) return;
+      group.addEventListener('mouseenter', function () { showTip(anchor); });
+      group.addEventListener('mouseleave', hideTip);
+    });
+    els.console.addEventListener('focusin', function (e) {
+      var grp = e.target.closest('.fader, .anomaly, .ctrl, .stepper-grid');
+      var anchor = grp && grp.querySelector('[data-tip]');
+      if (anchor) showTip(anchor);
+    });
+    els.console.addEventListener('focusout', hideTip);
+  }
+
+  /* ------------------------------------------------------------------ sync -- */
+  function syncConsole() {
+    if (!eco) return;
+    els.teleSeed.textContent = PAD4(cfg.seed);
+    els.teleGen.textContent = PAD3(eco.gen) + ' / ' + PAD3(cfg.generations);
+    var stateText = state.ended ? 'Sealed' : state.paused ? 'Paused' : 'Live';
+    els.teleStateText.textContent = stateText;
+    els.teleState.classList.toggle('is-paused', state.paused && !state.ended);
+    els.teleState.classList.toggle('is-ended', state.ended);
+    els.chronoGen.textContent = PAD3(eco.gen);
+    els.chronoOf.textContent = 'of ' + PAD3(cfg.generations);
+    els.transportRate.textContent = (cfg.speed * C.TPS / C.TICKS_PER_GEN).toFixed(2) + ' gen/s';
+    var simSec = Math.floor(eco.totalTicks / C.TPS);
+    var clock = 'T+ ' + PAD2(Math.floor(simSec / 60)) + ':' + PAD2(simSec % 60);
+    els.transportClock.textContent = clock;
+    els.chronoElapsed.textContent = clock;
+    els.traceSub.textContent = (state.ended ? 'sealed' : state.paused ? 'held' : 'live') + ' · generation ' + PAD3(eco.gen) + ' of ' + PAD3(cfg.generations);
+    els.tagMeta.textContent = 'SEED ' + PAD4(cfg.seed) + ' · ' + PAD3(eco.gen) + ' GEN';
+    els.consoleFootNote.textContent = state.ended ? 'record sealed' : state.paused ? 'observation held' : 'deterministic core';
+
+    var next = eco.nextAnomaly();
+    if (next) {
+      var names = { drought: 'Drought', plague: 'Plague', eruption: 'Vent surge' };
+      els.chronoNext.textContent = names[next.type];
+      els.chronoNextGen.textContent = 'gen ' + PAD3(next.gen);
+    } else {
+      els.chronoNext.textContent = 'None';
+      els.chronoNextGen.textContent = '';
+    }
+    ['drought', 'plague', 'eruption'].forEach(function (type) {
+      var el = $('next-' + type);
+      if (!el) return;
+      if (!cfg[type + 'On']) { el.textContent = 'off'; el.style.opacity = '0.4'; return; }
+      el.style.opacity = '0.85';
+      if (eco.anomaly && eco.anomaly.type === type) el.textContent = 'Active';
+      else {
+        var due = eco.nextDue[type];
+        el.textContent = due <= cfg.generations ? 'Next · gen ' + PAD3(due) : 'Beyond record';
+      }
+    });
+
+    var playing = !state.paused && !state.ended;
+    var use = $('playIcon');
+    if (use) use.setAttribute('href', state.ended ? '#i-plate' : playing ? '#i-pause' : '#i-play');
+    els.playBtn.setAttribute('aria-label', state.ended ? 'Open final plate' : playing ? 'Pause observation' : 'Resume observation');
+    els.playBtn.title = state.ended ? 'Open final plate (G)' : playing ? 'Pause / resume (Space)' : 'Resume observation (Space)';
+    els.stepBtn.disabled = state.ended;
+    els.stepBtn.style.opacity = state.ended ? '0.4' : '';
+    els.plateBtn.classList.toggle('main', state.ended);
+  }
+
+  function syncRibbon() {
+    if (!eco) return;
+    ribbon.draw(eco, cfg.generations, cfg);
+  }
+
+  /* --------------------------------------------------------------- transport -- */
+  function togglePause() {
+    if (state.ended) { openPlate(); return; }
+    state.paused = !state.paused;
+    if (!state.paused) state.lastTs = 0;
+    els.stage.classList.toggle('is-paused', state.paused);
+    syncConsole();
+  }
+
+  function stepGeneration() {
+    if (!eco || state.ended) { openPlate(); return; }
+    state.paused = true;
+    els.stage.classList.add('is-paused');
+    var g0 = eco.gen, guard = 0;
+    while (!eco.done && eco.gen === g0 && guard++ < 3000) eco.step();
+    state.acc = 0;
+    consumeEvents();
+    if (eco.done) handleEnd();
+    syncAll();
+  }
+
+  function sealRun(manual) {
+    if (!eco || state.ended) return;
+    eco.done = true;
+    eco.endReason = manual ? 'sealed' : 'complete';
+    handleEnd();
+  }
+
+  function recast() {
+    state.paused = false;
+    state.ended = false;
+    state.plateOpen = false;
+    state.acc = 0;
+    state.seenEvents = 0;
+    state.lastGen = -1;
+    state.lastTs = 0;
+    els.stage.classList.remove('is-paused', 'event-drought', 'event-plague', 'event-eruption');
+    activeEventType = null;
+    doc.body.classList.remove('is-ended');
+    els.dashboard.classList.remove('show');
+    setTimeout(function () {
+      if (!state.plateOpen) els.dashboard.hidden = true;
+    }, 320);
+    eco = new C.Ecosystem(cfg.seed, simCfg());
+    state.running = true;
+    if (!renderer) renderer = new R.Renderer(els.world, els.stage);
+    else renderer.resize();
+    if (!chrono) chrono = new R.Chrono(els.chrono, els.console);
+    else chrono.resize();
+    if (!ribbon) ribbon = new R.Ribbon(els.ribbon);
+    else ribbon.resize();
+    resetNotes();
+    syncAll();
+    drawSpark('seed');
+    persistUrl();
+    hideTip();
+    if (state.updateScrollCue) state.updateScrollCue();
+  }
+
+  function resumeRun() {
+    if (!eco) return;
+    state.ended = false;
+    state.paused = false;
+    doc.body.classList.remove('is-ended');
+    els.dashboard.classList.remove('show');
+    setTimeout(function () { if (!state.plateOpen) els.dashboard.hidden = true; }, 320);
+    state.plateOpen = false;
+    eco.done = false;
+    eco.endReason = null;
+    syncAll();
+  }
+
+  /* --------------------------------------------------------------- end flow -- */
+  function handleEnd() {
+    if (state.ended) return;
+    state.ended = true;
+    state.paused = true;
+    state.plateOpen = false;
+    doc.body.classList.add('is-ended');
+    els.stage.classList.remove('is-paused', 'event-drought', 'event-plague', 'event-eruption');
+    activeEventType = null;
+    syncConsole();
+    syncAll();
+    addNote(eco.gen, 'PLATE', 'The lamp is drawn. ' + eco.events.length + ' anomalies crossed the vessel.', 'plate');
+    setTimeout(function () {
+      if (state.ended && !state.plateOpen) openPlate();
+    }, 900);
+  }
+
+  /* -------------------------------------------------------------- dashboard -- */
+  function strongestDrift(summary) {
+    var best = null;
+    ['prey', 'pred'].forEach(function (sp) {
+      C.GENE_KEYS.forEach(function (gene) {
+        var d = summary.drift[sp][gene];
+        if (!d || !d.sdFrom) return;
+        var effect = Math.abs(d.mean) / Math.max(d.sdFrom, 0.0001);
+        if (!best || effect > best.effect) {
+          best = { species: sp === 'prey' ? 'grazers' : 'hunters', gene: gene, mean: d.mean, effect: effect, from: d.from, to: d.to };
+        }
+      });
+    });
+    return best;
+  }
+
+  function composeNarrative(summary) {
+    var parts = [];
+    var seed = PAD4(summary.seed);
+    parts.push('Under seed <b>' + seed + '</b> the vessel ran <b>' + summary.generations + ' generations</b>' +
+      (summary.endReason === 'sealed' ? ', sealed by hand before its time.' : ' before the plate was drawn.'));
+    if (summary.extinctPrey) {
+      var ext = null;
+      eco.history.forEach(function (e) { if (!ext && e.prey === 0) ext = e.gen; });
+      parts.push('The grazers were lost' + (ext !== null ? ' by generation <b>' + ext + '</b>' : '') + '; the hunters followed the famine down.');
+    } else {
+      var finalCover = Math.round(summary.finalPlant * 100);
+      parts.push('The bloom closed at <b>' + finalCover + '% density</b>; grazers peaked at <b>' + summary.peakPrey +
+        '</b> and finished at <b>' + summary.finalPrey + '</b>, while hunters peaked at <b>' + summary.peakPred +
+        '</b> and finished at <b>' + summary.finalPred + '</b>.');
+    }
+    var drift = strongestDrift(summary);
+    if (drift) {
+      var words = {
+        speed: [drift.mean > 0 ? 'quickened' : 'slowed', 'speed'],
+        vision: [drift.mean > 0 ? 'sharpened' : 'dimmed', 'vision'],
+        metabolism: [drift.mean > 0 ? 'burned hotter' : 'grew leaner', 'metabolism'],
+        threshold: [drift.mean > 0 ? 'moved later' : 'moved earlier', 'reproductive threshold']
+      };
+      var verb = words[drift.gene][0];
+      var noun = words[drift.gene][1];
+      var whose = drift.species === 'grazers' ? 'the grazers’' : 'the hunters’';
+      parts.push('The clearest current ran through ' + whose + ' <b>' + noun + '</b>, which ' + verb +
+        ' by <b>' + drift.effect.toFixed(1) + 'σ</b> of its starting spread.');
+    }
+    if (summary.events) {
+      var counts = { drought: 0, plague: 0, eruption: 0 };
+      eco.events.forEach(function (e) { if (counts[e.type] !== undefined) counts[e.type]++; });
+      var bits = [];
+      if (counts.drought) bits.push(counts.drought + ' drought' + (counts.drought > 1 ? 's' : ''));
+      if (counts.plague) bits.push(counts.plague + ' plague' + (counts.plague > 1 ? 's' : ''));
+      if (counts.eruption) bits.push(counts.eruption + ' vent surge' + (counts.eruption > 1 ? 's' : ''));
+      parts.push('<b>' + summary.events + (summary.events === 1 ? ' anomaly' : ' anomalies') + '</b> crossed the vessel — ' + bits.join(', ') + ' — and are marked on the record.');
+    }
+    parts.push('The record is deterministic; seed <b>' + seed + '</b> will reproduce this plate exactly, under glass or headless.');
+    return parts.join(' ');
+  }
+
+  function buildPlate() {
+    var summary = eco.summary();
+    els.dashSub.textContent = 'Specimen Nº 08 · seed ' + PAD4(cfg.seed) + ' · ' + summary.generations + ' of ' +
+      PAD3(cfg.generations) + ' generations' + (summary.endReason === 'sealed' ? ' · sealed by hand' : '');
+    els.dashProse.innerHTML = composeNarrative(summary);
+    els.statPrey.innerHTML = summary.peakPrey + '<small>individuals</small>';
+    els.statPred.innerHTML = summary.peakPred + '<small>individuals</small>';
+    els.statPlant.innerHTML = Math.round(summary.finalPlant * 100) + '%<small>density</small>';
+    els.statEvents.innerHTML = summary.events + '<small>crossed</small>';
+    var drift = strongestDrift(summary);
+    if (drift) {
+      els.statDrift.innerHTML = drift.effect.toFixed(1) + 'σ<small>' + drift.species + ' · ' + drift.gene + '</small>';
+    } else {
+      els.statDrift.innerHTML = '—<small>no living drift</small>';
+    }
+    els.dashSeedNote.textContent = 'Seed ' + PAD4(cfg.seed) + ' reproduces this plate exactly; the core also runs headless, faster than real time.';
+    els.dashStepNote.textContent = 'Deterministic record · ' + summary.ticks + ' steps · hash ' + summary.hash.toString(16).toUpperCase();
+    dashboard.show(eco);
+  }
+
+  function openPlate() {
+    if (!eco) return;
+    if (!state.ended) sealRun(true);
+    state.plateOpen = true;
+    buildPlate();
+    els.dashboard.hidden = false;
+    root.requestAnimationFrame(function () {
+      els.dashboard.classList.add('show');
+      dashboard.resize();
+      try { els.closeDash.focus(); } catch (e) {}
+    });
+  }
+
+  function closePlate() {
+    state.plateOpen = false;
+    els.dashboard.classList.remove('show');
+    dashboard.hide();
+    setTimeout(function () { if (!state.plateOpen) els.dashboard.hidden = true; }, 380);
+  }
+
+  function downloadRecord() {
+    try {
+      var summary = eco.summary();
+      var payload = {
+        app: 'Abyssal Vivarium',
+        specimen: 8,
+        seed: cfg.seed,
+        config: simCfg(),
+        summary: summary,
+        events: eco.events,
+        history: eco.history
+      };
+      var blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+      var url = URL.createObjectURL(blob);
+      var a = doc.createElement('a');
+      a.href = url;
+      a.download = 'abyssal-vivarium-seed-' + PAD4(cfg.seed) + '.json';
+      doc.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(function () { URL.revokeObjectURL(url); }, 2000);
+    } catch (e) { /* download is a courtesy, never fatal */ }
+  }
+
+  /* ------------------------------------------------------------ sim loop ---- */
+  var rafId = null;
+  var cancels = false;
+
+  function syncAll() {
+    if (!eco) return;
+    syncConsole();
+    syncRibbon();
+    state.lastGen = eco.gen;
+  }
+
+  function frame(ts) {
+    rafId = root.requestAnimationFrame(frame);
+    if (!eco) return;
+    if (!state.lastTs) state.lastTs = ts;
+    var dt = Math.min(0.06, Math.max(0.001, (ts - state.lastTs) / 1000));
+    state.lastTs = ts;
+    var budget = 13;
+    if (!state.paused && !state.ended && !eco.done) {
+      state.acc += dt * C.TPS * cfg.speed;
+      var t0 = (root.performance || Date).now();
+      var steps = 0;
+      var maxSteps = Math.ceil(C.TPS * cfg.speed * 0.1) + 2;
+      while (state.acc >= 1 && steps < maxSteps && !eco.done) {
+        eco.step();
+        state.acc -= 1;
+        steps++;
+        if ((steps & 7) === 0) {
+          if ((root.performance || Date).now() - t0 > budget) break;
+        }
+      }
+      if (state.acc > maxSteps * 2) state.acc = maxSteps * 2;
+      if (eco.done && !state.ended) handleEnd();
+    }
+    consumeEvents();
+    clearEventWash();
+    if (eco.gen !== state.lastGen) {
+      syncAll();
+    } else if (ts - state.lastSync > 180) {
+      syncConsole();
+      state.lastSync = ts;
+    }
+    if (ts - state.lastRibbon > 220) {
+      syncRibbon();
+      state.lastRibbon = ts;
+    }
+    renderer.draw(eco, dt, state.paused || state.ended);
+    chrono.draw(eco, cfg.generations, dt);
+  }
+
+  /* --------------------------------------------------------------- resizes -- */
+  function bindResizes() {
+    function onResize() {
+      if (renderer) renderer.resize();
+      if (chrono) chrono.resize();
+      if (ribbon) ribbon.resize();
+      if (dashboard) dashboard.resize();
+    }
+    root.addEventListener('resize', onResize);
+    if (root.ResizeObserver) {
+      var ro = new ResizeObserver(function () { onResize(); });
+      ro.observe(els.stage);
+      ro.observe(els.ribbon.parentNode);
+    }
+  }
+
+  /* ------------------------------------------------------------------ probe -- */
+  function bindProbe() {
+    var stage = els.stage;
+    stage.addEventListener('mousemove', function (e) {
+      if (!renderer) return;
+      var rect = stage.getBoundingClientRect();
+      var x = e.clientX - rect.left, y = e.clientY - rect.top;
+      renderer.probe = { x: x, y: y, on: true };
+      var wx = (x / rect.width) * C.W;
+      var wy = (y / rect.height) * C.H;
+      els.probe.textContent = 'Probe · ' + wx.toFixed(1).padStart(5, '0') + ' / ' + wy.toFixed(1).padStart(5, '0');
+    });
+    stage.addEventListener('mouseleave', function () {
+      if (!renderer) return;
+      renderer.probe.on = false;
+    });
+  }
+
+  /* ------------------------------------------------------------------- url -- */
+  function persistUrl() {
+    try {
+      var p = new URLSearchParams();
+      p.set('seed', cfg.seed);
+      p.set('gens', cfg.generations);
+      p.set('speed', cfg.speed);
+      p.set('mutation', cfg.mutation);
+      p.set('food', (cfg.food / 100).toFixed(2));
+      p.set('severity', (cfg.severity / 100).toFixed(2));
+      p.set('drought', cfg.droughtEvery);
+      p.set('plague', cfg.plagueEvery);
+      p.set('eruption', cfg.eruptionEvery);
+      var q = p.toString();
+      root.history.replaceState(null, '', '?' + q);
+    } catch (e) { /* file:// or sandboxed contexts */ }
+  }
+
+  function readUrl() {
+    try {
+      var p = new URLSearchParams(root.location.search);
+      function num(key, fallback) {
+        var v = parseFloat(p.get(key));
+        return isNaN(v) ? fallback : v;
+      }
+      cfg.seed = clamp(Math.round(num('seed', C.DEFAULTS.seed)), 0, 9999);
+      cfg.generations = clamp(Math.round(num('gens', C.DEFAULTS.generations) / 6) * 6 || C.DEFAULTS.generations, 12, 240);
+      cfg.speed = clamp(Math.round(num('speed', C.DEFAULTS.speed)), 1, 48);
+      cfg.mutation = clamp(num('mutation', 6), 0, 30);
+      cfg.food = clamp(num('food', 1) * 100, 20, 200);
+      cfg.severity = clamp(num('severity', 1) * 100, 40, 160);
+      cfg.droughtEvery = clamp(Math.round(num('drought', 12)), 4, 40);
+      cfg.plagueEvery = clamp(Math.round(num('plague', 17)), 4, 40);
+      cfg.eruptionEvery = clamp(Math.round(num('eruption', 23)), 4, 40);
+      if (p.get('anomalies') === 'off') { cfg.droughtOn = cfg.plagueOn = cfg.eruptionOn = false; }
+    } catch (e) {}
+  }
+
+  /* -------------------------------------------------------------- keyboard -- */
+  function bindKeys() {
+    doc.addEventListener('keydown', function (e) {
+      var t = e.target || {};
+      var tag = (t.tagName || '').toLowerCase();
+      if (tag === 'input' || tag === 'textarea' || tag === 'select' || t.isContentEditable) return;
+      if (state.plateOpen) {
+        if (e.key === 'Escape') { e.preventDefault(); closePlate(); }
+        return;
+      }
+      if (e.code === 'Space') {
+        if (tag === 'button' || tag === 'a') return; // let the focused control act
+        e.preventDefault();
+        togglePause();
+      } else if (e.key === 's' || e.key === 'S') {
+        e.preventDefault(); stepGeneration();
+      } else if (e.key === 'r' || e.key === 'R') {
+        e.preventDefault(); recast();
+      } else if (e.key === 'g' || e.key === 'G') {
+        e.preventDefault(); openPlate();
+      }
+    });
+  }
+
+  /* ------------------------------------------------------------ headless API -- */
+  function runHeadless(opts) {
+    opts = opts || {};
+    var config = simCfg();
+    if (opts.config) config = Object.assign(config, opts.config);
+    return C.runHeadless({
+      seed: opts.seed !== undefined ? opts.seed : cfg.seed,
+      generations: opts.generations !== undefined ? opts.generations : cfg.generations,
+      config: config
+    });
+  }
+
+  function expose() {
+    root.ABYSSAL = {
+      version: '1.0.0',
+      core: C,
+      get sim() { return eco; },
+      get renderer() { return renderer; },
+      get config() {
+        var out = {}; for (var k in cfg) out[k] = cfg[k];
+        return out;
+      },
+      state: function () {
+        return {
+          paused: state.paused, ended: state.ended, plateOpen: state.plateOpen,
+          generation: eco ? eco.gen : 0, totalTicks: eco ? eco.totalTicks : 0,
+          prey: eco ? eco.prey.length : 0, predators: eco ? eco.pred.length : 0,
+          done: eco ? eco.done : false, hash: eco ? eco.hash() : 0
+        };
+      },
+      runHeadless: runHeadless,
+      pause: function () { if (!state.paused) togglePause(); },
+      resume: function () { if (state.paused) togglePause(); },
+      seal: function () { sealRun(true); openPlate(); },
+      openDashboard: openPlate,
+      closeDashboard: closePlate,
+      recast: recast,
+      setSpeed: function (v) {
+        cfg.speed = clamp(Math.round(v), 1, 48);
+        var input = $('f-speed'); if (input) { input.value = cfg.speed; setFill(input); }
+        refreshReadout('speed'); drawSpark('speed'); syncConsole(); persistUrl();
+      },
+      triggerAnomaly: function (type) {
+        if (!eco || !C.ANOMALY[type] || state.ended) return false;
+        eco._fireAnomaly(type);
+        consumeEvents();
+        return true;
+      },
+      hash: function () { return eco ? eco.hash() : 0; }
+    };
+  }
+
+  /* -------------------------------------------------------------------- boot -- */
+  function init() {
+    pickEls();
+    readUrl();
+
+    var headless = new URLSearchParams((root.location && root.location.search) || '').get('headless') === '1';
+    if (headless) {
+      var res = runHeadless({});
+      var payload = {
+        seed: res.seed, generations: res.generations, planned: res.planned, ticks: res.ticks,
+        done: res.done, endReason: res.endReason, hash: res.hash,
+        events: res.events.map(function (e) { return { gen: e.gen, type: e.type }; }),
+        summary: res.summary,
+        history: res.history
+      };
+      var pre = $('headless');
+      pre.textContent = JSON.stringify(payload);
+      pre.classList.add('visible');
+      root.__ABYSSAL_HEADLESS__ = payload;
+      expose();
+      doc.body.setAttribute('data-headless', 'true');
+      return;
+    }
+
+    bindFaders();
+    bindSteppers();
+    bindTips();
+    bindKeys();
+    bindProbe();
+    bindResizes();
+    drawAllSparks();
+    expose();
+
+    renderer = new R.Renderer(els.world, els.stage);
+    chrono = new R.Chrono(els.chrono, els.console);
+    ribbon = new R.Ribbon(els.ribbon);
+    dashboard = new D.Dashboard({
+      popChart: els.popChart,
+      geneSpeed: els['gene-speed'],
+      geneVision: els['gene-vision'],
+      geneMetabolism: els['gene-metabolism'],
+      geneThreshold: els['gene-threshold']
+    });
+
+    els.playBtn.addEventListener('click', togglePause);
+    els.stepBtn.addEventListener('click', stepGeneration);
+    els.resetBtn.addEventListener('click', recast);
+    els.plateBtn.addEventListener('click', openPlate);
+    els.openPlateBtn.addEventListener('click', openPlate);
+    els.closeDash.addEventListener('click', closePlate);
+    els.replayBtn.addEventListener('click', function () { closePlate(); recast(); });
+    els.newBtn.addEventListener('click', function () {
+      cfg.seed = Math.floor(uiClock() * 10000);
+      els.seedInput.value = PAD4(cfg.seed);
+      closePlate();
+      recast();
+    });
+    var recordBtn = $('recordBtn');
+    if (recordBtn) recordBtn.addEventListener('click', downloadRecord);
+
+    els.consoleToggle.addEventListener('click', function () {
+      var collapsed = els.console.classList.toggle('is-collapsed');
+      els.consoleToggle.setAttribute('aria-expanded', String(!collapsed));
+      els.consoleToggle.setAttribute('aria-label', collapsed ? 'Expand instrument console' : 'Collapse instrument console');
+      setTimeout(function () { if (renderer) renderer.resize(); if (state.updateScrollCue) state.updateScrollCue(); }, 260);
+    });
+
+    els.dashboard.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') { e.preventDefault(); closePlate(); }
+    });
+
+    var scrollCue = $('scrollCue');
+    var scroller = $('consoleScroll');
+    function updateScrollCue() {
+      if (!scroller || !scrollCue) return;
+      var more = scroller.scrollHeight - scroller.clientHeight - scroller.scrollTop > 10;
+      scrollCue.classList.toggle('show', more);
+    }
+    if (scroller) scroller.addEventListener('scroll', updateScrollCue, { passive: true });
+    root.addEventListener('resize', function () { setTimeout(updateScrollCue, 60); });
+    state.updateScrollCue = updateScrollCue;
+
+    recast();
+    setTimeout(updateScrollCue, 80);
+    state.lastTs = 0;
+    rafId = root.requestAnimationFrame(frame);
+  }
+
+  if (doc.readyState === 'loading') doc.addEventListener('DOMContentLoaded', init);
+  else init();
+})(window);
+
+</script>
+</body>
+</html>
