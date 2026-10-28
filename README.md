@@ -21,7 +21,7 @@ A static, browsable archive of benchmark demos, organized by round and platform.
 
 Only the final standalone `index.html` from each provider’s `round 2/cartographers-paradox/` is archived. Development sources, QA files, and intermediate builds are excluded. Each original HTML is copied byte for byte; no demo code is edited. SHA-256 hashes in `rounds/checksums.json` guard all seven preserved files during every build. Original web font references are retained.
 
-Round 2 has a compact **Prompt** button on the archive and each viewer. It opens the original task text in a scrollable dialog, dismissible with Close, Escape, or a click outside. The prompt is stored as plain text in `assets/round-2-prompt.txt`. A 15-second, labeled four-provider gameplay comparison is available below the round 2 cards.
+Both rounds have a compact **Prompt** button on the archive and each viewer. It opens the original task text in a scrollable dialog, dismissible with Close, Escape, or a click outside. The prompts are stored as plain text in `assets/round-1-prompt.txt` and `assets/round-2-prompt.txt`. A 15-second, labeled four-provider gameplay comparison is available below the round 2 cards.
 
 The archive (`index.html`) links into a shared viewer (`demo.html?round=round-1&demo=ccg`). The viewer keeps round and platform navigation outside the original demo in an iframe. Switching platforms starts the selected demo fresh. **Open standalone** opens the original file in the same tab; browser Back returns to the viewer. Direct demo URLs also work independently. All paths are relative to support GitHub Pages project subdirectories.
 

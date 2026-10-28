@@ -4,6 +4,7 @@ window.BENCHMARK_ROUNDS = [
     id: "round-1",
     title: "Round 1",
     description: "Ecosystems under glass. Three interactive vivariums, each with its own world to explore.",
+    prompt: "assets/round-1-prompt.txt",
     demos: [
       { id: "dsp", name: "DeepSeek Platform", shortName: "DSP", title: "A Closed Ecology", description: "Plate VII, observed from Station KH-9.", path: "rounds/round-1/dsp/index.html", tone: "blue" },
       { id: "ocg", name: "OpenCode Go", shortName: "OCG", title: "Abyssal Vivarium", description: "Specimen Plate Nº 08, from the deep-sea observatory.", path: "rounds/round-1/ocg/index.html", tone: "aqua" },
