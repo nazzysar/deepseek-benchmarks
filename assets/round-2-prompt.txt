@@ -1,0 +1,77 @@
+Build this inside “round 2/cartographers-paradox” within this thread’s assigned working directory. Each concurrent thread has its own separate folder; do not create alternate project directories.
+
+Create a beautiful, complete single-file HTML/CSS/JS game titled “CARTOGRAPHER’S PARADOX”. No build step. Deliver a working index.html with all code inline except the permitted imports below.
+
+TECHNOLOGY
+- Use three.js r160 through an importmap: “three” → https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js and “three/addons/” → https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/.
+- That CDN and optional Google Fonts with fallbacks are the only network resources. Generate all textures, models, and effects procedurally.
+- Keep model, PRNG, solver, generator, and logic tests pure JavaScript with zero three.js or DOM dependencies. Build the solver Web Worker from a Blob.
+- Use InstancedMesh for hex tiles and repeated scenery, cap pixel ratio at 2, use ResizeObserver, dispose resources on level changes, handle WebGL context loss/restoration, and provide a styled WebGL failure fallback.
+- Include High/Low quality and top-view controls. Target smooth 60fps on supported hardware; render on demand when animation is disabled.
+
+GAME
+Complete a hand-inked fantasy hex map using Sea, Forest, Mountain, Desert, and Swamp. An unreliable cartographer supplies clues; exactly L clues lie.
+
+Implement these clue types exactly:
+1. Exactly k neighbors of a specified hex are terrain T.
+2. A specified hex’s row contains exactly k tiles of terrain T.
+3. All terrain-T tiles form one connected region.
+4. No two terrain-T tiles touch.
+5. Hex A and hex B have the same terrain.
+
+Use axial hex adjacency and define rows by equal axial r coordinates. Connectivity requires a nonempty connected set; an absent terrain makes its connectivity clue false.
+
+A lying clue must be false; every other clue must be true. Require exactly L lying clues and a unique solution over the complete (map, liar-set) pair. Players must deduce both.
+
+TIERS AND GENERATION
+- Surveyor: radius 3, three terrains, zero liars.
+- Cartographer: radius 4, four terrains, one liar.
+- Archmage: radius 6, five terrains, two liars.
+- Use seeded mulberry32 with an editable seed and deterministic output.
+- Generate a map, derive clues, introduce exactly L false statements, and prune redundant clues while preserving uniqueness and logical solvability.
+- Implement a complete backtracking solver with propagation and forward checking that counts solutions up to 2, running in the Worker.
+- Separately implement a propagation-only deduction solver. Every generated puzzle must be solved completely by this solver without guessing, including liar identities.
+- Verify uniqueness and logical solvability before exposing a puzzle. Show generation progress, support cancellation, and handle bounded generation failure explicitly. Do not silently weaken requirements or expose unverified puzzles.
+
+VISUAL DESIGN
+Create a polished tabletop fantasy atlas with strong typography, generous spacing, and a palette defined by six CSS color variables.
+- Procedural parchment CanvasTexture with layered noise, stains, and burnt edges on a subtly curled plane.
+- Tilted perspective camera with limited OrbitControls and a flat top-view button.
+- Extruded hex prisms with beveled ink borders.
+- Faceted mountains with snowcaps, instanced low-poly pines, shader-rippled sea, dune-ridged desert, and murky swamp with bubbling particles.
+- Raycaster picking, hover elevation, soft shadows, and a watercolor wash when a region is correctly resolved.
+- Parchment HTML clue cards with mark-as-liar controls and wax-seal flags using LatheGeometry, a procedural emboss texture, and a small physical bounce.
+- A brass compass rose with subtle rotation.
+- Responsive layout from 360px to 4K; respect prefers-reduced-motion.
+
+INTERACTION AND ACCESSIBILITY
+Include terrain assignment, per-hex pencil candidates shown as floating glyphs, liar toggles, undo/redo, live contradiction highlighting with pulsing red ink, and submit validation explaining the first violated constraint.
+Provide a “Why?” hint that reports the next deduction from the propagation solver, identifies the supporting clues, and explains the reasoning in readable language. Never produce hints by consulting the stored solution.
+Persist seed, tier, progress, pencil marks, and liar selections using localStorage inside try/catch with an in-memory fallback.
+Mirror every canvas interaction in accessible DOM controls. Provide full keyboard operation, visible focus, descriptive labels, a usable hex selector/grid, and an aria-live status region.
+
+ENGINEERING
+Organize the source into clearly labeled model, solver, generator, renderer, input, UI, and persistence sections.
+Add a self-test panel toggled by T, except while typing in an input, containing:
+- 30 deterministic seeded cases covering all tiers.
+- Exactly one solution per case, counted up to 2.
+- Complete propagation-only solutions.
+- Every emitted hint agrees with the verified solution.
+- Identical puzzles for identical seed and tier.
+- Clear pass/fail results and renderer.info statistics.
+
+TESTING AND FINAL QA
+- Concurrent threads have separate project folders. Keep work inside this thread’s assigned folder, use a unique temporary browser profile and OS-assigned server/debugging ports, and never access my real Chrome profile or another thread’s processes.
+- During implementation, verify pure-JS logic in Node and use static HTML/CSS/JS checks. Run tests sequentially within this thread. Run the required 30-case suite once near completion; after fixes, rerun only affected checks unless broader verification is necessary.
+- Reserve browser use for ONE final QA round after implementation and Node checks are complete. Do not use a browser for implementation, navigation research, or ongoing progress checks.
+- Coordinate browser QA through the SAME shared atomic lock at /tmp/cartographers-paradox-browser-qa.lock across all threads. Record ownership, never steal an active lock, and wait without busy-polling for at most 120 seconds. If unavailable, report browser QA as skipped.
+- Launch Chromium only once, headless, with --use-mock-keychain --password-store=basic and a unique temporary --user-data-dir. Reuse that instance for one QA pass lasting at most 60 seconds.
+- In that pass, inspect one desktop and one mobile layout, exercise the primary interaction flow, and check console errors. Prefer DOM inspection and programmatic assertions; limit visual inspection to those two final layouts. Disable automatic visual capture, tracing, video, and per-action recording where configurable.
+- Use Low quality, pixel ratio 1, deterministic animation time, and on-demand rendering during QA. Render explicitly when checking WebGL.
+- End the review when those checks finish. Do not enter repeated visual-polish cycles or relaunch Chromium. Apply final fixes using targeted Node/static checks and disclose anything requiring further browser verification.
+- Enforce the browser deadline and always close only this thread’s browser/server, clean up its temporary resources, and release its owned lock in a finally block. Never use broad process-kill commands.
+- Report only checks actually performed, including failures and skipped verification. Do not claim universal 60fps from a smoke test.
+- These limits govern development verification; retain the game’s complete built-in self-test functionality.
+
+DELIVERY
+Start with a plan under 150 words. Implement and save the complete index.html, perform the limited verification above, then provide the complete source in ONE HTML code block followed by an exactly five-line demo checklist. Include actual verification status in the checklist. No placeholders, omitted functions, pseudocode, or claims of features that are not implemented.

@@ -34,6 +34,7 @@ if (!round || !demo) {
     if (item === demo) link.setAttribute("aria-current", "page");
     document.querySelector("#demo-nav").append(link);
   }
+  if (round.prompt) document.querySelector("#direct-link").before(window.createPromptButton(round));
   const direct = document.querySelector("#direct-link");
   direct.href = demo.path;
   direct.hidden = false;

@@ -1,5 +1,9 @@
 {
   "rounds/round-1/ccg/index.html": "7c350f28397188ab536586fae78079143a42a6e5ecb3f57325f3430091e4136d",
   "rounds/round-1/dsp/index.html": "75510ddbb48599ebabc7b51a322ab4b925d78698a575719307056ab71dd7e4a2",
-  "rounds/round-1/ocg/index.html": "2b75ff1a30876079fced576ca8ae9b7b29d03a8290f26dfa7bf44bcffc500653"
+  "rounds/round-1/ocg/index.html": "2b75ff1a30876079fced576ca8ae9b7b29d03a8290f26dfa7bf44bcffc500653",
+  "rounds/round-2/dsp/index.html": "54f40559d85936fd4a780d9317d95e4caa1380ca421dc00af984e9eff7267893",
+  "rounds/round-2/ocg/index.html": "b303901d78f19694c08d88ac486ead7935b540bab9b0a0d2598f8ce85f98274f",
+  "rounds/round-2/od/index.html": "cffa9a1d5f42b52aeb30ea786fe20b33dc930e444d7da9cb8c5140529a923ce0",
+  "rounds/round-2/oll/index.html": "198e4c1aee3b19310206718cf70811465660a3c413e59c80c995815030cd6b1b"
 }

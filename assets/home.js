@@ -10,7 +10,11 @@ for (const [index, round] of window.BENCHMARK_ROUNDS.entries()) {
   const count = document.createElement("span");
   count.className = "eyebrow";
   count.textContent = `${String(index + 1).padStart(2, "0")} / ${round.demos.length} demos`;
-  heading.append(title, count);
+  const actions = document.createElement("div");
+  actions.className = "round-actions";
+  if (round.prompt) actions.append(window.createPromptButton(round));
+  actions.append(count);
+  heading.append(title, actions);
   const description = document.createElement("p");
   description.className = "round-description";
   description.textContent = round.description;
@@ -38,5 +42,20 @@ for (const [index, round] of window.BENCHMARK_ROUNDS.entries()) {
     grid.append(card);
   }
   section.append(heading, description, grid);
+  if (round.video) {
+    const figure = document.createElement("figure");
+    figure.className = "round-video";
+    const caption = document.createElement("figcaption");
+    caption.textContent = "Four atlases in motion · 15-second gameplay comparison";
+    const video = document.createElement("video");
+    video.src = round.video;
+    if (round.poster) video.poster = round.poster;
+    video.controls = true;
+    video.playsInline = true;
+    video.preload = "none";
+    video.setAttribute("aria-label", `${round.title}: gameplay from all four providers`);
+    figure.append(caption, video);
+    section.append(figure);
+  }
   roundsRoot.append(section);
 }

@@ -1,0 +1,3651 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Cartographer’s Paradox — A Hand-Inked Atlas</title>
+<meta name="description" content="A single-file fantasy hex deduction game. Complete a hand-inked atlas while an unreliable cartographer lies exactly L times." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IM+Fell+English:ital@0;1&family=Spectral+SC:wght@500;600&display=swap" rel="stylesheet">
+<script type="importmap">{
+"imports": {
+"three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+"three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+}
+}</script>
+<style>
+:root{
+--parchment:#e8d9b8;
+--ink:#2a1d15;
+--seal:#8c2f26;
+--brass:#b08b45;
+--sage:#596b4c;
+--sea:#3f6b73;
+--parchment-1:color-mix(in srgb, var(--parchment) 92%, white);
+--parchment-2:color-mix(in srgb, var(--parchment) 82%, var(--ink));
+--parchment-deep:color-mix(in srgb, var(--parchment) 66%, var(--ink));
+--ink-soft:color-mix(in srgb, var(--ink) 62%, var(--parchment));
+--ink-faint:color-mix(in srgb, var(--ink) 26%, var(--parchment));
+--seal-dark:color-mix(in srgb, var(--seal) 72%, var(--ink));
+--brass-hi:color-mix(in srgb, var(--brass) 68%, white);
+--sage-soft:color-mix(in srgb, var(--sage) 40%, var(--parchment));
+--sea-soft:color-mix(in srgb, var(--sea) 42%, var(--parchment));
+--card-grain:url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.82' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .16 0 0 0 0 .11 0 0 0 0 .07 0 0 0 .16 0'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
+--font-display:"IM Fell English","Cormorant Garamond",Georgia,"Times New Roman",serif;
+--font-body:"Cormorant Garamond",Georgia,"Times New Roman",serif;
+--font-label:"Spectral SC","Cormorant Garamond",Georgia,serif;
+--edge:1px solid color-mix(in srgb, var(--ink) 34%, transparent);
+--shadow-soft:0 18px 42px -24px color-mix(in srgb, var(--ink) 70%, transparent);
+--radius:14px;
+}
+*,*::before,*::after{box-sizing:border-box}
+html,body{height:100%}
+html{-webkit-text-size-adjust:100%}
+body{
+margin:0;color:var(--ink);font-family:var(--font-body);font-size:clamp(15px,1.05vw + 10px,18px);
+line-height:1.5;background:
+radial-gradient(1200px 700px at 18% -10%, color-mix(in srgb, var(--parchment) 96%, white) 0%, transparent 60%),
+radial-gradient(900px 600px at 105% 8%, color-mix(in srgb, var(--brass) 22%, var(--parchment)) 0%, transparent 55%),
+linear-gradient(165deg, color-mix(in srgb, var(--parchment) 84%, var(--ink)) 0%, var(--parchment) 42%, color-mix(in srgb, var(--parchment) 78%, var(--brass)) 100%);
+min-height:100dvh;overflow-x:hidden;
+}
+body::before{
+content:"";position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.5;mix-blend-mode:multiply;
+background-image:var(--card-grain);
+}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer}
+a{color:inherit}
+:focus-visible{outline:3px solid color-mix(in srgb, var(--seal) 82%, transparent);outline-offset:3px;border-radius:4px}
+.sr-only{position:absolute!important;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.app{position:relative;z-index:1;max-width:2200px;margin:0 auto;padding:clamp(12px,2vw,34px) clamp(12px,2.4vw,42px) 28px}
+.masthead{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px 26px;padding-bottom:10px;border-bottom:var(--edge)}
+.title-block{min-width:0}
+.eyebrow{font-family:var(--font-label);letter-spacing:.34em;text-transform:uppercase;font-size:clamp(9px,.72vw + 5px,12px);color:var(--ink-soft);margin:0 0 2px}
+h1{
+margin:0;font-family:var(--font-display);font-weight:400;line-height:.94;letter-spacing:.015em;
+font-size:clamp(30px,4.4vw + 8px,74px);
+color:var(--ink);
+text-shadow:0 1px 0 color-mix(in srgb, var(--parchment) 80%, white), 0 10px 26px color-mix(in srgb, var(--ink) 14%, transparent);
+}
+h1 .amp{font-style:italic;color:color-mix(in srgb, var(--seal) 82%, var(--ink))}
+.subtitle{margin:.35em 0 0;max-width:54ch;color:var(--ink-soft);font-style:italic;font-size:clamp(13px,1vw + 6px,17px)}
+.masthead-meta{display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:flex-end}
+.badge{display:inline-flex;align-items:center;gap:6px;border:var(--edge);border-radius:999px;padding:4px 11px;background:color-mix(in srgb, var(--parchment) 72%, transparent);font-family:var(--font-label);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft)}
+.toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:12px 0 0}
+.control-cluster{display:flex;flex-wrap:wrap;align-items:center;gap:7px;padding:5px;border:var(--edge);border-radius:12px;background:color-mix(in srgb, var(--parchment) 56%, transparent);box-shadow:inset 0 1px 0 color-mix(in srgb, white 45%, transparent)}
+.field{display:inline-flex;align-items:center;gap:7px;font-family:var(--font-label);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft)}
+.field input[type="text"],.field select{
+width:9.5em;background:color-mix(in srgb, var(--parchment) 88%, white);border:1px solid color-mix(in srgb, var(--ink) 40%, transparent);
+border-radius:7px;padding:6px 8px;font-family:var(--font-body);font-size:15px;letter-spacing:.02em;color:var(--ink)
+}
+.field select{width:auto}
+.field input[type="text"]:hover,.field select:hover{border-color:color-mix(in srgb, var(--ink) 62%, transparent)}
+.btn{
+position:relative;display:inline-flex;align-items:center;gap:7px;border:1px solid color-mix(in srgb, var(--ink) 52%, transparent);
+border-radius:8px;padding:7px 12px;background:
+linear-gradient(180deg, color-mix(in srgb, var(--parchment) 85%, white), color-mix(in srgb, var(--parchment) 88%, var(--brass)));
+box-shadow:0 1px 0 color-mix(in srgb, white 55%, transparent) inset, 0 2px 4px -3px color-mix(in srgb, var(--ink) 70%, transparent);
+font-family:var(--font-label);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink);white-space:nowrap;
+transition:transform .12s ease, box-shadow .15s ease, background .15s ease;
+}
+.btn:hover{background:linear-gradient(180deg, color-mix(in srgb, var(--parchment) 92%, white), color-mix(in srgb, var(--brass) 34%, var(--parchment)))}
+.btn:active{transform:translateY(1px)}
+.btn[aria-pressed="true"],.btn.is-active{background:linear-gradient(180deg, color-mix(in srgb, var(--seal) 76%, var(--parchment)), var(--seal));color:var(--parchment-1);border-color:var(--seal-dark);text-shadow:0 1px 0 color-mix(in srgb, var(--ink) 50%, transparent)}
+.btn.ghost{background:color-mix(in srgb, var(--parchment) 40%, transparent);box-shadow:none}
+.btn.seal{background:radial-gradient(circle at 34% 26%, color-mix(in srgb, var(--seal) 55%, white), var(--seal) 62%, var(--seal-dark));color:var(--parchment-1);border-color:var(--seal-dark)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.tiny{padding:4px 8px;font-size:10px}
+.btn .kbd{font-family:var(--font-body);opacity:.62;font-size:11px;letter-spacing:0;text-transform:none}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(330px,clamp(330px,27vw,430px));gap:clamp(12px,1.6vw,24px);margin-top:clamp(12px,1.4vw,20px);align-items:start}
+.map-column{min-width:0;display:flex;flex-direction:column;gap:10px}
+.map-frame{
+position:relative;border-radius:calc(var(--radius) + 6px);padding:clamp(6px,.7vw,10px);
+background:
+linear-gradient(135deg, color-mix(in srgb, var(--brass) 58%, var(--ink)) 0%, color-mix(in srgb, var(--brass) 42%, var(--parchment)) 26%, color-mix(in srgb, var(--brass) 70%, var(--ink)) 52%, color-mix(in srgb, var(--brass) 36%, var(--parchment)) 78%, color-mix(in srgb, var(--brass) 64%, var(--ink)) 100%);
+box-shadow:var(--shadow-soft), 0 1px 0 color-mix(in srgb, white 40%, transparent) inset;
+}
+.map-frame::before,.map-frame::after{content:"";position:absolute;inset:2px;border-radius:var(--radius);pointer-events:none;border:1px solid color-mix(in srgb, var(--ink) 36%, transparent)}
+.map-frame::after{inset:6px;border-color:color-mix(in srgb, var(--parchment) 30%, transparent);box-shadow:inset 0 0 0 1px color-mix(in srgb, var(--ink) 16%, transparent)}
+.stage{
+position:relative;border-radius:var(--radius);overflow:hidden;min-height:clamp(360px,58vh,760px);
+background:radial-gradient(120% 100% at 50% 0%, color-mix(in srgb, var(--parchment) 86%, white) 0%, color-mix(in srgb, var(--parchment) 72%, var(--brass)) 58%, color-mix(in srgb, var(--parchment) 56%, var(--ink)) 100%);
+isolation:isolate;
+}
+.stage canvas{position:absolute;inset:0;display:block;width:100%;height:100%;touch-action:none;outline:none}
+.stage canvas:focus-visible{outline:3px solid color-mix(in srgb, var(--seal) 80%, transparent);outline-offset:-3px}
+.stage::after{content:"";position:absolute;inset:0;pointer-events:none;border-radius:var(--radius);box-shadow:inset 0 0 48px color-mix(in srgb, var(--ink) 30%, transparent), inset 0 0 4px color-mix(in srgb, var(--ink) 28%, transparent)}
+.map-vignette{position:absolute;inset:0;pointer-events:none;border-radius:var(--radius);background:radial-gradient(120% 90% at 50% 42%, transparent 52%, color-mix(in srgb, var(--ink) 18%, transparent) 100%)}
+.map-hud{position:absolute;inset:0;pointer-events:none;display:flex;flex-direction:column;justify-content:space-between;padding:clamp(8px,1vw,14px)}
+.hud-row{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;flex-wrap:wrap}
+.hud-chip{pointer-events:none;background:color-mix(in srgb, var(--parchment) 82%, transparent);border:var(--edge);border-radius:9px;padding:5px 10px;font-family:var(--font-label);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft);backdrop-filter:blur(3px)}
+.hud-chip strong{color:var(--ink);font-weight:600}
+.hud-actions{display:flex;gap:6px;pointer-events:auto;flex-wrap:wrap;justify-content:flex-end}
+.hud-actions .btn{background:color-mix(in srgb, var(--parchment) 86%, transparent);backdrop-filter:blur(4px)}
+.seed-readout{pointer-events:auto;font-family:var(--font-body);font-size:13px;letter-spacing:.03em;text-transform:none;max-width:24ch;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+@media (max-width:640px){.seed-readout{max-width:15ch}}
+.gate{position:absolute;inset:0;display:grid;place-items:center;background:color-mix(in srgb, var(--parchment) 78%, transparent);backdrop-filter:blur(4px);z-index:9;padding:18px;text-align:center}
+.gate[hidden]{display:none}
+.gate-inner{max-width:min(420px,90%);display:grid;gap:12px;justify-items:center}
+.gate-title{font-family:var(--font-display);font-size:clamp(22px,2.6vw,32px);line-height:1.05;margin:0}
+.gate p{margin:0;color:var(--ink-soft);font-size:14px}
+.progress{width:min(320px,80vw);height:7px;border-radius:99px;background:color-mix(in srgb, var(--ink) 16%, transparent);overflow:hidden;border:1px solid color-mix(in srgb, var(--ink) 22%, transparent)}
+.progress > i{display:block;height:100%;width:0%;background:linear-gradient(90deg,var(--brass),var(--seal));transition:width .25s ease}
+.gate .spinner{width:30px;height:30px;border:2px solid color-mix(in srgb, var(--ink) 22%, transparent);border-top-color:var(--seal);border-radius:50%;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(1turn)}}
+.failure{border:1px solid color-mix(in srgb, var(--seal) 55%, transparent);background:color-mix(in srgb, var(--parchment) 92%, var(--seal));border-radius:10px;padding:12px;text-align:left;font-size:14px;color:var(--ink)}
+.stage-fallback{position:absolute;inset:0;display:grid;place-items:center;padding:24px;z-index:7;background:
+radial-gradient(120% 100% at 50% 0%, color-mix(in srgb, var(--parchment) 90%, white), color-mix(in srgb, var(--parchment) 62%, var(--ink)));
+z-index:8;text-align:center}
+.stage-fallback[hidden]{display:none}
+.stage-fallback .card{max-width:430px;display:grid;gap:10px;justify-items:center;border:var(--edge);border-radius:12px;padding:22px;background:color-mix(in srgb, var(--parchment) 90%, white);box-shadow:var(--shadow-soft);position:relative;z-index:1}
+.command-bar{display:flex;flex-wrap:wrap;gap:8px;align-items:stretch}
+.panel{background:color-mix(in srgb, var(--parchment) 58%, transparent);border:var(--edge);border-radius:12px;padding:9px 11px;box-shadow:inset 0 1px 0 color-mix(in srgb, white 42%, transparent)}
+.panel-title{font-family:var(--font-label);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-soft);margin:0 0 6px}
+.terrain-palette{display:flex;gap:5px;flex-wrap:wrap}
+.terrain-chip{display:inline-flex;align-items:center;gap:6px;border:1px solid color-mix(in srgb, var(--ink) 40%, transparent);background:color-mix(in srgb, var(--parchment) 76%, white);border-radius:8px;padding:5px 8px;font-family:var(--font-label);font-size:11px;letter-spacing:.05em;transition:transform .12s ease, background .12s ease}
+.terrain-chip:hover{transform:translateY(-1px)}
+.terrain-chip[aria-pressed="true"]{box-shadow:0 0 0 2px color-mix(in srgb, var(--ink) 60%, transparent) inset;background:color-mix(in srgb, var(--parchment) 60%, white)}
+.terrain-chip .glyph{font-size:15px;line-height:1;width:1.25em;text-align:center}
+.terrain-chip .swatch{width:11px;height:11px;border-radius:3px;border:1px solid color-mix(in srgb, var(--ink) 45%, transparent)}
+.terrain-chip[data-terrain="Sea"] .swatch{background:var(--sea)}
+.terrain-chip[data-terrain="Forest"] .swatch{background:var(--sage)}
+.terrain-chip[data-terrain="Mountain"] .swatch{background:color-mix(in srgb, var(--ink) 45%, var(--parchment))}
+.terrain-chip[data-terrain="Desert"] .swatch{background:color-mix(in srgb, var(--brass) 78%, var(--parchment))}
+.terrain-chip[data-terrain="Swamp"] .swatch{background:color-mix(in srgb, var(--sage) 55%, var(--ink))}
+.inspector{flex:1 1 240px;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.hex-readout{font-family:var(--font-label);font-size:11px;letter-spacing:.08em;color:var(--ink-soft);min-width:10ch}
+.hex-readout strong{font-size:13px;color:var(--ink)}
+.mini-actions{display:flex;gap:6px;flex-wrap:wrap;margin-left:auto}
+.candidates{display:flex;gap:4px;flex-wrap:wrap}
+.candidate{display:inline-flex;align-items:center;gap:4px;border:1px dashed color-mix(in srgb, var(--ink) 38%, transparent);border-radius:6px;padding:2px 6px;background:color-mix(in srgb, var(--parchment) 70%, white);font-size:12px;font-family:var(--font-label)}
+.candidate[data-on="true"]{border-style:solid;background:color-mix(in srgb, var(--sage) 34%, var(--parchment))}
+.rail{display:flex;flex-direction:column;gap:12px;min-width:0;position:sticky;top:10px;max-height:calc(100dvh - 20px)}
+.rail-head{display:flex;align-items:flex-end;justify-content:space-between;gap:10px;border-bottom:var(--edge);padding-bottom:7px}
+.rail-head h2{font-family:var(--font-display);font-weight:400;font-size:clamp(21px,1.7vw,27px);margin:0;line-height:1}
+.rail-head p{margin:2px 0 0;font-size:12px;color:var(--ink-soft);font-style:italic}
+.rail-count{font-family:var(--font-label);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft);white-space:nowrap}
+.clue-scroll{overflow:auto;padding:2px 4px 6px 2px;display:flex;flex-direction:column;gap:9px;scrollbar-width:thin;scrollbar-color:var(--ink-faint) transparent;flex:1 1 auto;min-height:160px}
+.clue-card{
+position:relative;border:1px solid color-mix(in srgb, var(--ink) 34%, transparent);border-radius:11px;
+padding:10px 44px 10px 12px;background:
+linear-gradient(155deg, color-mix(in srgb, var(--parchment) 92%, white) 0%, color-mix(in srgb, var(--parchment) 78%, var(--brass)) 100%);
+box-shadow:0 7px 15px -14px color-mix(in srgb, var(--ink) 90%, transparent), inset 0 1px 0 color-mix(in srgb, white 40%, transparent);
+transform:rotate(var(--tilt,0deg));transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+font-size:14.5px;line-height:1.4;
+}
+.clue-card::before{content:"";position:absolute;inset:0;border-radius:inherit;background-image:var(--card-grain);opacity:.4;pointer-events:none;mix-blend-mode:multiply}
+.clue-card:hover{transform:rotate(0) translateY(-1px);box-shadow:0 12px 22px -18px color-mix(in srgb, var(--ink) 95%, transparent)}
+.clue-card[data-liar="true"]{border-color:color-mix(in srgb, var(--seal) 70%, transparent);background:linear-gradient(150deg,color-mix(in srgb, var(--parchment) 72%, var(--seal)) 0%, color-mix(in srgb, var(--parchment) 86%, var(--seal)) 100%)}
+.clue-card.is-support{border-color:color-mix(in srgb, var(--brass) 88%, var(--ink));box-shadow:0 0 0 2px color-mix(in srgb, var(--brass) 40%, transparent), 0 10px 22px -18px var(--ink)}
+.clue-top{display:flex;align-items:center;gap:7px;margin-bottom:3px}
+.clue-num{font-family:var(--font-label);font-size:10px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink-soft)}
+.clue-type{font-family:var(--font-label);font-size:9px;letter-spacing:.1em;text-transform:uppercase;padding:2px 6px;border-radius:99px;background:color-mix(in srgb, var(--ink) 9%, transparent);color:var(--ink-soft)}
+.clue-text{margin:0;position:relative;z-index:1;color:var(--ink)}
+.clue-text .hl{font-weight:600;color:color-mix(in srgb, var(--seal) 78%, var(--ink))}
+.clue-stamp{position:absolute;right:7px;bottom:6px;font-family:var(--font-display);font-style:italic;font-size:10.5px;letter-spacing:.03em;color:var(--seal);opacity:.8;transform:rotate(-7deg);z-index:1}
+.lie-toggle{
+position:absolute;top:6px;right:6px;width:32px;height:32px;border-radius:50%;border:2px solid color-mix(in srgb, var(--seal) 40%, var(--ink));
+display:grid;place-items:center;background:radial-gradient(circle at 36% 30%, color-mix(in srgb, var(--seal) 34%, var(--parchment)), color-mix(in srgb, var(--parchment) 80%, var(--seal)) 70%);
+color:color-mix(in srgb, var(--seal) 70%, var(--ink));font-family:var(--font-label);font-size:9px;letter-spacing:.02em;padding:0;
+transition:transform .14s ease, background .18s ease, box-shadow .18s ease;z-index:2;
+}
+.lie-toggle:hover{transform:scale(1.08)}
+.lie-toggle[aria-pressed="true"]{background:radial-gradient(circle at 36% 30%, color-mix(in srgb, var(--seal) 50%, white), var(--seal) 62%, var(--seal-dark));color:var(--parchment-1);border-color:var(--seal-dark);box-shadow:0 0 0 2px color-mix(in srgb, var(--seal) 40%, transparent), 0 4px 8px -4px var(--ink);animation:seal-pop .5s cubic-bezier(.2,1.7,.4,1)}
+@keyframes seal-pop{0%{transform:scale(.7)}55%{transform:scale(1.18)}100%{transform:scale(1)}}
+.clue-card[data-liar="true"] .clue-stamp{content:"";}
+.legend{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.legend .legend-item{display:inline-flex;align-items:center;gap:5px;font-family:var(--font-label);font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft)}
+.legend .swatch{width:10px;height:10px;border-radius:2px}
+.hint-box{border:1px solid color-mix(in srgb, var(--brass) 60%, var(--ink));border-radius:11px;padding:10px 11px;background:color-mix(in srgb, var(--parchment) 84%, white);box-shadow:inset 0 1px 0 color-mix(in srgb, white 40%, transparent)}
+.hint-box[hidden]{display:none}
+.hint-box h3{margin:0 0 3px;font-family:var(--font-display);font-weight:400;font-size:19px;line-height:1.1}
+.hint-box p{margin:3px 0;font-size:13.5px}
+.hint-box .why-detail{color:var(--ink-soft);font-style:italic;font-size:12.5px}
+.hint-refs{display:flex;flex-wrap:wrap;gap:4px;margin-top:5px}
+.clue-ref{font-family:var(--font-label);font-size:9.5px;letter-spacing:.06em;text-transform:uppercase;border:1px solid color-mix(in srgb, var(--ink) 36%, transparent);border-radius:99px;padding:2px 7px;background:color-mix(in srgb, var(--parchment) 70%, transparent);color:var(--ink-soft)}
+.verdict{border:1px solid color-mix(in srgb, var(--ink) 32%, transparent);border-radius:11px;padding:10px 11px;background:color-mix(in srgb, var(--parchment) 78%, white);font-size:13.5px}
+.verdict[hidden]{display:none}
+.verdict.ok{border-color:color-mix(in srgb, var(--sage) 70%, var(--ink));background:color-mix(in srgb, var(--parchment) 70%, var(--sage))}
+.verdict.bad{border-color:color-mix(in srgb, var(--seal) 60%, var(--ink));background:color-mix(in srgb, var(--parchment) 80%, var(--seal))}
+.verdict h3{margin:0 0 4px;font-family:var(--font-display);font-weight:400;font-size:19px}
+.verdict p{margin:3px 0}
+.selftest{position:fixed;inset:0;z-index:40;display:grid;place-items:center;padding:clamp(8px,2vw,28px);background:color-mix(in srgb, var(--ink) 54%, transparent);backdrop-filter:blur(6px)}
+.selftest[hidden]{display:none}
+.selftest-sheet{width:min(980px,100%);max-height:min(88dvh,900px);display:flex;flex-direction:column;border-radius:16px;border:1px solid color-mix(in srgb, var(--brass) 70%, var(--ink));background:
+linear-gradient(150deg,color-mix(in srgb, var(--parchment) 94%, white),color-mix(in srgb, var(--parchment) 80%, var(--brass)));
+box-shadow:0 40px 90px -40px color-mix(in srgb, var(--ink) 90%, transparent);overflow:hidden;position:relative}
+.selftest-sheet::before{content:"";position:absolute;inset:0;background-image:var(--card-grain);opacity:.4;pointer-events:none}
+.selftest-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:13px 16px;border-bottom:var(--edge);position:relative;z-index:1}
+.selftest-head h2{font-family:var(--font-display);font-weight:400;margin:0;font-size:clamp(20px,2vw,28px)}
+.selftest-body{padding:12px 16px 16px;overflow:auto;position:relative;z-index:1;display:grid;gap:10px}
+.selftest-summary{display:flex;flex-wrap:wrap;gap:8px}
+.test-stat{flex:1 1 120px;border:var(--edge);border-radius:10px;padding:7px 9px;background:color-mix(in srgb, var(--parchment) 68%, transparent)}
+.test-stat b{display:block;font-family:var(--font-display);font-size:22px;font-weight:400;line-height:1}
+.test-stat span{font-family:var(--font-label);font-size:9.5px;letter-spacing:.11em;text-transform:uppercase;color:var(--ink-soft)}
+.test-list{display:grid;gap:5px;font-size:12.5px}
+.test-row{display:grid;grid-template-columns:auto minmax(90px,1fr) auto;gap:8px;align-items:baseline;border-bottom:1px dotted color-mix(in srgb, var(--ink) 22%, transparent);padding:3px 0}
+.test-row .ok{color:color-mix(in srgb, var(--sage) 82%, var(--ink));font-weight:600}
+.test-row .fail{color:var(--seal);font-weight:600}
+.test-row code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;color:var(--ink-soft)}
+.self-actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.self-progress{flex:1 1 140px;min-width:120px}
+.renderer-info{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;color:var(--ink-soft);white-space:pre-wrap;border-top:var(--edge);padding-top:8px}
+.statusbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:13px;color:var(--ink-soft);min-height:24px}
+.statusbar .dot{width:8px;height:8px;border-radius:50%;background:var(--sage);box-shadow:0 0 0 3px color-mix(in srgb, var(--sage) 22%, transparent);flex:none}
+.statusbar[data-tone="warn"] .dot{background:var(--brass);box-shadow:0 0 0 3px color-mix(in srgb, var(--brass) 26%, transparent)}
+.statusbar[data-tone="bad"] .dot{background:var(--seal);box-shadow:0 0 0 3px color-mix(in srgb, var(--seal) 24%, transparent)}
+.statusbar .status-text{flex:1 1 220px}
+.live{position:fixed;left:8px;bottom:8px;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.toast{position:fixed;left:50%;bottom:22px;transform:translate(-50%,14px);z-index:50;pointer-events:none;opacity:0;transition:opacity .2s ease, transform .2s ease;background:var(--ink);color:var(--parchment-1);border-radius:9px;padding:8px 14px;font-size:13px;max-width:min(90vw,520px);box-shadow:0 18px 40px -18px #000}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.hex-grid-panel{border:var(--edge);border-radius:12px;background:color-mix(in srgb, var(--parchment) 48%, transparent);padding:8px 11px}
+.hex-grid-panel summary{cursor:pointer;font-family:var(--font-label);font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink-soft);list-style:none}
+.hex-grid-panel summary::-webkit-details-marker{display:none}
+.hex-grid-panel summary::before{content:"▸ ";color:var(--brass)}
+.hex-grid-panel[open] summary::before{content:"▾ "}
+.hex-grid{display:flex;flex-direction:column;gap:3px;margin-top:8px;overflow:auto;padding-bottom:4px}
+.hex-row{display:flex;gap:3px}
+.hex-cell{flex:0 0 auto;min-width:26px;min-height:26px;border:1px solid color-mix(in srgb, var(--ink) 28%, transparent);border-radius:5px;background:color-mix(in srgb, var(--parchment) 82%, white);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:8.5px;padding:1px;color:var(--ink-soft);line-height:1.05}
+.hex-cell[data-selected="true"]{outline:2px solid var(--seal);outline-offset:1px}
+.hex-cell[data-terrain="Sea"]{background:color-mix(in srgb, var(--sea) 40%, var(--parchment))}
+.hex-cell[data-terrain="Forest"]{background:color-mix(in srgb, var(--sage) 40%, var(--parchment))}
+.hex-cell[data-terrain="Mountain"]{background:color-mix(in srgb, var(--ink) 32%, var(--parchment))}
+.hex-cell[data-terrain="Desert"]{background:color-mix(in srgb, var(--brass) 52%, var(--parchment))}
+.hex-cell[data-terrain="Swamp"]{background:color-mix(in srgb, var(--sage) 55%, var(--ink))}
+.test-detail{font-size:11.5px;color:var(--seal);padding-left:10px;grid-column:1/-1}
+.footer{margin-top:20px;padding-top:10px;border-top:var(--edge);display:flex;flex-wrap:wrap;gap:8px 18px;justify-content:space-between;font-size:11.5px;color:var(--ink-soft)}
+.footer .keys{display:flex;gap:12px;flex-wrap:wrap}
+kbd{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:10px;border:1px solid color-mix(in srgb, var(--ink) 30%, transparent);border-bottom-width:2px;border-radius:4px;padding:1px 4px;background:color-mix(in srgb, var(--parchment) 70%, white)}
+@media (max-width:1080px){
+.layout{grid-template-columns:minmax(0,1fr)}
+.rail{position:static;max-height:none}
+.clue-scroll{max-height:46dvh}
+.stage{min-height:clamp(340px,52vh,620px)}
+}
+@media (max-width:640px){
+.app{padding:10px 10px 20px}
+.toolbar{gap:6px}
+.control-cluster{width:100%;justify-content:flex-start}
+.stage{min-height:clamp(300px,46vh,520px)}
+.clue-card{font-size:13.5px;padding-right:40px}
+.rail-head h2{font-size:22px}
+.masthead-meta{justify-content:flex-start}
+.map-hud{padding:7px}
+.hud-chip{font-size:9px;padding:4px 7px}
+.hud-actions .btn{padding:5px 8px;font-size:9.5px}
+}
+@media (min-width:1900px){
+.layout{grid-template-columns:minmax(0,1fr) minmax(380px,480px)}
+.stage{min-height:clamp(520px,62vh,900px)}
+}
+@media (prefers-reduced-motion:reduce){
+*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
+}
+</style>
+</head>
+<body>
+<a class="sr-only" href="#clue-rail">Skip to the cartographer’s field notes</a>
+<div class="app">
+<header class="masthead">
+<div class="title-block">
+<p class="eyebrow">The Hand-Inked Atlas · Folio II</p>
+<h1>Cartographer’s <span class="amp">Paradox</span></h1>
+<p class="subtitle">The old cartographer swears every note is true — except, of course, for the ones that are not. Finish the map, and name the lies.</p>
+</div>
+<div class="masthead-meta" aria-label="Game status">
+<span class="badge" id="tier-badge">Surveyor · R3</span>
+<span class="badge" id="liar-badge">0 lies</span>
+<span class="badge" id="quality-badge">High quality</span>
+</div>
+</header>
+<div class="toolbar" role="group" aria-label="Atlas controls">
+<div class="control-cluster">
+<label class="field" for="seed-input">Seed
+<input id="seed-input" type="text" value="the-weeping-coast" autocomplete="off" spellcheck="false" maxlength="48" aria-describedby="seed-help">
+</label>
+<label class="field" for="tier-select">Tier
+<select id="tier-select">
+<option value="surveyor">Surveyor · R3 · 3 terrains · 0 lies</option>
+<option value="cartographer">Cartographer · R4 · 4 terrains · 1 lie</option>
+<option value="archmage">Archmage · R6 · 5 terrains · 2 lies</option>
+</select>
+</label>
+<button class="btn seal" id="generate-btn" type="button">Chart the atlas <span class="kbd" aria-hidden="true">G</span></button>
+</div>
+<div class="control-cluster">
+<button class="btn" id="why-btn" type="button">Why? hint <span class="kbd" aria-hidden="true">W</span></button>
+<button class="btn" id="undo-btn" type="button" disabled>Undo <span class="kbd" aria-hidden="true">⌘Z</span></button>
+<button class="btn" id="redo-btn" type="button" disabled>Redo <span class="kbd" aria-hidden="true">⇧⌘Z</span></button>
+<button class="btn" id="submit-btn" type="button">Submit atlas <span class="kbd" aria-hidden="true">Enter</span></button>
+</div>
+<div class="control-cluster">
+<button class="btn" id="view-btn" type="button" aria-pressed="false">Top view <span class="kbd" aria-hidden="true">V</span></button>
+<button class="btn" id="quality-btn" type="button" aria-pressed="false">High quality</button>
+<button class="btn" id="anim-btn" type="button" aria-pressed="true">Animation</button>
+<button class="btn ghost" id="selftest-btn" type="button">Self-test <span class="kbd" aria-hidden="true">T</span></button>
+</div>
+<span class="sr-only" id="seed-help">Changing the seed and charting produces the same fully verified atlas every time.</span>
+</div>
+<div class="layout">
+<main class="map-column">
+<section class="map-frame" aria-label="Atlas map">
+<div class="stage" id="stage">
+<canvas id="scene" tabindex="0" role="application" aria-label="Interactive hex atlas. Use arrow keys to choose a hex, number keys 1 to 5 to assign terrain, L to mark the focused note a lie, and P to toggle a pencil candidate."></canvas>
+<div class="map-vignette" aria-hidden="true"></div>
+<div class="map-hud">
+<div class="hud-row">
+<span class="hud-chip" id="map-progress-chip">Inked <strong>0</strong> / <span data-total>0</span> hexes</span>
+<div class="hud-actions">
+<button class="btn ghost tiny" id="reset-marks-btn" type="button">Clear marks</button>
+<button class="btn ghost tiny" id="recenter-btn" type="button">Recenter</button>
+</div>
+</div>
+<div class="hud-row" style="align-items:flex-end">
+<span class="hud-chip seed-readout" id="map-seed-chip">Seed: —</span>
+<span class="hud-chip" id="map-focus-chip">Focus: —</span>
+</div>
+</div>
+<div class="gate" id="gate">
+<div class="gate-inner">
+<div class="spinner" id="gate-spinner" aria-hidden="true"></div>
+<h2 class="gate-title" id="gate-title">Charting the atlas…</h2>
+<p id="gate-text">Shaping coastlines</p>
+<div class="progress" role="progressbar" aria-labelledby="gate-title" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="gate-progress"><i></i></div>
+<button class="btn ghost" id="cancel-gen-btn" type="button">Cancel generation</button>
+<div class="failure" id="gate-failure" hidden></div>
+</div>
+</div>
+<div class="stage-fallback" id="webgl-fallback" hidden>
+<div class="card">
+<h2 class="gate-title">The atlas will not open</h2>
+<p>Your browser or device could not create a WebGL context, so the illuminated map cannot be drawn. Every puzzle control below still works, including the full hex grid, clues, hints and validation.</p>
+<p><strong>Try:</strong> enabling hardware acceleration, updating the browser, or opening the game in a current desktop browser.</p>
+<button class="btn seal" id="fallback-continue-btn" type="button">Continue without the map</button>
+</div>
+</div>
+</div>
+</section>
+<div class="command-bar">
+<div class="panel" style="flex:1 1 260px">
+<p class="panel-title" id="palette-title">Ink the selected hex</p>
+<div class="terrain-palette" id="terrain-palette" role="group" aria-labelledby="palette-title"></div>
+</div>
+<div class="panel inspector" aria-label="Selected hex details">
+<span class="hex-readout" id="hex-readout" aria-live="polite">No hex selected</span>
+<div class="candidates" id="candidate-list" role="group" aria-label="Pencil candidates for the selected hex"></div>
+<div class="mini-actions">
+<button class="btn tiny" id="clear-hex-btn" type="button" disabled>Clear hex</button>
+<button class="btn tiny" id="mark-lie-btn" type="button" disabled>Mark note a lie <span class="kbd" aria-hidden="true">L</span></button>
+</div>
+</div>
+</div>
+<details class="hex-grid-panel" id="hex-grid-panel">
+<summary>Accessible hex selector</summary>
+<div class="hex-grid" id="hex-grid" role="grid" aria-label="Hex grid. Arrow keys move, Enter selects, 1 to 5 ink a terrain."></div>
+</details>
+<div class="statusbar" id="statusbar" data-tone="ok">
+<span class="dot" aria-hidden="true"></span>
+<span class="status-text" id="status-text">Chart an atlas to begin.</span>
+<span id="mark-counter" class="rail-count"></span>
+</div>
+</main>
+<aside class="rail" id="clue-rail" aria-label="Cartographer’s field notes">
+<div class="rail-head">
+<div>
+<h2>Field Notes</h2>
+<p id="tier-blurb">Every note can be trusted.</p>
+</div>
+<span class="rail-count" id="clue-count">0 notes</span>
+</div>
+<div class="clue-scroll" id="clue-list" role="list" aria-label="Clues. Each note has a control to mark it as a lie."></div>
+<div class="legend" id="legend" aria-label="Terrain legend"></div>
+<div class="hint-box" id="hint-box" hidden role="region" aria-labelledby="hint-title">
+<h3 id="hint-title">The next deduction</h3>
+<p id="hint-text"></p>
+<p class="why-detail" id="hint-detail"></p>
+<div class="hint-refs" id="hint-refs"></div>
+</div>
+<div class="verdict" id="verdict" hidden role="region" aria-labelledby="verdict-title">
+<h3 id="verdict-title">Atlas review</h3>
+<p id="verdict-text"></p>
+<p class="why-detail" id="verdict-extra"></p>
+</div>
+</aside>
+</div>
+<footer class="footer">
+<span>Hand-inked with procedural parchment, brass and seal wax. No image assets were harmed.</span>
+<span class="keys"><span><kbd>↑↓←→</kbd> hex</span><span><kbd>1–5</kbd> ink</span><span><kbd>P</kbd> pencil</span><span><kbd>L</kbd> lie</span><span><kbd>W</kbd> why</span><span><kbd>T</kbd> tests</span></span>
+</footer>
+</div>
+<div class="selftest" id="selftest" hidden role="dialog" aria-modal="true" aria-labelledby="selftest-title">
+<div class="selftest-sheet">
+<div class="selftest-head">
+<h2 id="selftest-title">Instrument Check</h2>
+<button class="btn" id="selftest-close" type="button">Close <span class="kbd" aria-hidden="true">Esc</span></button>
+</div>
+<div class="selftest-body">
+<div class="self-actions">
+<button class="btn seal" id="selftest-run" type="button">Run 30-case suite</button>
+<div class="progress self-progress" role="progressbar" aria-label="Self-test progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="selftest-progress"><i></i></div>
+<span id="selftest-status" class="rail-count">Idle</span>
+</div>
+<div class="selftest-summary" id="selftest-summary"></div>
+<div class="test-list" id="selftest-list"></div>
+<pre class="renderer-info" id="renderer-info">renderer.info: not measured yet</pre>
+</div>
+</div>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<p class="live" id="live-region" aria-live="polite" aria-atomic="true"></p>
+<script id="core-source">(function (global) {
+'use strict';
+var TERRAIN_NAMES = ['Sea', 'Forest', 'Mountain', 'Desert', 'Swamp'];
+var TERRAIN_GLYPHS = ['≈', '♣', '▲', '☼', '✿'];
+var TIERS = [
+{ id: 'surveyor', name: 'Surveyor', radius: 3, terrains: 3, liars: 0,
+blurb: 'A quiet coastal survey. Every note can be trusted.' },
+{ id: 'cartographer', name: 'Cartographer', radius: 4, terrains: 4, liars: 1,
+blurb: 'One inked falsehood hides among the field notes.' },
+{ id: 'archmage', name: 'Archmage', radius: 6, terrains: 5, liars: 2,
+blurb: 'A grand atlas, and two lies woven into its margins.' }
+];
+function hashSeed(str) {
+str = String(str);
+var h = 2166136261 >>> 0;
+for (var i = 0; i < str.length; i++) {
+h ^= str.charCodeAt(i);
+h = Math.imul(h, 16777619) >>> 0;
+}
+h ^= h >>> 16; h = Math.imul(h, 0x7feb352d) >>> 0;
+h ^= h >>> 15; h = Math.imul(h, 0x846ca68b) >>> 0;
+h ^= h >>> 16;
+return h >>> 0;
+}
+function mulberry32(a) {
+a = a >>> 0;
+return function () {
+a |= 0; a = (a + 0x6D2B79F5) | 0;
+var t = Math.imul(a ^ (a >>> 15), 1 | a);
+t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+};
+}
+function makeRng(seed, salt) { return mulberry32(hashSeed(String(seed) + '|' + String(salt))); }
+function shuffle(arr, rng) {
+var a = arr.slice();
+for (var i = a.length - 1; i > 0; i--) {
+var j = Math.floor(rng() * (i + 1)), t = a[i]; a[i] = a[j]; a[j] = t;
+}
+return a;
+}
+function pick(arr, rng) { return arr[Math.floor(rng() * arr.length)]; }
+function makeMap(radius) {
+var cells = [], byKey = new Map();
+for (var q = -radius; q <= radius; q++) {
+for (var r = Math.max(-radius, -q - radius); r <= Math.min(radius, -q + radius); r++) {
+byKey.set(q + ',' + r, cells.length);
+cells.push({ i: cells.length, q: q, r: r, nbr: [] });
+}
+}
+var dirs = [[1, 0], [-1, 0], [0, 1], [0, -1], [1, -1], [-1, 1]];
+for (var i = 0; i < cells.length; i++) {
+for (var d = 0; d < 6; d++) {
+var j = byKey.get((cells[i].q + dirs[d][0]) + ',' + (cells[i].r + dirs[d][1]));
+if (j !== undefined) cells[i].nbr.push(j);
+}
+}
+var rowMap = new Map();
+for (var k = 0; k < cells.length; k++) {
+if (!rowMap.has(cells[k].r)) rowMap.set(cells[k].r, []);
+rowMap.get(cells[k].r).push(k);
+}
+var rvals = Array.from(rowMap.keys()).sort(function (a, b) { return a - b; });
+var rows = rvals.map(function (rr) {
+return { r: rr, cells: rowMap.get(rr).slice().sort(function (a, b) { return cells[a].q - cells[b].q; }) };
+});
+var rowIndex = new Map();
+for (var ri = 0; ri < rows.length; ri++) rowIndex.set(rows[ri].r, ri);
+return { radius: radius, cells: cells, rows: rows, rowIndex: rowIndex, byKey: byKey };
+}
+function allMask(T) { return (1 << T) - 1; }
+function popcount(x) { var c = 0; while (x) { x &= x - 1; c++; } return c; }
+function isSingleton(x) { return x > 0 && (x & (x - 1)) === 0; }
+function bitIndex(x) { return Math.round(Math.log(x) / Math.LN2); }
+function cellName(map, i) {
+var c = map.cells[i];
+return 'hex (' + c.q + ', ' + c.r + ')';
+}
+function hexDistance(a, b) {
+var dq = a.q - b.q, dr = a.r - b.r;
+return (Math.abs(dq) + Math.abs(dr) + Math.abs(dq + dr)) / 2;
+}
+function clueText(map, clue) {
+var t = TERRAIN_NAMES[clue.terrain];
+if (clue.type === 'neighbor') {
+return 'Exactly ' + clue.k + ' of the neighbours of ' + cellName(map, clue.hex) + ' are ' + t + '.';
+}
+if (clue.type === 'row') {
+return 'Row r=' + map.rows[clue.row].r + ' contains exactly ' + clue.k + ' ' + t + ' tile' + (clue.k === 1 ? '' : 's') + '.';
+}
+if (clue.type === 'same') {
+return cellName(map, clue.a) + ' and ' + cellName(map, clue.b) + ' have the same terrain.';
+}
+if (clue.type === 'connected') return 'All ' + t + ' tiles form one connected region.';
+if (clue.type === 'notouch') return 'No two ' + t + ' tiles touch.';
+return '?';
+}
+function clueTypeLabel(type) {
+return {
+neighbor: 'Neighbour count', row: 'Row count', same: 'Same terrain',
+connected: 'Connectivity', notouch: 'No touch'
+}[type] || type;
+}
+function countTerrain(cells, assign, t) {
+var n = 0;
+for (var i = 0; i < cells.length; i++) if (assign[cells[i]] === t) n++;
+return n;
+}
+function terrainCells(assign, t) {
+var out = [];
+for (var i = 0; i < assign.length; i++) if (assign[i] === t) out.push(i);
+return out;
+}
+function connectedOnMap(map, cellsSet, t, assign) {
+var list = terrainCells(assign, t);
+if (!list.length) return false;
+var seen = new Uint8Array(assign.length), stack = [list[0]], got = 0;
+seen[list[0]] = 1;
+while (stack.length) {
+var c = stack.pop(); got++;
+var nb = map.cells[c].nbr;
+for (var k = 0; k < nb.length; k++) {
+if (!seen[nb[k]] && assign[nb[k]] === t) { seen[nb[k]] = 1; stack.push(nb[k]); }
+}
+}
+return got === list.length;
+}
+function touchesSelf(map, assign, t) {
+for (var i = 0; i < assign.length; i++) {
+if (assign[i] !== t) continue;
+var nb = map.cells[i].nbr;
+for (var k = 0; k < nb.length; k++) if (nb[k] > i && assign[nb[k]] === t) return true;
+}
+return false;
+}
+function clueTruth(map, assign, clue) {
+var t = clue.terrain;
+if (clue.type === 'neighbor') {
+return countTerrain(map.cells[clue.hex].nbr, assign, t) === clue.k;
+}
+if (clue.type === 'row') {
+return countTerrain(map.rows[clue.row].cells, assign, t) === clue.k;
+}
+if (clue.type === 'same') return assign[clue.a] === assign[clue.b];
+if (clue.type === 'connected') return connectedOnMap(map, null, t, assign);
+if (clue.type === 'notouch') return !touchesSelf(map, assign, t);
+throw new Error('unknown clue type ' + clue.type);
+}
+function clueTruthAll(map, assign, clues) {
+var out = [];
+for (var i = 0; i < clues.length; i++) out.push(clueTruth(map, assign, clues[i]));
+return out;
+}
+function initState(n, m, T) {
+return { dom: new Int16Array(n).fill(allMask(T)), cs: new Int8Array(m) };
+}
+function cloneState(st) { return { dom: st.dom.slice(), cs: st.cs.slice() }; }
+function stateChecksum(st) {
+var a = 0x811c9dc5, i;
+for (i = 0; i < st.dom.length; i++) { a = Math.imul(a ^ st.dom[i], 16777619); }
+for (i = 0; i < st.cs.length; i++) { a = Math.imul(a ^ st.cs[i], 16777619); }
+return a >>> 0;
+}
+function propagate(map, T, clues, L, st, trace, opts) {
+var n = map.cells.length, m = clues.length, MAX_ITER = (opts && opts.maxIter) || 600;
+var contradiction = null;
+var full = allMask(T);
+function push(step) { if (trace) trace.push(step); }
+function fail(msg, clueList) {
+contradiction = msg;
+push({ kind: 'contradiction', text: msg, clues: (clueList || []).slice() });
+return false;
+}
+function log(step) { push(step); }
+function countBounds(cells, t) {
+var min = 0, max = 0, unknown = [], list = [];
+for (var i = 0; i < cells.length; i++) {
+var c = cells[i], d = st.dom[c];
+if (d & (1 << t)) {
+max++;
+if (d === (1 << t)) min++;
+else unknown.push(c);
+list.push(c);
+}
+}
+return { min: min, max: max, unknown: unknown, possible: list };
+}
+function removeT(i, t, clueList, reason) {
+var before = st.dom[i];
+if (!(before & (1 << t))) return true;
+st.dom[i] = before & ~(1 << t);
+log({ kind: 'cannotTerrain', cell: i, terrain: t, clues: (clueList || []).slice(), text: reason });
+if (st.dom[i] === 0) return fail('No terrain remains possible at ' + cellName(map, i) + '.', clueList);
+return true;
+}
+function forceT(i, t, clueList, reason) {
+if (st.dom[i] === (1 << t)) return true;
+for (var tt = 0; tt < T; tt++) {
+if (tt !== t && (st.dom[i] & (1 << tt))) {
+if (!removeT(i, tt, clueList, reason)) return false;
+}
+}
+return true;
+}
+function setClue(i, v, clueList, reason) {
+if (st.cs[i] === v) return true;
+if (st.cs[i] !== 0) return fail('Clue ' + (i + 1) + ' was forced to be both true and false.', [i]);
+st.cs[i] = v;
+log({ kind: v === 1 ? 'clueTrue' : 'clueLie', clue: i, clues: (clueList || [i]).slice(), text: reason });
+return true;
+}
+function countRule(cells, t, k, ci, label, wantTrue) {
+var b = countBounds(cells, t);
+var where = label;
+if (wantTrue) {
+if (b.min > k || b.max < k) {
+return fail(where + ' is impossible: between ' + b.min + ' and ' + b.max + ' matching tiles can exist.', [ci]);
+}
+if (b.max === k) {
+for (var u = 0; u < b.unknown.length; u++) {
+if (!forceT(b.unknown[u], t, [ci], where + ' needs every remaining candidate to be ' + TERRAIN_NAMES[t] + '.')) return false;
+}
+}
+if (b.min === k) {
+for (var u2 = 0; u2 < b.unknown.length; u2++) {
+if (!removeT(b.unknown[u2], t, [ci], where + ' already has its ' + k + ' ' + TERRAIN_NAMES[t] + ' tile(s).')) return false;
+}
+}
+} else {
+if (b.min === k && b.max === k) return fail(where + ' is forced true, but it is marked as a lie.', [ci]);
+if (b.min === k && b.max > k && b.unknown.length === 1) {
+if (!forceT(b.unknown[0], t, [ci], where + ' must be false, so its one remaining candidate has to be ' + TERRAIN_NAMES[t] + '.')) return false;
+}
+if (b.max === k && b.min < k && b.unknown.length === 1) {
+if (!removeT(b.unknown[0], t, [ci], where + ' must be false, so its one remaining candidate cannot be ' + TERRAIN_NAMES[t] + '.')) return false;
+}
+}
+return true;
+}
+function sameRule(a, b, ci, wantTrue) {
+var da = st.dom[a], db = st.dom[b];
+if (wantTrue) {
+var common = da & db;
+if (common === 0) return fail('Clue ' + (ci + 1) + ' needs both hexes to match, but no terrain fits both.', [ci]);
+if (common !== da) {
+for (var t = 0; t < T; t++) if ((da & (1 << t)) && !(common & (1 << t))) {
+if (!removeT(a, t, [ci], 'To match ' + cellName(map, b) + ' as clue ' + (ci + 1) + ' requires, ' + cellName(map, a) + ' cannot be ' + TERRAIN_NAMES[t] + '.')) return false;
+}
+}
+if (common !== db) {
+for (var t2 = 0; t2 < T; t2++) if ((db & (1 << t2)) && !(common & (1 << t2))) {
+if (!removeT(b, t2, [ci], 'To match ' + cellName(map, a) + ' as clue ' + (ci + 1) + ' requires, ' + cellName(map, b) + ' cannot be ' + TERRAIN_NAMES[t2] + '.')) return false;
+}
+}
+} else {
+if (isSingleton(da) && da === db) return fail('Clue ' + (ci + 1) + ' is marked a lie, yet both hexes are forced to the same terrain.', [ci]);
+if (isSingleton(da)) {
+if (!removeT(b, bitIndex(da), [ci], 'Clue ' + (ci + 1) + ' is false; ' + cellName(map, a) + ' is ' + TERRAIN_NAMES[bitIndex(da)] + ', so ' + cellName(map, b) + ' must differ.')) return false;
+} else if (isSingleton(db)) {
+if (!removeT(a, bitIndex(db), [ci], 'Clue ' + (ci + 1) + ' is false; ' + cellName(map, b) + ' is ' + TERRAIN_NAMES[bitIndex(db)] + ', so ' + cellName(map, a) + ' must differ.')) return false;
+}
+}
+return true;
+}
+function notouchRule(t, ci, wantTrue) {
+if (wantTrue) {
+var forced = [];
+for (var i = 0; i < n; i++) if (st.dom[i] === (1 << t)) forced.push(i);
+for (var f = 0; f < forced.length; f++) {
+var nb = map.cells[forced[f]].nbr;
+for (var k = 0; k < nb.length; k++) {
+var j = nb[k];
+if (st.dom[j] === (1 << t)) return fail('Clue ' + (ci + 1) + ' forbids touching ' + TERRAIN_NAMES[t] + ', but two adjacent hexes are forced to it.', [ci]);
+if (!removeT(j, t, [ci], cellName(map, forced[f]) + ' is ' + TERRAIN_NAMES[t] + ', and clue ' + (ci + 1) + ' forbids adjacent ' + TERRAIN_NAMES[t] + ' tiles.')) return false;
+}
+}
+}
+return true;
+}
+function connectedRule(t, ci, wantTrue) {
+var poss = [], forced = [], i;
+for (i = 0; i < n; i++) if (st.dom[i] & (1 << t)) {
+poss.push(i);
+if (st.dom[i] === (1 << t)) forced.push(i);
+}
+if (wantTrue) {
+if (!poss.length) return fail('Clue ' + (ci + 1) + ' requires a non-empty connected ' + TERRAIN_NAMES[t] + ' region, but no ' + TERRAIN_NAMES[t] + ' can exist.', [ci]);
+if (poss.length === 1) {
+if (!forceT(poss[0], t, [ci], 'Clue ' + (ci + 1) + ' requires a ' + TERRAIN_NAMES[t] + ' and ' + cellName(map, poss[0]) + ' is its only candidate.')) return false;
+}
+var comp = new Int32Array(n).fill(-1), nc = 0;
+for (var p = 0; p < poss.length; p++) {
+var s = poss[p];
+if (comp[s] !== -1) continue;
+var stack = [s]; comp[s] = nc;
+while (stack.length) {
+var c = stack.pop(), nb = map.cells[c].nbr;
+for (var k = 0; k < nb.length; k++) if (comp[nb[k]] === -1 && (st.dom[nb[k]] & (1 << t))) {
+comp[nb[k]] = nc; stack.push(nb[k]);
+}
+}
+nc++;
+}
+if (forced.length) {
+var keep = comp[forced[0]];
+for (var f = 0; f < forced.length; f++) if (comp[forced[f]] !== keep) {
+return fail('Clue ' + (ci + 1) + ' needs one connected ' + TERRAIN_NAMES[t] + ' region, but forced pieces are separated.', [ci]);
+}
+for (var p2 = 0; p2 < poss.length; p2++) {
+if (comp[poss[p2]] !== keep) {
+if (!removeT(poss[p2], t, [ci], 'The forced ' + TERRAIN_NAMES[t] + ' tiles lie in another component; ' + cellName(map, poss[p2]) + ' would create a second region.')) return false;
+}
+}
+}
+} else {
+var pc = 0;
+for (i = 0; i < n; i++) if (st.dom[i] & (1 << t)) pc++;
+if (pc === 1) {
+var only = -1;
+for (i = 0; i < n; i++) if (st.dom[i] & (1 << t)) { only = i; break; }
+if (st.dom[only] === (1 << t)) return fail('Clue ' + (ci + 1) + ' is marked a lie, but the only possible ' + TERRAIN_NAMES[t] + ' hex is forced and therefore connected.', [ci]);
+if (!removeT(only, t, [ci], 'Clue ' + (ci + 1) + ' is false; a single ' + TERRAIN_NAMES[t] + ' would be connected, so ' + cellName(map, only) + ' must not be ' + TERRAIN_NAMES[t] + '.')) return false;
+}
+}
+return true;
+}
+function truthPossible(clue) {
+var t = clue.terrain, i;
+if (clue.type === 'neighbor' || clue.type === 'row') {
+var cells = clue.type === 'neighbor' ? map.cells[clue.hex].nbr : map.rows[clue.row].cells;
+var b = countBounds(cells, t);
+return !(b.min > clue.k || b.max < clue.k);
+}
+if (clue.type === 'same') return (st.dom[clue.a] & st.dom[clue.b]) !== 0;
+if (clue.type === 'connected') {
+var poss = [], forced = [];
+for (i = 0; i < n; i++) if (st.dom[i] & (1 << t)) { poss.push(i); if (st.dom[i] === (1 << t)) forced.push(i); }
+if (!poss.length) return false;
+if (!forced.length) return true;
+var seen = new Uint8Array(n), stk = [forced[0]]; seen[forced[0]] = 1;
+while (stk.length) {
+var c = stk.pop(), nb = map.cells[c].nbr;
+for (var k = 0; k < nb.length; k++) if (!seen[nb[k]] && (st.dom[nb[k]] & (1 << t))) { seen[nb[k]] = 1; stk.push(nb[k]); }
+}
+for (var f = 0; f < forced.length; f++) if (!seen[forced[f]]) return false;
+return true;
+}
+if (clue.type === 'notouch') {
+for (i = 0; i < n; i++) {
+if (st.dom[i] !== (1 << t)) continue;
+var nb2 = map.cells[i].nbr;
+for (var k2 = 0; k2 < nb2.length; k2++) if (st.dom[nb2[k2]] === (1 << t)) return false;
+}
+return true;
+}
+return true;
+}
+function falsePossible(clue) {
+var t = clue.terrain, i;
+if (clue.type === 'neighbor' || clue.type === 'row') {
+var cells = clue.type === 'neighbor' ? map.cells[clue.hex].nbr : map.rows[clue.row].cells;
+var b = countBounds(cells, t);
+return !(b.min === clue.k && b.max === clue.k);
+}
+if (clue.type === 'same') return !(isSingleton(st.dom[clue.a]) && st.dom[clue.a] === st.dom[clue.b]);
+if (clue.type === 'connected') {
+var poss = [], forcedCount = 0;
+for (i = 0; i < n; i++) if (st.dom[i] & (1 << t)) { poss.push(i); if (st.dom[i] === (1 << t)) forcedCount++; }
+if (!poss.length) return true;
+if (forcedCount !== poss.length) return true;
+var seen = new Uint8Array(n), stk = [poss[0]]; seen[poss[0]] = 1;
+while (stk.length) {
+var c = stk.pop(), nb = map.cells[c].nbr;
+for (var k = 0; k < nb.length; k++) if (!seen[nb[k]] && (st.dom[nb[k]] & (1 << t))) { seen[nb[k]] = 1; stk.push(nb[k]); }
+}
+for (var p = 0; p < poss.length; p++) if (!seen[poss[p]]) return true;
+return false;
+}
+if (clue.type === 'notouch') {
+for (i = 0; i < n; i++) {
+if (!(st.dom[i] & (1 << t))) continue;
+var nb2 = map.cells[i].nbr;
+for (var k2 = 0; k2 < nb2.length; k2++) if (nb2[k2] > i && (st.dom[nb2[k2]] & (1 << t))) return true;
+}
+return false;
+}
+return true;
+}
+function applyKnown(clue, ci, truth) {
+var t = clue.terrain;
+if (clue.type === 'neighbor') return countRule(map.cells[clue.hex].nbr, t, clue.k, ci, 'Clue ' + (ci + 1), truth);
+if (clue.type === 'row') return countRule(map.rows[clue.row].cells, t, clue.k, ci, 'Clue ' + (ci + 1), truth);
+if (clue.type === 'same') return sameRule(clue.a, clue.b, ci, truth);
+if (clue.type === 'notouch') return notouchRule(t, ci, truth);
+if (clue.type === 'connected') return connectedRule(t, ci, truth);
+return true;
+}
+var iter = 0;
+while (iter++ < MAX_ITER) {
+if (contradiction) return false;
+var before = stateChecksum(st);
+var nf = 0, nt = 0, unknown = [], ci;
+for (ci = 0; ci < m; ci++) {
+if (st.cs[ci] === 2) nf++;
+else if (st.cs[ci] === 1) nt++;
+else unknown.push(ci);
+}
+if (nf > L) return fail('More clues are false than the stated ' + L + ' lie(s).', []);
+if (nt > m - L) return fail('More clues are truthful than the stated lie count allows.', []);
+if (nf === L) {
+for (var u = 0; u < unknown.length; u++) {
+if (!setClue(unknown[u], 1, [unknown[u]], 'All ' + L + ' lie(s) are accounted for, so clue ' + (unknown[u] + 1) + ' must be truthful.')) return false;
+}
+} else if (nf + unknown.length === L) {
+for (var u2 = 0; u2 < unknown.length; u2++) {
+if (!setClue(unknown[u2], 2, [unknown[u2]], 'Every remaining clue must be false to reach exactly ' + L + ' lie(s).')) return false;
+}
+}
+nf = 0; nt = 0; unknown = [];
+for (ci = 0; ci < m; ci++) {
+if (st.cs[ci] === 2) nf++; else if (st.cs[ci] === 1) nt++; else unknown.push(ci);
+}
+if (nf > L || nt > m - L) return fail('The clue states exceed the stated lie count.', []);
+for (var ui = 0; ui < unknown.length; ui++) {
+ci = unknown[ui];
+var tp = truthPossible(clues[ci]), fp = falsePossible(clues[ci]);
+if (!tp && !fp) return fail('Clue ' + (ci + 1) + ' can be neither true nor false under the current knowledge.', [ci]);
+if (!tp) { if (!setClue(ci, 2, [ci], 'Clue ' + (ci + 1) + ' is impossible as written, so it must be one of the lies.')) return false; }
+else if (!fp) { if (!setClue(ci, 1, [ci], 'Clue ' + (ci + 1) + ' cannot be false, so it must be truthful.')) return false; }
+}
+for (ci = 0; ci < m; ci++) {
+if (!st.cs[ci]) continue;
+if (!applyKnown(clues[ci], ci, st.cs[ci] === 1)) return false;
+if (contradiction) return false;
+}
+var allPinned = true;
+for (var d = 0; d < n; d++) if (!isSingleton(st.dom[d])) { allPinned = false; break; }
+if (allPinned) {
+var pinned = new Int8Array(n);
+for (var pd = 0; pd < n; pd++) pinned[pd] = bitIndex(st.dom[pd]);
+var evalTruths = clueTruthAll(map, pinned, clues);
+var evalLies = [];
+for (var ec = 0; ec < m; ec++) if (!evalTruths[ec]) evalLies.push(ec);
+if (evalLies.length !== L) return fail('The pinned map has ' + evalLies.length + ' false note(s), but exactly ' + L + ' lie(s) were promised.', evalLies);
+for (var sc = 0; sc < m; sc++) {
+if (st.cs[sc]) continue;
+if (!setClue(sc, evalTruths[sc] ? 1 : 2, [sc], 'Every hex is pinned, so note ' + (sc + 1) + ' can be checked against the finished map: it is ' + (evalTruths[sc] ? 'true' : 'a lie') + '.')) return false;
+}
+}
+if (stateChecksum(st) === before) break;
+}
+if (iter >= MAX_ITER) return fail('Propagation did not settle within the safety limit.', []);
+return true;
+}
+function derived(map, clues, st) {
+var assign = new Int8Array(st.dom.length);
+for (var i = 0; i < st.dom.length; i++) assign[i] = isSingleton(st.dom[i]) ? bitIndex(st.dom[i]) : -1;
+var liarSet = [];
+if (assign.indexOf(-1) < 0) {
+var truths = clueTruthAll(map, assign, clues);
+for (var c = 0; c < clues.length; c++) if (!truths[c]) liarSet.push(c);
+}
+return { assign: assign, liarSet: liarSet };
+}
+function propagationSolve(map, T, clues, L, trace) {
+var st = initState(map.cells.length, clues.length, T);
+var t = trace || [];
+var ok = propagate(map, T, clues, L, st, t);
+if (!ok) {
+var last = t.length ? t[t.length - 1] : null;
+return { ok: false, complete: false, contradiction: last ? last.text : 'Contradiction.', trace: t, state: st };
+}
+var complete = true, i;
+for (i = 0; i < st.dom.length; i++) if (!isSingleton(st.dom[i])) { complete = false; break; }
+if (complete) for (i = 0; i < st.cs.length; i++) if (!st.cs[i]) { complete = false; break; }
+var d = complete ? derived(map, clues, st) : { assign: null, liarSet: null };
+var statesMatch = true;
+if (complete) {
+var truths = clueTruthAll(map, d.assign, clues);
+for (i = 0; i < clues.length; i++) {
+if (st.cs[i] === 1 && !truths[i]) statesMatch = false;
+if (st.cs[i] === 2 && truths[i]) statesMatch = false;
+}
+}
+return { ok: true, complete: complete, assign: d.assign, liarSet: d.liarSet, statesMatch: statesMatch, trace: t, state: st };
+}
+function countSolutions(map, T, clues, L, limit, nodeCap) {
+limit = limit || 2; nodeCap = nodeCap || 250000;
+var n = map.cells.length, m = clues.length, count = 0, found = null, nodes = 0, capped = false;
+var st0 = initState(n, m, T);
+if (!propagate(map, T, clues, L, st0, null)) return { count: 0, solution: null, nodes: 0, capped: false };
+function done(st) {
+for (var i = 0; i < n; i++) if (!isSingleton(st.dom[i])) return false;
+return true;
+}
+function evaluate(st) {
+if (!done(st)) return false;
+var assign = new Int8Array(n);
+for (var i = 0; i < n; i++) assign[i] = bitIndex(st.dom[i]);
+var truths = clueTruthAll(map, assign, clues), lies = 0;
+for (var c = 0; c < m; c++) if (!truths[c]) lies++;
+if (lies !== L) return false;
+count++;
+if (!found) {
+var liarSet = [];
+for (var c2 = 0; c2 < m; c2++) if (!truths[c2]) liarSet.push(c2);
+found = { assign: assign, liarSet: liarSet };
+}
+return true;
+}
+function dfs(st) {
+if (count >= limit || capped) return;
+nodes++;
+if (nodes > nodeCap) { capped = true; return; }
+if (!propagate(map, T, clues, L, st, null)) return;
+if (done(st)) { evaluate(st); return; }
+var best = -1, bestCount = 99;
+for (var i = 0; i < n; i++) {
+var pc = popcount(st.dom[i]);
+if (pc > 1 && pc < bestCount) { best = i; bestCount = pc; if (pc === 2) break; }
+}
+if (best < 0) return;
+for (var t = 0; t < T; t++) {
+if (!(st.dom[best] & (1 << t))) continue;
+var child = cloneState(st);
+child.dom[best] = 1 << t;
+dfs(child);
+if (count >= limit || capped) return;
+}
+}
+dfs(st0);
+return { count: count, solution: found, nodes: nodes, capped: capped };
+}
+function adjacentSame(map, assign, i) {
+var out = [];
+for (var k = 0; k < map.cells[i].nbr.length; k++) {
+var j = map.cells[i].nbr[k];
+if (assign[j] === assign[i]) out.push(j);
+}
+return out;
+}
+function makeSolution(map, T, rng) {
+var n = map.cells.length, assign = new Int8Array(n).fill(-1);
+var order = shuffle(Array.from({ length: n }, function (_, i) { return i; }), rng);
+var seeds = [];
+var minGap = Math.max(2, Math.floor(map.radius * 0.9));
+for (var t = 0; t < T; t++) {
+var chosen = -1;
+for (var pass = 0; pass < 2 && chosen < 0; pass++) {
+var gap = pass === 0 ? minGap : 1;
+for (var oi = 0; oi < order.length; oi++) {
+var cand = order[oi];
+if (assign[cand] !== -1) continue;
+var ok = true;
+for (var s = 0; s < seeds.length; s++) {
+if (hexDistance(map.cells[seeds[s]], map.cells[cand]) < gap) { ok = false; break; }
+}
+if (ok) { chosen = cand; break; }
+}
+}
+if (chosen < 0) {
+for (var z = 0; z < n; z++) if (assign[z] === -1) { chosen = z; break; }
+}
+seeds.push(chosen); assign[chosen] = t;
+}
+var frontier = seeds.slice();
+var remaining = n - T, guard = 0;
+while (remaining > 0 && guard++ < n * 60) {
+var pickIdx = Math.floor(rng() * frontier.length);
+var cell = frontier[pickIdx];
+var options = [];
+var nb = map.cells[cell].nbr;
+for (var k = 0; k < nb.length; k++) if (assign[nb[k]] === -1) options.push(nb[k]);
+if (!options.length) { frontier.splice(pickIdx, 1); if (!frontier.length) break; continue; }
+var next = options[Math.floor(rng() * options.length)];
+assign[next] = assign[cell];
+remaining--;
+frontier.push(next);
+}
+if (remaining !== 0) {
+for (var q = 0; q < n; q++) if (assign[q] === -1) assign[q] = q % T;
+}
+var sizes = new Array(T).fill(0), interior = new Array(T).fill(0);
+var interiors = [];
+for (var i = 0; i < n; i++) sizes[assign[i]]++;
+for (var i2 = 0; i2 < n; i2++) {
+if (map.cells[i2].nbr.length !== 6) continue;
+var sameAll = true;
+for (var k2 = 0; k2 < 6; k2++) if (assign[map.cells[i2].nbr[k2]] !== assign[i2]) { sameAll = false; break; }
+if (sameAll) { interiors.push(i2); interior[assign[i2]]++; }
+}
+for (var t2 = 0; t2 < T; t2++) {
+if (sizes[t2] === 0) return null;
+if (interior[t2] === 0) return null;
+}
+return { assign: assign, sizes: sizes, interior: interiors };
+}
+function clueKey(c) {
+if (c.type === 'neighbor') return 'n:' + c.hex + ':' + c.terrain + ':' + c.k;
+if (c.type === 'row') return 'r:' + c.row + ':' + c.terrain + ':' + c.k;
+if (c.type === 'same') return 's:' + Math.min(c.a, c.b) + ':' + Math.max(c.a, c.b);
+if (c.type === 'connected') return 'c:' + c.terrain;
+if (c.type === 'notouch') return 'x:' + c.terrain;
+return JSON.stringify(c);
+}
+function verifyClueSet(map, T, clues, L, solution, opts) {
+if (clues.length > 400) return { ok: false, error: 'too many clues' };
+var prop = propagationSolve(map, T, clues, L, null);
+if (!prop.ok) return { ok: false, error: 'propagation contradiction: ' + prop.contradiction };
+if (!prop.complete) return { ok: false, error: 'propagation incomplete' };
+if (!prop.statesMatch) return { ok: false, error: 'propagation states inconsistent' };
+if (prop.liarSet.length !== L) return { ok: false, error: 'liar count ' + prop.liarSet.length + ' != ' + L };
+for (var i = 0; i < solution.length; i++) if (prop.assign[i] !== solution[i]) return { ok: false, error: 'propagation assignment differs from solution' };
+var count = countSolutions(map, T, clues, L, 2, (opts && opts.nodeCap) || 200000);
+if (count.capped) return { ok: false, error: 'solution counter hit node cap' };
+if (count.count !== 1) return { ok: false, error: 'solution count is ' + count.count };
+if (!count.solution) return { ok: false, error: 'no counted solution' };
+for (var j = 0; j < solution.length; j++) if (count.solution.assign[j] !== solution[j]) return { ok: false, error: 'counted assignment differs' };
+for (var k = 0; k < count.solution.liarSet.length; k++) if (prop.liarSet.indexOf(count.solution.liarSet[k]) < 0) return { ok: false, error: 'liar set differs' };
+return { ok: true, prop: prop, count: count };
+}
+function makeImpossibleLies(map, T, L, rng) {
+var out = [], used = new Set();
+var rowOrder = shuffle(Array.from({ length: map.rows.length }, function (_, i) { return i; }), rng);
+var hexOrder = shuffle(Array.from({ length: map.cells.length }, function (_, i) { return i; }), rng);
+var greedy = rng() < 0.5;
+while (out.length < L) {
+var made = false;
+if (greedy) {
+for (var ri = 0; ri < rowOrder.length && !made; ri++) {
+var row = rowOrder[ri], len = map.rows[row].cells.length;
+for (var t = 0; t < T; t++) {
+var key = 'r' + row + ':' + t;
+if (used.has(key)) continue;
+used.add(key);
+out.push({ type: 'row', row: row, terrain: t, k: len + 1 + Math.floor(rng() * 2) });
+made = true; break;
+}
+}
+} else {
+for (var hi = 0; hi < hexOrder.length && !made; hi++) {
+var hex = hexOrder[hi], deg = map.cells[hex].nbr.length;
+for (var t2 = 0; t2 < T; t2++) {
+var key2 = 'n' + hex + ':' + t2;
+if (used.has(key2)) continue;
+used.add(key2);
+out.push({ type: 'neighbor', hex: hex, terrain: t2, k: deg + 1 + Math.floor(rng() * 2) });
+made = true; break;
+}
+}
+}
+if (!made) break;
+greedy = !greedy;
+}
+return out;
+}
+function makeTrueCluePool(map, T, solution, rng) {
+var pool = [];
+var n = map.cells.length, terrains = Array.from({ length: T }, function (_, i) { return i; });
+for (var t = 0; t < T; t++) {
+var cells = terrainCells(solution, t);
+if (cells.length && connectedOnMap(map, null, t, solution)) pool.push({ type: 'connected', terrain: t });
+if (!touchesSelf(map, solution, t)) pool.push({ type: 'notouch', terrain: t });
+}
+for (var r = 0; r < map.rows.length; r++) {
+for (var ti = 0; ti < T; ti++) {
+var k = countTerrain(map.rows[r].cells, solution, ti);
+if (rng() < 0.28) pool.push({ type: 'row', row: r, terrain: ti, k: k });
+}
+}
+for (var h = 0; h < n; h++) {
+if (rng() > 0.2) continue;
+var cnts = new Array(T).fill(0);
+var nb = map.cells[h].nbr;
+for (var z = 0; z < nb.length; z++) cnts[solution[nb[z]]]++;
+var tt = Math.floor(rng() * T);
+pool.push({ type: 'neighbor', hex: h, terrain: tt, k: cnts[tt] });
+}
+for (var s = 0; s < 18; s++) {
+var a = Math.floor(rng() * n), b = -1;
+if (rng() < 0.5) {
+var adj = adjacentSame(map, solution, a);
+if (adj.length) b = pick(adj, rng);
+} else {
+var sameList = [];
+for (var c = 0; c < n; c++) if (c !== a && solution[c] === solution[a]) sameList.push(c);
+if (sameList.length) b = pick(sameList, rng);
+}
+if (b >= 0) pool.push({ type: 'same', a: a, b: b });
+}
+return pool.filter(function (c) {
+return clueTruth(map, solution, c);
+});
+}
+function buildPuzzle(seed, tierId, opts) {
+opts = opts || {};
+var t0 = now();
+var tier = null;
+for (var ti = 0; ti < TIERS.length; ti++) if (TIERS[ti].id === tierId) tier = TIERS[ti];
+if (!tier) tier = TIERS[0];
+var map = makeMap(tier.radius), T = tier.terrains, L = tier.liars;
+var rng = makeRng(seed, tier.id);
+var progress = opts.onProgress || function () {};
+var maxAttempts = opts.maxAttempts || 10;
+var lastError = 'unknown generation failure';
+for (var attempt = 1; attempt <= maxAttempts; attempt++) {
+progress(Math.min(90, 8 + Math.round((attempt - 1) / maxAttempts * 52)), 'Shaping coastlines (attempt ' + attempt + '/' + maxAttempts + ')');
+var sol = null;
+for (var tries = 0; tries < 30 && !sol; tries++) sol = makeSolution(map, T, rng);
+if (!sol) { lastError = 'could not form anchored regions'; continue; }
+progress(40, 'Inking field notes');
+var solution = sol.assign;
+var clues = [], seen = new Set();
+function add(c) {
+var key = clueKey(c);
+if (seen.has(key)) return;
+seen.add(key); clues.push(c);
+}
+var covered = new Set();
+for (var ai = 0; ai < map.cells.length; ai++) {
+if (map.cells[ai].nbr.length !== 6) continue;
+var uniform = true;
+for (var an = 0; an < 6; an++) if (solution[map.cells[ai].nbr[an]] !== solution[ai]) { uniform = false; break; }
+if (!uniform) continue;
+add({ type: 'neighbor', hex: ai, terrain: solution[ai], k: 6 });
+for (var an2 = 0; an2 < 6; an2++) covered.add(map.cells[ai].nbr[an2]);
+}
+for (var i = 0; i < map.cells.length; i++) {
+if (covered.has(i)) continue;
+var target = -1;
+for (var aj = 0; aj < map.cells[i].nbr.length; aj++) {
+var nb = map.cells[i].nbr[aj];
+if (solution[nb] === solution[i] && covered.has(nb)) { target = nb; break; }
+}
+if (target < 0) {
+for (var cj = 0; cj < map.cells.length; cj++) {
+if (cj !== i && solution[cj] === solution[i] && covered.has(cj)) { target = cj; break; }
+}
+}
+if (target < 0) {
+for (var ai2 = 0; ai2 < map.cells.length; ai2++) {
+if (solution[ai2] === solution[i] && covered.has(ai2)) { target = ai2; break; }
+}
+}
+if (target >= 0) { add({ type: 'same', a: i, b: target }); covered.add(i); }
+}
+progress(52, 'Adding marginalia');
+var pool = makeTrueCluePool(map, T, solution, rng);
+var poolOrder = shuffle(pool, rng);
+for (var pi = 0; pi < poolOrder.length && clues.length < 190; pi++) add(poolOrder[pi]);
+for (var rr = 0; rr < map.rows.length; rr++) {
+for (var tt = 0; tt < T; tt++) {
+add({ type: 'row', row: rr, terrain: tt, k: countTerrain(map.rows[rr].cells, solution, tt) });
+}
+}
+var lies = makeImpossibleLies(map, T, L, rng);
+if (lies.length !== L) { lastError = 'could not place L impossible notes'; continue; }
+for (var li = 0; li < lies.length; li++) add(lies[li]);
+var all = shuffle(clues, rng);
+var cluesBefore = all.length;
+progress(66, 'Testing deductions');
+var check = verifyClueSet(map, T, all, L, solution, { nodeCap: 220000 });
+if (!check.ok) { lastError = check.error; continue; }
+progress(78, 'Proving uniqueness');
+var lieKeys = Object.create(null);
+for (var lk = 0; lk < lies.length; lk++) lieKeys[clueKey(lies[lk])] = true;
+var pruned = all.slice(), changed = true, rounds = 0;
+var order = shuffle(Array.from({ length: pruned.length }, function (_, idx) { return idx; }), rng);
+while (changed && rounds++ < 5) {
+changed = false;
+for (var oi = 0; oi < order.length; oi++) {
+var idx = order[oi];
+if (idx >= pruned.length) continue;
+if (lieKeys[clueKey(pruned[idx])]) continue;
+var trial = pruned.slice(0, idx).concat(pruned.slice(idx + 1));
+var tv = verifyClueSet(map, T, trial, L, solution, { nodeCap: 120000 });
+if (tv.ok) { pruned = trial; changed = true; }
+}
+}
+progress(92, 'Final verification');
+var finalCheck = verifyClueSet(map, T, pruned, L, solution, { nodeCap: 220000 });
+if (!finalCheck.ok) { lastError = 'final verification failed: ' + finalCheck.error; continue; }
+var liarSet = finalCheck.prop.liarSet.slice().sort(function (a, b) { return a - b; });
+if (liarSet.length !== L) { lastError = 'final liar count mismatch'; continue; }
+var truths = clueTruthAll(map, solution, pruned), falseCount = 0;
+for (var fc = 0; fc < truths.length; fc++) if (!truths[fc]) falseCount++;
+if (falseCount !== L) { lastError = 'false note count ' + falseCount + ' != ' + L; continue; }
+var lieIdx = Object.create(null);
+for (var lj = 0; lj < liarSet.length; lj++) lieIdx[liarSet[lj]] = true;
+progress(100, 'Atlas complete');
+return {
+ok: true,
+puzzle: {
+seed: String(seed), tierId: tier.id, tierName: tier.name, radius: tier.radius,
+T: T, L: L, clues: pruned, solution: solution, liarSet: liarSet,
+stats: {
+attempts: attempt, cluesBeforePrune: cluesBefore, clues: pruned.length,
+interiorAnchors: (function () {
+var c = 0;
+for (var q = 0; q < map.cells.length; q++) {
+if (map.cells[q].nbr.length !== 6) continue;
+var same = true;
+for (var n2 = 0; n2 < 6; n2++) if (solution[map.cells[q].nbr[n2]] !== solution[q]) { same = false; break; }
+if (same) c++;
+}
+return c;
+})(), regions: sol.sizes.slice(),
+nodes: finalCheck.count.nodes, ms: Math.round(now() - t0)
+}
+},
+stats: { ms: Math.round(now() - t0), attempts: attempt }
+};
+}
+return { ok: false, error: 'Bounded generation failed after ' + maxAttempts + ' attempts (' + lastError + '). No unverified puzzle was supplied; try another seed or tier.' };
+}
+function testSingleCase(seed, tierId) {
+var issues = [], stats = '';
+var first;
+try {
+first = buildPuzzle(seed, tierId, { maxAttempts: 6 });
+if (!first.ok) return { ok: false, seed: seed, tierId: tierId, issues: ['generation failed: ' + first.error] };
+var p = first.puzzle, map = makeMap(p.radius), i, c;
+var truths = clueTruthAll(map, p.solution, p.clues);
+var falseCount = 0;
+for (i = 0; i < truths.length; i++) if (!truths[i]) falseCount++;
+if (falseCount !== p.L) issues.push('stored solution has ' + falseCount + ' false notes, expected ' + p.L);
+var count = countSolutions(map, p.T, p.clues, p.L, 2, 250000);
+if (count.capped) issues.push('solution counter reached its node cap');
+if (count.count !== 1) issues.push('solution count is ' + count.count + ', expected exactly 1 (capped at 2)');
+var prop = propagationSolve(map, p.T, p.clues, p.L, null);
+if (!prop.ok) issues.push('propagation solver reports a contradiction');
+else if (!prop.complete) issues.push('propagation solver could not finish without guessing');
+else {
+if (prop.liarSet.join(',') !== p.liarSet.join(',')) issues.push('propagation liar set differs from the verified set');
+for (i = 0; i < p.solution.length; i++) if (prop.assign[i] !== p.solution[i]) { issues.push('propagation assignment differs at hex ' + i); break; }
+}
+if (count.solution) {
+for (i = 0; i < p.solution.length; i++) if (count.solution.assign[i] !== p.solution[i]) { issues.push('counted solution differs from stored at hex ' + i); break; }
+for (i = 0; i < count.solution.liarSet.length; i++) if (prop.liarSet && prop.liarSet.indexOf(count.solution.liarSet[i]) < 0) { issues.push('counted liar set differs from propagation'); break; }
+}
+var player = {
+assign: new Int8Array(map.cells.length).fill(-1),
+pencil: new Uint16Array(map.cells.length).fill((1 << p.T) - 1),
+liars: [], trusted: []
+};
+var guard = 0, hintFail = '';
+while (guard++ < 900) {
+var h = nextHint(map, p.T, p.clues, p.L, player);
+if (h.kind === 'none') break;
+if (h.kind === 'contradiction') { hintFail = 'hint solver contradicts itself: ' + h.text; break; }
+if (h.kind === 'cannotTerrain') {
+if (p.solution[h.cell] === h.terrain) { hintFail = 'hint ruled out the true terrain at hex ' + h.cell; break; }
+player.pencil[h.cell] &= ~(1 << h.terrain);
+if (isSingleton(player.pencil[h.cell])) player.assign[h.cell] = bitIndex(player.pencil[h.cell]);
+} else if (h.kind === 'clueLie') {
+if (p.liarSet.indexOf(h.clue) < 0) { hintFail = 'hint called truthful clue ' + h.clue + ' a lie'; break; }
+if (player.liars.indexOf(h.clue) < 0) player.liars.push(h.clue);
+} else if (h.kind === 'clueTrue') {
+if (p.liarSet.indexOf(h.clue) >= 0) { hintFail = 'hint called lying clue ' + h.clue + ' truthful'; break; }
+if (player.trusted.indexOf(h.clue) < 0) player.trusted.push(h.clue);
+} else { hintFail = 'unknown hint kind ' + h.kind; break; }
+}
+if (hintFail) issues.push(hintFail);
+else {
+var allAssigned = true;
+for (i = 0; i < player.assign.length; i++) if (player.assign[i] < 0) { allAssigned = false; break; }
+if (!allAssigned) issues.push('hint walk did not deduce every hex');
+if (player.liars.length !== p.L) issues.push('hint walk identified ' + player.liars.length + ' liars, expected ' + p.L);
+for (i = 0; i < p.liarSet.length; i++) if (player.liars.indexOf(p.liarSet[i]) < 0) issues.push('hint walk missed liar ' + p.liarSet[i]);
+}
+var second = buildPuzzle(seed, tierId, { maxAttempts: 6 });
+if (!second.ok) issues.push('second generation failed');
+else if (JSON.stringify(second.puzzle.clues) !== JSON.stringify(p.clues) || second.puzzle.liarSet.join(',') !== p.liarSet.join(',')) {
+issues.push('identical seed and tier produced a different puzzle');
+}
+stats = p.stats.clues + ' clues, ' + p.stats.ms + 'ms, ' + p.stats.attempts + ' attempt(s)';
+} catch (e) {
+issues.push('exception: ' + ((e && e.message) || String(e)));
+}
+return { ok: issues.length === 0, seed: seed, tierId: tierId, issues: issues, stats: stats };
+}
+function testSuiteCases() {
+var out = [], tiers = ['surveyor', 'cartographer', 'archmage'];
+for (var ti = 0; ti < tiers.length; ti++) {
+for (var i = 0; i < 10; i++) out.push({ seed: 'folio-' + tiers[ti] + '-' + (i + 1), tierId: tiers[ti] });
+}
+return out;
+}
+function hasClue(container, c) {
+if (!container) return false;
+if (typeof container.has === 'function') return container.has(c);
+if (Array.isArray(container)) return container.indexOf(c) >= 0;
+return !!container[c];
+}
+function playerStateToSolver(map, T, clues, L, player) {
+var n = map.cells.length, st = initState(n, clues.length, T);
+var full = allMask(T);
+for (var i = 0; i < n; i++) {
+if (player.assign && player.assign[i] >= 0) st.dom[i] = 1 << player.assign[i];
+else if (player.pencil && player.pencil[i]) st.dom[i] = player.pencil[i] & full;
+}
+for (var c = 0; c < clues.length; c++) {
+if (hasClue(player.liars, c)) st.cs[c] = 2;
+else if (hasClue(player.trusted, c)) st.cs[c] = 1;
+}
+return st;
+}
+function nextHint(map, T, clues, L, player) {
+var st = playerStateToSolver(map, T, clues, L, player);
+var trace = [];
+var ok = propagate(map, T, clues, L, st, trace);
+if (!ok) {
+var last = trace.length ? trace[trace.length - 1] : null;
+return {
+kind: 'contradiction',
+text: last ? last.text : 'Your current markings contradict the field notes.',
+clues: last ? last.clues : [],
+detail: 'The propagation solver reaches a contradiction without guessing. Undo recent marks or re-examine the cited notes.'
+};
+}
+var i, step;
+for (i = 0; i < trace.length; i++) {
+step = trace[i];
+if (step.kind === 'cannotTerrain') {
+var assigned = player.assign && player.assign[step.cell] >= 0;
+var pencilKnown = player.pencil && player.pencil[step.cell] && !(player.pencil[step.cell] & (1 << step.terrain));
+if (assigned || pencilKnown) continue;
+return makeHint(step, 'Ruled out', map, clues);
+}
+if (step.kind === 'clueLie') {
+if (hasClue(player.liars, step.clue)) continue;
+return makeHint(step, 'A lie surfaces', map, clues);
+}
+}
+for (i = 0; i < trace.length; i++) {
+step = trace[i];
+if (step.kind === 'clueTrue') {
+if (hasClue(player.liars, step.clue)) continue;
+return makeHint(step, 'A note rings true', map, clues);
+}
+}
+var complete = true, j;
+for (j = 0; j < st.dom.length; j++) if (!isSingleton(st.dom[j])) { complete = false; break; }
+return {
+kind: 'none', complete: complete,
+text: complete
+? 'The propagation solver can derive nothing further from these marks; the deductions it supports are already reflected.'
+: 'No forced deduction is available from the current marks. Try marking a note as a lie, clearing doubtful pencil marks, or assigning a hex you can justify.',
+clues: [], detail: 'This message comes from the propagation solver only; the stored solution is never consulted.'
+};
+}
+function analyzeMarks(map, T, clues, L, player) {
+var st = playerStateToSolver(map, T, clues, L, player);
+var trace = [];
+var ok = propagate(map, T, clues, L, st, trace);
+var cells = [], involved = [];
+if (!ok) {
+var start = Math.max(0, trace.length - 7);
+for (var i = start; i < trace.length; i++) {
+var step = trace[i];
+if (step.cell !== undefined && cells.indexOf(step.cell) < 0) cells.push(step.cell);
+if (step.clues) for (var k = 0; k < step.clues.length; k++) if (involved.indexOf(step.clues[k]) < 0) involved.push(step.clues[k]);
+}
+var lastStep = trace.length ? trace[trace.length - 1] : null;
+return {
+ok: false, contradiction: lastStep ? lastStep.text : 'Contradiction.',
+cells: cells, clues: involved, trace: trace
+};
+}
+var singles = new Int8Array(map.cells.length).fill(-1);
+for (var c = 0; c < map.cells.length; c++) if (isSingleton(st.dom[c])) singles[c] = bitIndex(st.dom[c]);
+var trueClues = [], lieClues = [];
+for (var q = 0; q < clues.length; q++) {
+if (st.cs[q] === 1) trueClues.push(q);
+else if (st.cs[q] === 2) lieClues.push(q);
+}
+var resolvedRegions = [];
+for (var t = 0; t < T; t++) {
+var poss = [], allForced = true;
+for (var r = 0; r < map.cells.length; r++) {
+if (st.dom[r] & (1 << t)) {
+poss.push(r);
+if (st.dom[r] !== (1 << t)) allForced = false;
+}
+}
+if (!poss.length || !allForced) continue;
+var seenR = new Uint8Array(map.cells.length), stackR = [poss[0]], got = 0;
+seenR[poss[0]] = 1;
+while (stackR.length) {
+var cur = stackR.pop(); got++;
+var nbrs = map.cells[cur].nbr;
+for (var k = 0; k < nbrs.length; k++) if (!seenR[nbrs[k]] && (st.dom[nbrs[k]] === (1 << t))) { seenR[nbrs[k]] = 1; stackR.push(nbrs[k]); }
+}
+if (got === poss.length) resolvedRegions.push(poss);
+}
+return { ok: true, contradiction: null, cells: [], clues: [], singles: singles, trueClues: trueClues, lieClues: lieClues, resolvedRegions: resolvedRegions, trace: trace };
+}
+function validateSubmission(map, T, clues, L, solution, assign, liarSet) {
+var i, c;
+for (i = 0; i < map.cells.length; i++) {
+if (assign[i] < 0) {
+return { ok: false, kind: 'incomplete', text: 'The atlas is incomplete: ' + cellName(map, i) + ' has not been inked yet.' };
+}
+}
+var marked = [];
+for (c = 0; c < clues.length; c++) if (liarSet.indexOf(c) >= 0) marked.push(c);
+if (marked.length !== L) {
+return { ok: false, kind: 'liars', text: 'Exactly ' + L + ' note' + (L === 1 ? '' : 's') + ' must be marked as lies, but ' + marked.length + ' ' + (marked.length === 1 ? 'is' : 'are') + ' marked.' };
+}
+for (i = 0; i < map.cells.length; i++) {
+if (assign[i] !== solution[i]) {
+var truths = clueTruthAll(map, assign, clues);
+for (c = 0; c < clues.length; c++) {
+var isLieMarked = marked.indexOf(c) >= 0;
+if (isLieMarked && truths[c]) {
+return { ok: false, kind: 'clue', clue: c, text: 'Clue ' + (c + 1) + ' is marked as a lie, but under your map it is true: “' + clueText(map, clues[c]) + '”' };
+}
+if (!isLieMarked && !truths[c]) {
+return { ok: false, kind: 'clue', clue: c, text: 'Clue ' + (c + 1) + ' is treated as truthful, but under your map it is false: “' + clueText(map, clues[c]) + '”' };
+}
+}
+return { ok: false, kind: 'terrain', cell: i, text: cellName(map, i) + ' is inked ' + TERRAIN_NAMES[assign[i]] + ', which does not fit every truthful note.' };
+}
+}
+var truth = clueTruthAll(map, assign, clues);
+for (c = 0; c < clues.length; c++) {
+var markedLie = marked.indexOf(c) >= 0;
+if (markedLie && truth[c]) return { ok: false, kind: 'clue', clue: c, text: 'Clue ' + (c + 1) + ' is marked as a lie, but it is true: “' + clueText(map, clues[c]) + '”' };
+if (!markedLie && !truth[c]) return { ok: false, kind: 'clue', clue: c, text: 'Clue ' + (c + 1) + ' is false but not marked as a lie: “' + clueText(map, clues[c]) + '”' };
+}
+return { ok: true };
+}
+function makeHint(step, title, map, clues) {
+var clueNums = (step.clues || []).map(function (c) { return '#' + (c + 1); });
+var quotes = (step.clues || []).map(function (c) {
+return 'Note ' + (c + 1) + ': “' + clueText(map, clues[c]) + '”';
+});
+return {
+kind: step.kind, title: title, text: step.text, clues: step.clues || [],
+cell: step.cell, terrain: step.terrain, clue: step.clue,
+detail: (quotes.length ? quotes.join(' ') + ' ' : '') +
+'Reasoning: ' + step.text +
+' This follows by unit propagation' + (clueNums.length ? ' from note' + (clueNums.length > 1 ? 's ' : ' ') + clueNums.join(', ') : ' and the stated lie count') +
+', without guessing and without reading the stored map.'
+};
+}
+function now() {
+if (typeof performance !== 'undefined' && performance.now) return performance.now();
+return Date.now();
+}
+global.CartographerCore = {
+TERRAIN_NAMES: TERRAIN_NAMES,
+TERRAIN_GLYPHS: TERRAIN_GLYPHS,
+TIERS: TIERS,
+hashSeed: hashSeed,
+mulberry32: mulberry32,
+makeRng: makeRng,
+makeMap: makeMap,
+cellName: cellName,
+clueText: clueText,
+clueTypeLabel: clueTypeLabel,
+clueTruth: clueTruth,
+clueTruthAll: clueTruthAll,
+initState: initState,
+propagate: propagate,
+propagationSolve: propagationSolve,
+countSolutions: countSolutions,
+buildPuzzle: buildPuzzle,
+nextHint: nextHint,
+analyzeMarks: analyzeMarks,
+validateSubmission: validateSubmission,
+testSingleCase: testSingleCase,
+testSuiteCases: testSuiteCases,
+popcount: popcount,
+bitIndex: bitIndex,
+isSingleton: isSingleton,
+allMask: allMask,
+verifyClueSet: verifyClueSet
+};
+})(typeof globalThis !== 'undefined' ? globalThis : this);</script>
+<script type="module">import * as THREE_NS from 'three';
+import { OrbitControls as OC } from 'three/addons/controls/OrbitControls.js';
+const THREE_MOD = Object.assign({}, THREE_NS, { OrbitControls: OC });
+function createRendererModule(THREE, CORE) {
+const { OrbitControls } = THREE;
+const PALETTE = { parchment: 0xe8d9b8, ink: 0x2a1d15, seal: 0x8c2f26, brass: 0xb08b45, sage: 0x596b4c, sea: 0x3f6b73 };
+const TERRAIN_TINT = [
+new THREE.Color(0x4a7d86), new THREE.Color(0x5f7549), new THREE.Color(0x8d8371),
+new THREE.Color(0xc9a961), new THREE.Color(0x56603f)
+];
+const UNRESOLVED_TINT = new THREE.Color(0xcfc0a0);
+const frac = (n) => n - Math.floor(n);
+const hash2 = (x, y) => frac(Math.sin(x * 127.1 + y * 311.7) * 43758.5453);
+const smooth = (t) => t * t * (3 - 2 * t);
+function vnoise(x, y) {
+const xi = Math.floor(x), yi = Math.floor(y), xf = x - xi, yf = y - yi;
+const a = hash2(xi, yi), b = hash2(xi + 1, yi), c = hash2(xi, yi + 1), d = hash2(xi + 1, yi + 1);
+const u = smooth(xf), v = smooth(yf);
+return a * (1 - u) * (1 - v) + b * u * (1 - v) + c * (1 - u) * v + d * u * v;
+}
+function fbm(x, y, oct) {
+let amp = 0.5, f = 1, s = 0;
+for (let i = 0; i < oct; i++) { s += amp * vnoise(x * f, y * f); f *= 2.03; amp *= 0.5; }
+return s;
+}
+function mulberry(seed) {
+let a = seed >>> 0;
+return function () {
+a |= 0; a = a + 0x6D2B79F5 | 0;
+let t = Math.imul(a ^ a >>> 15, 1 | a);
+t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+return ((t ^ t >>> 14) >>> 0) / 4294967296;
+};
+}
+function makeParchmentTexture(size, seed) {
+const s = size || 1024;
+const c = document.createElement('canvas'); c.width = s; c.height = s;
+const g = c.getContext('2d');
+const rng = mulberry(seed || 7);
+const base = g.createLinearGradient(0, 0, s, s);
+base.addColorStop(0, '#efe2c4'); base.addColorStop(0.45, '#e7d6b1'); base.addColorStop(1, '#d9c49b');
+g.fillStyle = base; g.fillRect(0, 0, s, s);
+const img = g.getImageData(0, 0, s, s), d = img.data;
+for (let y = 0; y < s; y++) for (let x = 0; x < s; x++) {
+const i = (y * s + x) * 4;
+const n = fbm(x / 42, y / 42, 4) * 0.62 + fbm(x / 7, y / 7, 2) * 0.14;
+const shade = (n - 0.5) * 34 + (rng() - 0.5) * 9;
+d[i] = Math.max(0, Math.min(255, d[i] + shade));
+d[i + 1] = Math.max(0, Math.min(255, d[i + 1] + shade * 0.94));
+d[i + 2] = Math.max(0, Math.min(255, d[i + 2] + shade * 0.8));
+}
+g.putImageData(img, 0, 0);
+for (let k = 0; k < 26; k++) {
+const cx = rng() * s, cy = rng() * s, r = s * (0.02 + rng() * 0.1);
+const rg = g.createRadialGradient(cx, cy, r * 0.1, cx, cy, r);
+const tone = rng() < 0.55 ? '120,76,38' : '84,60,32';
+const a = 0.03 + rng() * 0.06;
+rg.addColorStop(0, `rgba(${tone},${a.toFixed(3)})`);
+rg.addColorStop(0.6, `rgba(${tone},${(a * 0.5).toFixed(3)})`);
+rg.addColorStop(1, `rgba(${tone},0)`);
+g.fillStyle = rg;
+g.beginPath(); g.ellipse(cx, cy, r * (0.7 + rng() * 0.7), r * (0.6 + rng() * 0.6), rng() * Math.PI, 0, Math.PI * 2); g.fill();
+}
+g.save();
+g.globalAlpha = 0.10; g.strokeStyle = '#4a2f1c'; g.lineWidth = 1;
+for (let ring = 1; ring <= 4; ring++) { g.beginPath(); g.arc(s * 0.5, s * 0.5, s * 0.085 * ring, 0, Math.PI * 2); g.stroke(); }
+g.globalAlpha = 0.09;
+for (let i = 0; i < 48; i++) {
+const a = (i / 48) * Math.PI * 2;
+const r1 = s * (i % 4 === 0 ? 0.325 : 0.335), r2 = s * 0.35;
+g.beginPath();
+g.moveTo(s / 2 + Math.cos(a) * r1, s / 2 + Math.sin(a) * r1);
+g.lineTo(s / 2 + Math.cos(a) * r2, s / 2 + Math.sin(a) * r2);
+g.stroke();
+}
+g.globalAlpha = 0.055;
+g.beginPath(); g.moveTo(0, s * 0.5); g.lineTo(s, s * 0.5); g.stroke();
+g.beginPath(); g.moveTo(s * 0.5, 0); g.lineTo(s * 0.5, s); g.stroke();
+g.restore();
+const edge = g.createRadialGradient(s / 2, s / 2, s * 0.32, s / 2, s / 2, s * 0.72);
+edge.addColorStop(0, 'rgba(40,22,10,0)');
+edge.addColorStop(0.72, 'rgba(66,38,18,0.10)');
+edge.addColorStop(0.9, 'rgba(52,28,13,0.34)');
+edge.addColorStop(1, 'rgba(30,16,8,0.72)');
+g.fillStyle = edge; g.fillRect(0, 0, s, s);
+g.save();
+for (let i = 0; i < 90; i++) {
+const ang = (i / 90) * Math.PI * 2, rr = s * (0.46 + rng() * 0.045);
+g.globalAlpha = 0.08 + rng() * 0.16;
+g.fillStyle = rng() < 0.5 ? '#3b2413' : '#5b3a1e';
+g.beginPath(); g.arc(s / 2 + Math.cos(ang) * rr, s / 2 + Math.sin(ang) * rr, s * (0.004 + rng() * 0.012), 0, Math.PI * 2); g.fill();
+}
+g.restore();
+g.save(); g.globalAlpha = 0.05; g.strokeStyle = '#6b4a2a';
+for (let f = 0; f < 240; f++) {
+const fx = rng() * s, fy = rng() * s, len = 8 + rng() * 60, ang = rng() * Math.PI * 2;
+g.beginPath(); g.moveTo(fx, fy); g.lineTo(fx + Math.cos(ang) * len, fy + Math.sin(ang) * len); g.stroke();
+}
+g.restore();
+const tex = new THREE.CanvasTexture(c);
+tex.colorSpace = THREE.SRGBColorSpace;
+tex.wrapS = tex.wrapT = THREE.ClampToEdgeWrapping;
+tex.anisotropy = 4;
+return tex;
+}
+function makeParchmentGeometry(w, h, segs, curl) {
+const geo = new THREE.PlaneGeometry(w, h, segs, segs);
+const pos = geo.attributes.position, v = new THREE.Vector3();
+for (let i = 0; i < pos.count; i++) {
+v.fromBufferAttribute(pos, i);
+const nx = v.x / (w / 2), ny = v.y / (h / 2);
+const curlY = Math.pow(Math.abs(nx), 2.4) * curl * (h * 0.055) + Math.pow(Math.abs(ny), 8) * curl * h * 0.014;
+const wobble = (fbm(v.x * 0.06 + 10, v.y * 0.06 - 4, 3) - 0.5) * h * 0.012 * curl;
+pos.setZ(i, curlY + wobble);
+}
+geo.computeVertexNormals();
+return geo;
+}
+function makeWaxTexture(size) {
+const s = size || 256;
+const c = document.createElement('canvas'); c.width = s; c.height = s;
+const g = c.getContext('2d'), rng = mulberry(4242);
+g.fillStyle = '#8c2f26'; g.fillRect(0, 0, s, s);
+for (let i = 0; i < 700; i++) {
+g.globalAlpha = 0.03 + rng() * 0.07;
+g.fillStyle = rng() < 0.5 ? '#5e1a15' : '#c26a5c';
+g.beginPath(); g.arc(rng() * s, rng() * s, 1 + rng() * 8, 0, Math.PI * 2); g.fill();
+}
+g.globalAlpha = 1;
+g.strokeStyle = 'rgba(60,16,12,.55)'; g.lineWidth = s * 0.035;
+g.beginPath(); g.arc(s / 2, s / 2, s * 0.34, 0, Math.PI * 2); g.stroke();
+g.strokeStyle = 'rgba(255,205,190,.35)'; g.lineWidth = s * 0.012;
+g.beginPath(); g.arc(s / 2, s / 2, s * 0.30, 0, Math.PI * 2); g.stroke();
+g.save(); g.translate(s / 2, s / 2);
+g.fillStyle = 'rgba(50,12,9,.6)';
+for (let k = 0; k < 4; k++) {
+g.save(); g.rotate(k * Math.PI / 2);
+g.beginPath(); g.moveTo(0, -s * 0.26); g.lineTo(s * 0.045, 0); g.lineTo(0, s * 0.06); g.lineTo(-s * 0.045, 0); g.closePath(); g.fill();
+g.restore();
+}
+g.fillStyle = 'rgba(255,205,190,.34)'; g.beginPath(); g.arc(0, 0, s * 0.05, 0, Math.PI * 2); g.fill();
+g.restore();
+const tex = new THREE.CanvasTexture(c);
+tex.colorSpace = THREE.SRGBColorSpace;
+return tex;
+}
+function makeCompassTexture(size) {
+const s = size, c = document.createElement('canvas'); c.width = s; c.height = s;
+const g = c.getContext('2d'), cx = s / 2, cy = s / 2;
+g.clearRect(0, 0, s, s); g.translate(cx, cy);
+g.strokeStyle = 'rgba(58,38,20,.75)'; g.lineWidth = s * 0.004;
+g.beginPath(); g.arc(0, 0, s * 0.44, 0, Math.PI * 2); g.stroke();
+g.lineWidth = s * 0.002;
+g.beginPath(); g.arc(0, 0, s * 0.40, 0, Math.PI * 2); g.stroke();
+g.beginPath(); g.arc(0, 0, s * 0.26, 0, Math.PI * 2); g.stroke();
+for (let i = 0; i < 72; i++) {
+const a = i / 72 * Math.PI * 2, r1 = s * (i % 6 === 0 ? 0.40 : 0.425), r2 = s * 0.445;
+g.beginPath(); g.moveTo(Math.cos(a) * r1, Math.sin(a) * r1); g.lineTo(Math.cos(a) * r2, Math.sin(a) * r2); g.stroke();
+}
+for (let i = 0; i < 8; i++) {
+const a = i / 8 * Math.PI * 2, long = i % 2 === 0 ? 0.36 : 0.30;
+g.save(); g.rotate(a);
+g.fillStyle = i % 4 === 0 ? 'rgba(58,38,20,.55)' : 'rgba(90,60,30,.32)';
+g.beginPath(); g.moveTo(0, -s * long); g.lineTo(s * 0.035, 0); g.lineTo(0, s * 0.05); g.lineTo(-s * 0.035, 0); g.closePath(); g.fill();
+g.restore();
+}
+g.fillStyle = 'rgba(140,47,38,.6)'; g.beginPath(); g.arc(0, 0, s * 0.022, 0, Math.PI * 2); g.fill();
+g.fillStyle = 'rgba(42,29,21,.85)'; g.font = `600 ${Math.round(s * 0.045)}px Georgia, serif`;
+g.textAlign = 'center'; g.textBaseline = 'middle';
+[['N', 0, -0.47], ['E', 0.47, 0], ['S', 0, 0.47], ['W', -0.47, 0]].forEach(([ch, x, y]) => g.fillText(ch, x * s, y * s));
+const tex = new THREE.CanvasTexture(c); tex.colorSpace = THREE.SRGBColorSpace; return tex;
+}
+function makeGlyphTexture(glyph) {
+const s = 96, c = document.createElement('canvas'); c.width = s; c.height = s;
+const g = c.getContext('2d');
+g.clearRect(0, 0, s, s);
+g.beginPath(); g.arc(s / 2, s / 2, s * 0.41, 0, Math.PI * 2);
+g.fillStyle = 'rgba(240,229,203,.95)'; g.fill();
+g.lineWidth = 4; g.strokeStyle = 'rgba(42,29,21,.6)'; g.stroke();
+g.fillStyle = '#2a1d15';
+g.font = `600 ${Math.round(s * 0.5)}px Georgia, "Times New Roman", serif`;
+g.textAlign = 'center'; g.textBaseline = 'middle';
+g.fillText(glyph, s / 2, s / 2 + s * 0.03);
+const tex = new THREE.CanvasTexture(c);
+tex.colorSpace = THREE.SRGBColorSpace;
+return tex;
+}
+function makeWashTexture() {
+const s = 128, c = document.createElement('canvas'); c.width = s; c.height = s;
+const g = c.getContext('2d'), rng = mulberry(77);
+g.clearRect(0, 0, s, s);
+g.translate(s / 2, s / 2);
+for (let layer = 0; layer < 7; layer++) {
+g.beginPath();
+const pts = 26;
+for (let i = 0; i <= pts; i++) {
+const a = (i / pts) * Math.PI * 2;
+const r = s * (0.26 + rng() * 0.1) * (1 + 0.1 * Math.sin(a * 3 + layer));
+const x = Math.cos(a) * r, y = Math.sin(a) * r;
+if (i === 0) g.moveTo(x, y); else g.lineTo(x, y);
+}
+g.closePath();
+g.fillStyle = `rgba(176,139,69,${(0.10 + rng() * 0.07).toFixed(3)})`;
+g.fill();
+}
+const tex = new THREE.CanvasTexture(c);
+tex.colorSpace = THREE.SRGBColorSpace;
+return tex;
+}
+function mergeGeometries(geos) {
+const nonIdx = geos.map((g) => g.index ? g.toNonIndexed() : g);
+let vcount = 0;
+for (const g of nonIdx) vcount += g.attributes.position.count;
+const pos = new Float32Array(vcount * 3);
+let off = 0;
+for (const g of nonIdx) {
+pos.set(g.attributes.position.array, off);
+off += g.attributes.position.array.length;
+g.dispose();
+}
+const out = new THREE.BufferGeometry();
+out.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+out.computeVertexNormals();
+return out;
+}
+function makeTreeGeometry(low) {
+const trunk = new THREE.CylinderGeometry(0.032, 0.05, 0.2, low ? 4 : 5); trunk.translate(0, 0.1, 0);
+const c1 = new THREE.ConeGeometry(0.22, 0.36, low ? 5 : 6); c1.translate(0, 0.3, 0);
+const c2 = new THREE.ConeGeometry(0.165, 0.3, low ? 5 : 6); c2.translate(0, 0.47, 0);
+const c3 = new THREE.ConeGeometry(0.105, 0.24, low ? 5 : 6); c3.translate(0, 0.63, 0);
+return mergeGeometries([trunk, c1, c2, c3]);
+}
+function makePeakGeometry(low) {
+const g = new THREE.ConeGeometry(0.3, 0.62, low ? 5 : 7, 1);
+g.translate(0, 0.31, 0);
+const pos = g.attributes.position;
+for (let i = 0; i < pos.count; i++) {
+if (pos.getY(i) > 0.05) {
+pos.setX(i, pos.getX(i) + (hash2(i, 1) - 0.5) * 0.06);
+pos.setZ(i, pos.getZ(i) + (hash2(i, 2) - 0.5) * 0.06);
+pos.setY(i, pos.getY(i) + (hash2(i, 3) - 0.5) * 0.05);
+}
+}
+g.computeVertexNormals();
+return g;
+}
+function makeSnowGeometry(low) {
+const g = new THREE.ConeGeometry(0.145, 0.24, low ? 5 : 7, 1);
+g.translate(0, 0.54, 0);
+return g;
+}
+function makePadGeometry() {
+const g = new THREE.CylinderGeometry(0.22, 0.24, 0.035, 7);
+g.translate(0, 0.02, 0);
+return g;
+}
+function makeDuneGeometry() {
+const g = new THREE.SphereGeometry(0.26, 7, 4, 0, Math.PI * 2, 0, Math.PI / 2);
+g.scale(1.5, 0.55, 1);
+return g;
+}
+function makeInkBorder(size, thickness, low) {
+const verts = [];
+for (let i = 0; i < 6; i++) {
+const a = Math.PI / 180 * (60 * i - 30);
+verts.push([Math.cos(a) * size, Math.sin(a) * size]);
+}
+const pts = [];
+for (let i = 0; i < 6; i++) {
+const [x1, y1] = verts[i], [x2, y2] = verts[(i + 1) % 6];
+for (let s = 0; s < 3; s++) {
+const t0 = s / 3;
+pts.push(new THREE.Vector3(x1 + (x2 - x1) * t0 + (hash2(i * 7 + s, 3) - 0.5) * 0.05, 0, y1 + (y2 - y1) * t0 + (hash2(i * 7 + s, 9) - 0.5) * 0.05));
+}
+}
+const curve = new THREE.CatmullRomCurve3(pts, true, 'catmullrom', 0.06);
+return new THREE.TubeGeometry(curve, low ? 30 : 48, thickness, low ? 3 : 5, true);
+}
+function hexPrismGeometry(size, height, bevel) {
+const shape = new THREE.Shape();
+for (let i = 0; i < 6; i++) {
+const a = Math.PI / 180 * (60 * i - 30);
+const x = Math.cos(a) * size, y = Math.sin(a) * size;
+if (i === 0) shape.moveTo(x, y); else shape.lineTo(x, y);
+}
+shape.closePath();
+const geo = new THREE.ExtrudeGeometry(shape, {
+depth: height, bevelEnabled: true, bevelThickness: bevel, bevelSize: bevel * 0.7, bevelSegments: 2, curveSegments: 1
+});
+geo.rotateX(-Math.PI / 2);
+geo.computeVertexNormals();
+return geo;
+}
+function hexRingGeometry(size) {
+const outer = new THREE.Shape();
+for (let i = 0; i < 6; i++) {
+const a = Math.PI / 180 * (60 * i - 30);
+const x = Math.cos(a) * size, y = Math.sin(a) * size;
+if (i === 0) outer.moveTo(x, y); else outer.lineTo(x, y);
+}
+outer.closePath();
+const inner = new THREE.Path();
+for (let i = 0; i < 6; i++) {
+const a = Math.PI / 180 * (60 * i - 30);
+const x = Math.cos(a) * size * 0.9, y = Math.sin(a) * size * 0.9;
+if (i === 0) inner.moveTo(x, y); else inner.lineTo(x, y);
+}
+inner.closePath();
+outer.holes.push(inner);
+const geo = new THREE.ShapeGeometry(outer);
+geo.rotateX(-Math.PI / 2);
+return geo;
+}
+function makeStarShape(outer, inner, points) {
+const s = new THREE.Shape();
+for (let i = 0; i < points * 2; i++) {
+const r = i % 2 === 0 ? outer : inner;
+const a = (i / (points * 2)) * Math.PI * 2 - Math.PI / 2;
+const x = Math.cos(a) * r, y = Math.sin(a) * r;
+if (i === 0) s.moveTo(x, y); else s.lineTo(x, y);
+}
+s.closePath();
+return s;
+}
+function createAtlas(opts) {
+const canvas = opts.canvas, stage = opts.stage;
+let lowQuality = !!opts.lowQuality;
+const renderer = new THREE.WebGLRenderer({
+canvas, antialias: !lowQuality, alpha: false, powerPreference: 'high-performance', stencil: false
+});
+const pixelRatio = () => Math.min(window.devicePixelRatio || 1, lowQuality ? 1 : 2);
+renderer.setPixelRatio(pixelRatio());
+renderer.shadowMap.enabled = !lowQuality;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.03;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0xcbb795);
+scene.fog = new THREE.Fog(0xcbb795, 44, 108);
+const camera = new THREE.PerspectiveCamera(42, 1, 0.1, 240);
+let needsRender = true, animating = true, rafId = 0, lastT = 0, time = 0;
+let fpsAcc = 0, fpsN = 0, fps = 0, frames = 0;
+const controls = new OrbitControls(camera, canvas);
+controls.enableDamping = true; controls.dampingFactor = 0.08;
+controls.minDistance = 8; controls.maxDistance = 62;
+controls.minPolarAngle = 0.26; controls.maxPolarAngle = 1.22;
+controls.enablePan = false; controls.rotateSpeed = 0.5; controls.zoomSpeed = 0.65;
+controls.addEventListener('change', () => { needsRender = true; });
+const world = new THREE.Group(); scene.add(world);
+scene.add(new THREE.HemisphereLight(0xfff4dd, 0x4a3a28, 1.1));
+const key = new THREE.DirectionalLight(0xfff0d2, 2.15);
+key.position.set(-12, 22, 13);
+key.castShadow = !lowQuality;
+if (!lowQuality) {
+key.shadow.mapSize.set(2048, 2048);
+key.shadow.bias = -0.0006; key.shadow.normalBias = 0.03;
+key.shadow.camera.near = 1; key.shadow.camera.far = 90;
+key.shadow.camera.left = -26; key.shadow.camera.right = 26;
+key.shadow.camera.top = 26; key.shadow.camera.bottom = -26;
+}
+scene.add(key);
+const fill = new THREE.DirectionalLight(0xbfd4e8, 0.55); fill.position.set(14, 9, -10); scene.add(fill);
+const rim = new THREE.PointLight(0xf0c887, 10, 50, 2); rim.position.set(0, 7, 0); scene.add(rim);
+const tableTex = makeParchmentTexture(lowQuality ? 512 : 1024, 7);
+const table = new THREE.Mesh(
+makeParchmentGeometry(86, 86, lowQuality ? 36 : 110, 0.32),
+new THREE.MeshStandardMaterial({ map: tableTex, roughness: 0.94, metalness: 0, color: 0xffffff })
+);
+table.rotation.x = -Math.PI / 2; table.position.y = -0.42; table.receiveShadow = true;
+world.add(table);
+const brassMat = new THREE.MeshStandardMaterial({ color: PALETTE.brass, roughness: 0.28, metalness: 0.9 });
+const compassGroup = new THREE.Group();
+const rimProfile = [];
+for (let i = 0; i <= 16; i++) {
+const t = i / 16;
+rimProfile.push(new THREE.Vector2(0.66 + Math.sin(t * Math.PI) * 0.06, t * 0.075));
+}
+const rimGeo = new THREE.LatheGeometry(rimProfile, lowQuality ? 24 : 56);
+const rimMesh = new THREE.Mesh(rimGeo, brassMat);
+rimMesh.position.y = -0.055; compassGroup.add(rimMesh);
+const starGeo = new THREE.ExtrudeGeometry(makeStarShape(0.66, 0.18, 8), { depth: 0.028, bevelEnabled: true, bevelThickness: 0.014, bevelSize: 0.012, bevelSegments: 1 });
+starGeo.rotateX(-Math.PI / 2);
+const starMesh = new THREE.Mesh(starGeo, new THREE.MeshStandardMaterial({ color: 0xc49a52, roughness: 0.24, metalness: 0.92 }));
+starMesh.position.y = 0.012; compassGroup.add(starMesh);
+const capGeo = new THREE.SphereGeometry(0.07, 14, 10);
+const cap = new THREE.Mesh(capGeo, brassMat); cap.position.y = 0.055; compassGroup.add(cap);
+for (let i = 0; i < 4; i++) {
+const tick = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.02, 0.16), brassMat);
+const a = (i / 4) * Math.PI * 2 + Math.PI / 4;
+tick.position.set(Math.cos(a) * 0.78, 0.012, Math.sin(a) * 0.78);
+tick.rotation.y = -a;
+compassGroup.add(tick);
+}
+compassGroup.scale.setScalar(1.0);
+compassGroup.position.y = -0.18;
+world.add(compassGroup);
+let hexGroup = new THREE.Group(); world.add(hexGroup);
+let sceneryGroup = new THREE.Group(); world.add(sceneryGroup);
+let sealGroup = new THREE.Group(); world.add(sealGroup);
+let atlasApi = null;
+let puzzleRef = null, gameRef = null;
+let waterShaders = [];
+let glyphMeshes = [], washMesh = null, errorMesh = null;
+let waxTex = null, lowRes = lowQuality;
+let sealRecords = [];
+const picking = { map: null, layout: null, cells: [] };
+const raycaster = new THREE.Raycaster();
+const pointer = new THREE.Vector2();
+const hitPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), -0.42);
+const hitPoint = new THREE.Vector3();
+const hideMatrix = new THREE.Matrix4().makeScale(0.0001, 0.0001, 0.0001);
+const tmpMatrix = new THREE.Matrix4();
+const tmpObj = new THREE.Object3D();
+const tmpColor = new THREE.Color();
+function disposeGroup(group) {
+group.traverse((o) => {
+if (o.geometry) o.geometry.dispose();
+if (o.material) {
+const mats = Array.isArray(o.material) ? o.material : [o.material];
+for (const m of mats) { if (m.map) m.map.dispose(); if (m.normalMap) m.normalMap.dispose(); m.dispose(); }
+}
+});
+group.clear();
+}
+function computeLayout(map) {
+const size = 1.0, cellW = Math.sqrt(3) * size, cellH = 1.5 * size;
+const pos = [];
+let minX = Infinity, maxX = -Infinity, minZ = Infinity, maxZ = -Infinity;
+for (const c of map.cells) {
+const x = cellW * (c.q + c.r / 2), z = cellH * c.r;
+pos.push(new THREE.Vector3(x, 0, z));
+minX = Math.min(minX, x); maxX = Math.max(maxX, x);
+minZ = Math.min(minZ, z); maxZ = Math.max(maxZ, z);
+}
+const cx = (minX + maxX) / 2, cz = (minZ + maxZ) / 2;
+for (const p of pos) { p.x -= cx; p.z -= cz; }
+return { pos, size, cellW, cellH, bounds: { minX: minX - cx, maxX: maxX - cx, minZ: minZ - cz, maxZ: maxZ - cz } };
+}
+function buildMap(puzzle) {
+disposeGroup(hexGroup); disposeGroup(sceneryGroup); disposeGroup(sealGroup);
+world.remove(hexGroup); world.remove(sceneryGroup); world.remove(sealGroup);
+hexGroup = new THREE.Group(); sceneryGroup = new THREE.Group(); sealGroup = new THREE.Group();
+world.add(hexGroup); world.add(sceneryGroup); world.add(sealGroup);
+waterShaders = []; glyphMeshes = []; washMesh = null; errorMesh = null; waxTex = null;
+const map = CORE.makeMap(puzzle.radius);
+const layout = computeLayout(map);
+picking.map = map; picking.layout = layout;
+const height = 0.42;
+const prismGeo = hexPrismGeometry(layout.size * 0.94, height, 0.045);
+const tileGeo = prismGeo.clone();
+prismGeo.dispose();
+const terrains = new Float32Array(map.cells.length);
+tileGeo.setAttribute('aTerrain', new THREE.InstancedBufferAttribute(terrains, 1));
+const tileMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.9, metalness: 0.0 });
+tileMat.onBeforeCompile = (shader) => {
+shader.uniforms.uTime = { value: 0 };
+shader.uniforms.uWater = { value: 0.9 };
+tileMat.userData.shader = shader;
+waterShaders.push(shader);
+shader.vertexShader = 'attribute float aTerrain;\nvarying float vTerrain;\nvarying vec3 vWPos;\n' + shader.vertexShader.replace(
+'#include <begin_vertex>',
+'#include <begin_vertex>\n vTerrain = aTerrain; vWPos = (modelMatrix * instanceMatrix * vec4(transformed,1.0)).xyz;'
+);
+shader.fragmentShader = 'uniform float uTime;\nuniform float uWater;\nvarying float vTerrain;\nvarying vec3 vWPos;\n' + shader.fragmentShader
+.replace('#include <color_fragment>', `#include <color_fragment>
+float desertMask = 1.0 - step(0.5, abs(vTerrain - 3.0));
+float ridge = 0.90 + 0.10 * sin(vWPos.x * 16.0 + sin(vWPos.z * 2.4) * 2.2 + cos(vWPos.z * 5.0));
+diffuseColor.rgb *= mix(1.0, ridge, desertMask);
+float swampMask = 1.0 - step(0.5, abs(vTerrain - 4.0));
+float mottle = 0.94 + 0.06 * sin(vWPos.x * 9.0 + vWPos.z * 7.0) * sin(vWPos.z * 11.0);
+diffuseColor.rgb *= mix(1.0, mottle, swampMask);`)
+.replace('#include <normal_fragment_maps>',
+`#include <normal_fragment_maps>
+float seaMask = 1.0 - step(0.5, abs(vTerrain));
+float w1 = sin(vWPos.x*2.7 + uTime*1.15) * cos(vWPos.z*2.3 - uTime*0.85);
+float w2 = sin((vWPos.x+vWPos.z)*4.2 - uTime*1.7);
+normal = normalize(normal + vec3(w1*0.07, 0.0, w2*0.07) * seaMask);`
+);
+};
+const tiles = new THREE.InstancedMesh(tileGeo, tileMat, map.cells.length);
+tiles.castShadow = !lowQuality; tiles.receiveShadow = true;
+tiles.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+tiles.instanceColor = new THREE.InstancedBufferAttribute(new Float32Array(map.cells.length * 3), 3);
+tiles.instanceColor.setUsage(THREE.DynamicDrawUsage);
+for (let i = 0; i < map.cells.length; i++) {
+tmpMatrix.makeTranslation(layout.pos[i].x, 0, layout.pos[i].z);
+tiles.setMatrixAt(i, tmpMatrix);
+tiles.setColorAt(i, UNRESOLVED_TINT);
+}
+tiles.instanceMatrix.needsUpdate = true; tiles.instanceColor.needsUpdate = true;
+hexGroup.add(tiles);
+const inkGeo = makeInkBorder(layout.size * 0.985, 0.017, lowRes);
+const inkMat = new THREE.MeshStandardMaterial({ color: PALETTE.ink, roughness: 0.72, metalness: 0.06 });
+const inks = new THREE.InstancedMesh(inkGeo, inkMat, map.cells.length);
+for (let i = 0; i < map.cells.length; i++) {
+tmpMatrix.makeTranslation(layout.pos[i].x, height + 0.017, layout.pos[i].z);
+inks.setMatrixAt(i, tmpMatrix);
+}
+inks.instanceMatrix.needsUpdate = true;
+hexGroup.add(inks);
+const ringGeo = hexRingGeometry(layout.size * 0.9);
+const ringMat = new THREE.MeshBasicMaterial({ color: 0x8c2f26, transparent: true, opacity: 0.9, depthWrite: false, side: THREE.DoubleSide });
+errorMesh = new THREE.InstancedMesh(ringGeo, ringMat, map.cells.length);
+errorMesh.renderOrder = 5;
+for (let i = 0; i < map.cells.length; i++) errorMesh.setMatrixAt(i, hideMatrix);
+errorMesh.instanceMatrix.needsUpdate = true;
+hexGroup.add(errorMesh);
+const treeGeo = makeTreeGeometry(lowRes);
+const peakGeo = makePeakGeometry(lowRes);
+const snowGeo = makeSnowGeometry(lowRes);
+const padGeo = makePadGeometry();
+const duneGeo = makeDuneGeometry();
+const treeMat = new THREE.MeshStandardMaterial({ color: 0x3d5136, roughness: 0.92, flatShading: true });
+const peakMat = new THREE.MeshStandardMaterial({ color: 0x7d7365, roughness: 0.95, flatShading: true });
+const snowMat = new THREE.MeshStandardMaterial({ color: 0xf2efe6, roughness: 0.7, flatShading: true });
+const padMat = new THREE.MeshStandardMaterial({ color: 0x40492d, roughness: 0.9 });
+const duneMat = new THREE.MeshStandardMaterial({ color: 0xc9a961, roughness: 0.98, flatShading: true });
+const n = map.cells.length;
+const perCell = { tree: 3, peak: 2, pad: 2, dune: 3 };
+const trees = new THREE.InstancedMesh(treeGeo, treeMat, n * perCell.tree);
+const peaks = new THREE.InstancedMesh(peakGeo, peakMat, n * perCell.peak);
+const snows = new THREE.InstancedMesh(snowGeo, snowMat, n * perCell.peak);
+const pads = new THREE.InstancedMesh(padGeo, padMat, n * perCell.pad);
+const dunes = new THREE.InstancedMesh(duneGeo, duneMat, n * perCell.dune);
+[trees, peaks, pads, dunes].forEach((m) => { m.castShadow = !lowQuality; });
+[trees, peaks, snows, pads, dunes].forEach((m) => { m.receiveShadow = true; });
+const sceneryRng = mulberry(CORE.hashSeed(puzzle.seed + ':' + puzzle.tierId + ':scenery'));
+const records = [];
+const slotIndex = { tree: 0, peak: 0, pad: 0, dune: 0 };
+for (let i = 0; i < n; i++) {
+const p = layout.pos[i];
+const rec = { cell: i, items: [] };
+const slotCounts = { tree: 1 + Math.floor(sceneryRng() * perCell.tree), peak: 1 + Math.floor(sceneryRng() * perCell.peak), pad: 1 + Math.floor(sceneryRng() * perCell.pad), dune: 1 + Math.floor(sceneryRng() * perCell.dune) };
+for (let k = 0; k < slotCounts.tree; k++) {
+const ang = sceneryRng() * Math.PI * 2, rad = layout.size * (0.16 + sceneryRng() * 0.56);
+const sc = 0.5 + sceneryRng() * 0.4;
+tmpObj.position.set(p.x + Math.cos(ang) * rad, height + 0.04, p.z + Math.sin(ang) * rad);
+tmpObj.scale.set(sc, sc * (0.85 + sceneryRng() * 0.45), sc);
+tmpObj.rotation.set(0, sceneryRng() * Math.PI * 2, 0);
+tmpObj.updateMatrix();
+trees.setMatrixAt(slotIndex.tree, tmpObj.matrix);
+rec.items.push({ mesh: trees, idx: slotIndex.tree++, matrix: tmpObj.matrix.clone(), type: 'tree' });
+}
+for (let k = 0; k < slotCounts.peak; k++) {
+const ang = sceneryRng() * Math.PI * 2, rad = layout.size * (0.12 + sceneryRng() * 0.42);
+const sc = 0.5 + sceneryRng() * 0.38;
+tmpObj.position.set(p.x + Math.cos(ang) * rad, height + 0.04, p.z + Math.sin(ang) * rad);
+tmpObj.scale.set(sc, sc * (0.9 + sceneryRng() * 0.6), sc);
+tmpObj.rotation.set(0, sceneryRng() * Math.PI * 2, 0);
+tmpObj.updateMatrix();
+peaks.setMatrixAt(slotIndex.peak, tmpObj.matrix);
+rec.items.push({ mesh: peaks, idx: slotIndex.peak++, matrix: tmpObj.matrix.clone(), type: 'peak' });
+tmpObj.position.set(p.x + Math.cos(ang) * rad, height + 0.04, p.z + Math.sin(ang) * rad);
+tmpObj.scale.set(sc * 0.92, sc * 0.95, sc * 0.92);
+tmpObj.updateMatrix();
+snows.setMatrixAt(rec.items[rec.items.length - 1].idx, tmpObj.matrix);
+rec.items.push({ mesh: snows, idx: rec.items[rec.items.length - 1].idx, matrix: tmpObj.matrix.clone(), type: 'snow', link: rec.items[rec.items.length - 2].idx });
+}
+for (let k = 0; k < slotCounts.pad; k++) {
+const ang = sceneryRng() * Math.PI * 2, rad = layout.size * (0.12 + sceneryRng() * 0.5);
+const sc = 0.4 + sceneryRng() * 0.3;
+tmpObj.position.set(p.x + Math.cos(ang) * rad, height + 0.045, p.z + Math.sin(ang) * rad);
+tmpObj.scale.set(sc, 0.4, sc);
+tmpObj.rotation.set(0, sceneryRng() * Math.PI, 0);
+tmpObj.updateMatrix();
+pads.setMatrixAt(slotIndex.pad, tmpObj.matrix);
+rec.items.push({ mesh: pads, idx: slotIndex.pad++, matrix: tmpObj.matrix.clone(), type: 'pad' });
+}
+for (let k = 0; k < slotCounts.dune; k++) {
+const ang = sceneryRng() * Math.PI * 2, rad = layout.size * (0.2 + sceneryRng() * 0.5);
+const sc = 0.55 + sceneryRng() * 0.4;
+tmpObj.position.set(p.x + Math.cos(ang) * rad, height + 0.05, p.z + Math.sin(ang) * rad);
+tmpObj.scale.set(sc, sc * (0.5 + sceneryRng() * 0.4), sc);
+tmpObj.rotation.set(0, sceneryRng() * Math.PI * 2, 0);
+tmpObj.updateMatrix();
+dunes.setMatrixAt(slotIndex.dune, tmpObj.matrix);
+rec.items.push({ mesh: dunes, idx: slotIndex.dune++, matrix: tmpObj.matrix.clone(), type: 'dune' });
+}
+records.push(rec);
+}
+[trees, peaks, snows, pads, dunes].forEach((m) => {
+for (let i = 0; i < m.count; i++) m.setMatrixAt(i, hideMatrix);
+m.instanceMatrix.needsUpdate = true;
+});
+sceneryGroup.add(trees, peaks, snows, pads, dunes);
+const bubbleCount = lowRes ? 90 : 240;
+const bubbleGeo = new THREE.BufferGeometry();
+const bubblePos = new Float32Array(bubbleCount * 3);
+const bubbleRng = mulberry(555);
+const bubbleCells = [];
+const baseY = height + 0.03;
+for (let i = 0; i < bubbleCount; i++) {
+const cell = i % n;
+bubbleCells.push(cell);
+const p = layout.pos[cell];
+bubblePos[i * 3] = p.x + (bubbleRng() - 0.5) * 0.95;
+bubblePos[i * 3 + 1] = -100;
+bubblePos[i * 3 + 2] = p.z + (bubbleRng() - 0.5) * 0.95;
+}
+bubbleGeo.setAttribute('position', new THREE.BufferAttribute(bubblePos, 3));
+const bubbles = new THREE.Points(bubbleGeo, new THREE.PointsMaterial({ color: 0xcbdcb8, size: 0.06, transparent: true, opacity: 0.82, depthWrite: false }));
+bubbles.visible = false;
+bubbles.userData.cells = bubbleCells;
+bubbles.userData.baseY = baseY;
+sceneryGroup.add(bubbles);
+for (let t = 0; t < puzzle.T; t++) {
+const gGeo = new THREE.PlaneGeometry(0.42, 0.42);
+const gMat = new THREE.MeshBasicMaterial({ map: makeGlyphTexture(CORE.TERRAIN_GLYPHS[t]), transparent: true, depthWrite: false, side: THREE.DoubleSide });
+const gMesh = new THREE.InstancedMesh(gGeo, gMat, map.cells.length);
+gMesh.frustumCulled = false;
+gMesh.renderOrder = 6;
+for (let i = 0; i < map.cells.length; i++) gMesh.setMatrixAt(i, hideMatrix);
+gMesh.instanceMatrix.needsUpdate = true;
+sceneryGroup.add(gMesh);
+glyphMeshes.push(gMesh);
+}
+washMesh = new THREE.InstancedMesh(
+new THREE.PlaneGeometry(1.85, 1.85),
+new THREE.MeshBasicMaterial({ map: makeWashTexture(), transparent: true, depthWrite: false, opacity: 0.8 }),
+map.cells.length
+);
+washMesh.renderOrder = 2;
+for (let i = 0; i < map.cells.length; i++) washMesh.setMatrixAt(i, hideMatrix);
+washMesh.instanceMatrix.needsUpdate = true;
+sceneryGroup.add(washMesh);
+waxTex = makeWaxTexture(256);
+const sealGeo = new THREE.LatheGeometry([
+new THREE.Vector2(0.001, 0), new THREE.Vector2(0.17, 0.006), new THREE.Vector2(0.21, 0.05),
+new THREE.Vector2(0.228, 0.11), new THREE.Vector2(0.21, 0.17), new THREE.Vector2(0.13, 0.215),
+new THREE.Vector2(0.001, 0.222)
+], lowRes ? 22 : 48);
+const sealMat = new THREE.MeshStandardMaterial({ map: waxTex, color: 0xffffff, roughness: 0.44, metalness: 0.05, emissive: 0x2a0805, emissiveIntensity: 0.3 });
+const poleGeo = new THREE.CylinderGeometry(0.013, 0.019, 1.05, 6);
+poleGeo.translate(0, 0.525, 0);
+const poleMat = new THREE.MeshStandardMaterial({ color: 0x6b4a2a, roughness: 0.85 });
+const sealCount = Math.max(1, puzzle.clues.length);
+const sealHeads = new THREE.InstancedMesh(sealGeo, sealMat, sealCount);
+const sealPoles = new THREE.InstancedMesh(poleGeo, poleMat, sealCount);
+sealHeads.castShadow = !lowQuality; sealPoles.castShadow = !lowQuality;
+const b = layout.bounds;
+const rowWidth = Math.max(4, b.maxX - b.minX) + 1.1;
+sealRecords = [];
+for (let c = 0; c < sealCount; c++) {
+const t = sealCount === 1 ? 0.5 : c / (sealCount - 1);
+const x = -rowWidth / 2 + t * rowWidth;
+const z = b.minZ - 1.15 - (c % 2) * 0.42;
+sealRecords.push({ x, z, visible: false, vy: 0, offset: 0, base: -0.42 });
+sealHeads.setMatrixAt(c, hideMatrix);
+sealPoles.setMatrixAt(c, hideMatrix);
+}
+sealHeads.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+sealPoles.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+sealHeads.instanceMatrix.needsUpdate = true; sealPoles.instanceMatrix.needsUpdate = true;
+sealGroup.add(sealHeads, sealPoles);
+compassGroup.position.set(b.minX - 0.4, -0.18, b.maxZ + 2.1);
+const api = {
+map, layout, tiles, tileGeo, inks, errorMesh, trees, peaks, snows, pads, dunes, bubbles, washMesh,
+glyphMeshes, sealRecords, sealHeads, sealPoles, records, height, waterNormal: null, getGlyphMeshes: function () { return glyphMeshes; },
+tileTerrains: terrains,
+setScenery(i, assignment) {
+if (this._visible === undefined) this._visible = Object.create(null);
+if (this._visible[i] === assignment) return;
+this._visible[i] = assignment;
+const want = assignment === 1 ? 'tree' : assignment === 2 ? 'peak' : assignment === 4 ? 'pad' : assignment === 3 ? 'dune' : null;
+for (const item of records[i].items) {
+let show;
+if (want === null) show = false;
+else if (item.type === 'snow') show = want === 'peak';
+else show = item.type === want;
+item.mesh.setMatrixAt(item.idx, show ? item.matrix : hideMatrix);
+item.mesh.instanceMatrix.needsUpdate = true;
+}
+}
+};
+return api;
+}
+function updateTileMatrices(puzzle, game) {
+if (!atlasApi) return;
+const layout = atlasApi.layout;
+for (let i = 0; i < layout.pos.length; i++) {
+const elev = game.focus === i ? 0.085 : game.hover === i ? 0.05 : 0;
+tmpMatrix.makeTranslation(layout.pos[i].x, elev, layout.pos[i].z);
+atlasApi.tiles.setMatrixAt(i, tmpMatrix);
+}
+atlasApi.tiles.instanceMatrix.needsUpdate = true;
+}
+function refreshTiles(puzzle, game, dt) {
+if (!atlasApi) return;
+const n = atlasApi.map.cells.length;
+const terrainAttr = atlasApi.tileGeo.attributes.aTerrain;
+const color = tmpColor;
+for (let i = 0; i < n; i++) {
+const a = game.assign[i];
+const resolved = a >= 0;
+const correct = resolved && a === puzzle.solution[i];
+color.copy(resolved ? TERRAIN_TINT[a] : UNRESOLVED_TINT);
+atlasApi.tiles.setColorAt(i, color);
+terrainAttr.array[i] = resolved ? a : -1;
+atlasApi.setScenery(i, resolved ? a : -1);
+const bad = (game.showErrors && resolved && !correct) || (game.contradictionCells && game.contradictionCells.has(i));
+if (bad) {
+tmpMatrix.makeTranslation(atlasApi.layout.pos[i].x, atlasApi.height + 0.1, atlasApi.layout.pos[i].z);
+atlasApi.errorMesh.setMatrixAt(i, tmpMatrix);
+} else {
+atlasApi.errorMesh.setMatrixAt(i, hideMatrix);
+}
+if (washMesh) {
+const show = game.washCells && game.washCells.has(i) && correct;
+if (show) {
+tmpMatrix.makeRotationX(-Math.PI / 2);
+tmpMatrix.setPosition(atlasApi.layout.pos[i].x, atlasApi.height + 0.062, atlasApi.layout.pos[i].z);
+washMesh.setMatrixAt(i, tmpMatrix);
+} else washMesh.setMatrixAt(i, hideMatrix);
+}
+if (glyphMeshes.length) {
+const mask = game.pencil ? game.pencil[i] : 0;
+const full = (1 << puzzle.T) - 1;
+const narrowed = mask !== 0 && mask !== full;
+const total = mask ? CORE.popcount(mask) : 0;
+for (let t = 0; t < glyphMeshes.length; t++) {
+const show = !resolved && narrowed && (mask & (1 << t));
+if (!show) { glyphMeshes[t].setMatrixAt(i, hideMatrix); continue; }
+let slot = 0;
+for (let u = 0; u < t; u++) if (mask & (1 << u)) slot++;
+const spread = Math.min(0.46, 0.17 * Math.max(1, total - 1));
+const x = atlasApi.layout.pos[i].x + (slot - (total - 1) / 2) * spread;
+tmpObj.position.set(x, atlasApi.height + 0.27, atlasApi.layout.pos[i].z + 0.02);
+tmpObj.rotation.set(-Math.PI / 2 + 0.46, 0, 0);
+tmpObj.scale.set(1.05, 1.05, 1.05);
+tmpObj.updateMatrix();
+glyphMeshes[t].setMatrixAt(i, tmpObj.matrix);
+}
+}
+}
+atlasApi.tiles.instanceColor.needsUpdate = true;
+terrainAttr.needsUpdate = true;
+atlasApi.errorMesh.instanceMatrix.needsUpdate = true;
+atlasApi.errorMesh.material.opacity = (game.contradictionCells && game.contradictionCells.size) ? 0.85 : 0.9;
+if (washMesh) washMesh.instanceMatrix.needsUpdate = true;
+for (const m of glyphMeshes) m.instanceMatrix.needsUpdate = true;
+updateTileMatrices(puzzle, game);
+if (atlasApi.bubbles) {
+const pos = atlasApi.bubbles.geometry.attributes.position;
+let any = false;
+const cells = atlasApi.bubbles.userData.cells || [];
+const baseY = atlasApi.bubbles.userData.baseY;
+for (let i = 0; i < pos.count; i++) {
+const cell = cells[i];
+const show = cell !== undefined && cell >= 0 && game.assign[cell] === 4;
+if (show) {
+const cur = pos.array[i * 3 + 1];
+if (cur < 0) pos.array[i * 3 + 1] = baseY + ((i * 37) % 31) / 62;
+any = true;
+} else pos.array[i * 3 + 1] = -100;
+}
+pos.needsUpdate = true;
+atlasApi.bubbles.visible = any;
+}
+if (sealRecords.length) {
+for (let c = 0; c < sealRecords.length; c++) {
+const on = !!(game.liars && (typeof game.liars.has === 'function' ? game.liars.has(c) : game.liars[c]));
+sealRecords[c].visible = on;
+if (!on) { sealRecords[c].vy = 0; sealRecords[c].offset = 0; }
+}
+sealMatrices();
+}
+needsRender = true;
+}
+function sealMatrices() {
+if (!atlasApi || !atlasApi.sealHeads) return;
+const heads = atlasApi.sealHeads, poles = atlasApi.sealPoles;
+for (let c = 0; c < sealRecords.length; c++) {
+const rec = sealRecords[c];
+if (!rec.visible) {
+heads.setMatrixAt(c, hideMatrix); poles.setMatrixAt(c, hideMatrix);
+continue;
+}
+const y = rec.base + rec.offset;
+tmpObj.position.set(rec.x, y, rec.z);
+tmpObj.rotation.set(0, Math.sin(time * 1.4 + c * 0.7) * 0.05, 0);
+tmpObj.scale.setScalar(1.15);
+tmpObj.updateMatrix();
+poles.setMatrixAt(c, tmpObj.matrix);
+tmpObj.position.set(rec.x, y + 0.92, rec.z);
+tmpObj.updateMatrix();
+heads.setMatrixAt(c, tmpObj.matrix);
+}
+heads.instanceMatrix.needsUpdate = true;
+poles.instanceMatrix.needsUpdate = true;
+}
+function bumpSeal(index) {
+const rec = sealRecords[index];
+if (!rec) return;
+rec.visible = true;
+rec.vy = 2.9; rec.offset = 0;
+sealMatrices();
+needsRender = true;
+}
+function stepSeals(dt) {
+let active = false;
+for (const rec of sealRecords) {
+if (!rec.visible) continue;
+if (rec.vy !== 0 || rec.offset > 0) {
+rec.vy -= 16 * dt;
+rec.offset += rec.vy * dt;
+if (rec.offset <= 0) {
+rec.offset = 0;
+if (Math.abs(rec.vy) > 1.2) rec.vy = -rec.vy * 0.36;
+else rec.vy = 0;
+}
+active = true;
+}
+}
+if (active) { sealMatrices(); needsRender = true; }
+}
+function atlasRadius() {
+const b = picking.layout ? picking.layout.bounds : { minX: -6, maxX: 6, minZ: -6, maxZ: 6 };
+return Math.max(b.maxX - b.minX, b.maxZ - b.minZ + 2.4) * 0.62 + 3;
+}
+function frameAtlas(instant) {
+const b = picking.layout ? picking.layout.bounds : { minX: -6, maxX: 6, minZ: -6, maxZ: 6 };
+const target = new THREE.Vector3(0, 0.15, 0.6);
+const phi = 0.82, theta = 0.44;
+const halfDepth = Math.max(Math.abs(b.minZ - 2.0 - target.z), Math.abs(b.maxZ + 0.9 - target.z));
+const halfWidth = Math.max(Math.abs(b.minX), Math.abs(b.maxX)) + 2.2;
+const vFov = camera.fov * Math.PI / 180;
+const hFov = 2 * Math.atan(Math.tan(vFov / 2) * Math.max(0.6, camera.aspect));
+const distV = halfDepth / Math.tan(vFov / 2);
+const distH = halfWidth / Math.tan(hFov / 2);
+const dist = Math.max(distV, distH) * 1.12;
+const camPos = new THREE.Vector3(
+target.x + dist * Math.sin(phi) * Math.sin(theta),
+target.y + dist * Math.cos(phi),
+target.z + dist * Math.sin(phi) * Math.cos(theta)
+);
+if (instant) {
+camera.position.copy(camPos); controls.target.copy(target); controls.update();
+} else tweenCamera(camPos, target, 420);
+needsRender = true;
+}
+let camTween = null;
+function tweenCamera(toPos, toTarget, dur) {
+camTween = { fromPos: camera.position.clone(), fromTarget: controls.target.clone(), toPos: toPos.clone(), toTarget: toTarget.clone(), t0: performance.now(), dur };
+needsRender = true;
+}
+function stepCamera() {
+if (!camTween) return;
+const k = Math.min(1, (performance.now() - camTween.t0) / camTween.dur);
+const e = 1 - Math.pow(1 - k, 3);
+camera.position.lerpVectors(camTween.fromPos, camTween.toPos, e);
+controls.target.lerpVectors(camTween.fromTarget, camTween.toTarget, e);
+needsRender = true;
+if (k >= 1) camTween = null;
+}
+function setTopView(on) {
+if (on) {
+const d = atlasRadius() * 1.98, phi = controls.minPolarAngle + 0.008;
+tweenCamera(new THREE.Vector3(Math.sin(phi) * d, Math.cos(phi) * d + 0.2, 0.002), new THREE.Vector3(0, 0.2, 0), 380);
+} else frameAtlas(false);
+}
+function pointerToCell(clientX, clientY) {
+if (!picking.map) return -1;
+const rect = canvas.getBoundingClientRect();
+pointer.x = ((clientX - rect.left) / rect.width) * 2 - 1;
+pointer.y = -((clientY - rect.top) / rect.height) * 2 + 1;
+raycaster.setFromCamera(pointer, camera);
+if (atlasApi && atlasApi.tiles) {
+const hits = raycaster.intersectObject(atlasApi.tiles, false);
+if (hits.length && hits[0].instanceId !== undefined && hits[0].instanceId !== null) {
+return hits[0].instanceId;
+}
+}
+if (!raycaster.ray.intersectPlane(hitPlane, hitPoint)) return -1;
+const s = picking.layout.size;
+let best = -1, bestD = Infinity;
+const halfW = Math.sqrt(3) / 2 * s;
+for (let i = 0; i < picking.cells.length; i++) {
+const c = picking.cells[i];
+const dx = Math.abs(hitPoint.x - c.x), dz = Math.abs(hitPoint.z - c.z);
+if (dx > halfW) continue;
+if (dz > s - dx / Math.sqrt(3)) continue;
+const d = dx * dx + dz * dz;
+if (d < bestD) { bestD = d; best = i; }
+}
+return best;
+}
+function requestRender() { needsRender = true; }
+function resize() {
+const w = Math.max(1, stage.clientWidth), h = Math.max(1, stage.clientHeight);
+const prevW = renderer.domElement.width, prevH = renderer.domElement.height;
+renderer.setPixelRatio(pixelRatio());
+renderer.setSize(w, h, false);
+camera.aspect = w / h;
+camera.updateProjectionMatrix();
+if (prevW !== renderer.domElement.width || prevH !== renderer.domElement.height) needsRender = true;
+needsRender = true;
+}
+const ro = new ResizeObserver(resize);
+ro.observe(stage);
+resize();
+function tick(t) {
+rafId = requestAnimationFrame(tick);
+const dt = lastT ? Math.min(0.05, (t - lastT) / 1000) : 0.016;
+lastT = t;
+stepCamera();
+if (animating) {
+time += dt;
+for (const shader of waterShaders) shader.uniforms.uTime.value = time;
+stepSeals(dt);
+if (atlasApi && atlasApi.bubbles && atlasApi.bubbles.visible) {
+const pos = atlasApi.bubbles.geometry.attributes.position;
+const base = atlasApi.bubbles.userData.baseY || 0.45;
+for (let i = 0; i < pos.count; i++) {
+if (pos.array[i * 3 + 1] < -50) continue;
+let y = pos.array[i * 3 + 1] + dt * (0.05 + (i % 7) * 0.012);
+if (y > base + 0.55) y = base;
+pos.array[i * 3 + 1] = y;
+}
+pos.needsUpdate = true;
+}
+compassGroup.rotation.y += dt * 0.05;
+if (gameRef && gameRef.contradictionCells && gameRef.contradictionCells.size && atlasApi) {
+const pulse = 0.55 + 0.35 * Math.sin(time * 4.2);
+atlasApi.errorMesh.material.opacity = pulse;
+}
+controls.update();
+needsRender = true;
+} else {
+controls.update();
+}
+if (needsRender) {
+renderer.render(scene, camera);
+needsRender = false;
+frames++;
+fpsAcc += dt; fpsN++;
+if (fpsAcc >= 0.6) { fps = Math.round(fpsN / fpsAcc); fpsAcc = 0; fpsN = 0; }
+}
+}
+rafId = requestAnimationFrame(tick);
+function setPuzzle(puzzle, game) {
+puzzleRef = puzzle; gameRef = game;
+atlasApi = buildMap(puzzle);
+refreshTiles(puzzle, game);
+for (let c = 0; c < sealRecords.length; c++) sealRecords[c].visible = false;
+frameAtlas(true);
+needsRender = true;
+}
+function setGame(game) { gameRef = game; refreshTiles(puzzleRef, game); }
+function setAnimation(on) { animating = on; needsRender = true; }
+function setQuality(low) {
+lowQuality = !!low;
+lowRes = lowQuality;
+renderer.setPixelRatio(pixelRatio());
+renderer.shadowMap.enabled = !lowQuality;
+key.castShadow = !lowQuality;
+renderer.shadowMap.needsUpdate = true;
+resize();
+if (puzzleRef && gameRef) {
+atlasApi = buildMap(puzzleRef);
+refreshTiles(puzzleRef, gameRef);
+}
+needsRender = true;
+}
+function stats() {
+const info = renderer.info;
+return {
+calls: info.render.calls, triangles: info.render.triangles, lines: info.render.lines, points: info.render.points,
+geometries: info.memory.geometries, textures: info.memory.textures,
+fps, frames, pixelRatio: renderer.getPixelRatio(),
+width: renderer.domElement.width, height: renderer.domElement.height,
+quality: lowQuality ? 'Low' : 'High', animating, onDemand: !animating
+};
+}
+function dispose() {
+cancelAnimationFrame(rafId);
+ro.disconnect();
+camTween = null;
+disposeGroup(hexGroup); disposeGroup(sceneryGroup); disposeGroup(sealGroup);
+table.geometry.dispose(); table.material.map.dispose(); table.material.dispose();
+rimGeo.dispose(); starGeo.dispose(); capGeo.dispose();
+starMesh.material.dispose(); brassMat.dispose();
+controls.dispose(); renderer.dispose();
+}
+return {
+THREE, scene, camera, renderer, controls, world,
+get atlas() { return atlasApi; },
+setPuzzle, setGame, refreshTiles, pointerToCell, frameAtlas, setTopView,
+setAnimation, setQuality, resize, stats, dispose, requestRender, bumpSeal,
+getSealRecords() { return sealRecords; },
+getGlyphMeshes() { return glyphMeshes; },
+get time() { return time; },
+setTime(t) {
+time = t;
+for (const shader of waterShaders) shader.uniforms.uTime.value = t;
+needsRender = true;
+}
+};
+}
+return { createAtlas, makeParchmentTexture, makeWaxTexture, makeCompassTexture, PALETTE, TERRAIN_TINT };
+}
+(async function () {
+'use strict';
+const CORE = window.CartographerCore;
+if (!CORE) { document.body.innerHTML = '<p style="padding:2rem;font:16px serif">Core logic failed to load.</p>'; return; }
+const $ = (sel, root = document) => root.querySelector(sel);
+const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const el = {
+canvas: $('#scene'), stage: $('#stage'),
+seed: $('#seed-input'), tier: $('#tier-select'),
+generate: $('#generate-btn'), why: $('#why-btn'), undo: $('#undo-btn'), redo: $('#redo-btn'),
+submit: $('#submit-btn'), view: $('#view-btn'), quality: $('#quality-btn'), anim: $('#anim-btn'),
+selftestBtn: $('#selftest-btn'), selftest: $('#selftest'), selftestClose: $('#selftest-close'),
+selftestRun: $('#selftest-run'), selftestList: $('#selftest-list'), selftestSummary: $('#selftest-summary'),
+selftestStatus: $('#selftest-status'), selftestProgress: $('#selftest-progress'), rendererInfo: $('#renderer-info'),
+gate: $('#gate'), gateTitle: $('#gate-title'), gateText: $('#gate-text'), gateProgress: $('#gate-progress'), gateFailure: $('#gate-failure'),
+cancelGen: $('#cancel-gen-btn'), gateSpinner: $('#gate-spinner'),
+fallback: $('#webgl-fallback'), fallbackContinue: $('#fallback-continue-btn'),
+tierBadge: $('#tier-badge'), liarBadge: $('#liar-badge'), qualityBadge: $('#quality-badge'),
+clueList: $('#clue-list'), clueCount: $('#clue-count'), tierBlurb: $('#tier-blurb'),
+hintBox: $('#hint-box'), hintText: $('#hint-text'), hintDetail: $('#hint-detail'), hintTitle: $('#hint-title'), hintRefs: $('#hint-refs'),
+verdict: $('#verdict'), verdictTitle: $('#verdict-title'), verdictText: $('#verdict-text'), verdictExtra: $('#verdict-extra'),
+statusbar: $('#statusbar'), statusText: $('#status-text'), markCounter: $('#mark-counter'),
+terrainPalette: $('#terrain-palette'), hexReadout: $('#hex-readout'), candidateList: $('#candidate-list'),
+clearHex: $('#clear-hex-btn'), markLie: $('#mark-lie-btn'),
+hexGridPanel: $('#hex-grid-panel'), hexGrid: $('#hex-grid'),
+mapProgressChip: $('#map-progress-chip'), mapSeedChip: $('#map-seed-chip'), mapFocusChip: $('#map-focus-chip'),
+resetMarks: $('#reset-marks-btn'), recenter: $('#recenter-btn'),
+toast: $('#toast'), live: $('#live-region'), legend: $('#legend')
+};
+function announce(msg) {
+el.live.textContent = '';
+setTimeout(() => { el.live.textContent = msg; }, 30);
+}
+let toastTimer = 0;
+function toast(msg, ms = 2600) {
+el.toast.textContent = msg;
+el.toast.classList.add('show');
+clearTimeout(toastTimer);
+toastTimer = setTimeout(() => el.toast.classList.remove('show'), ms);
+announce(msg);
+}
+function setButtonLabel(btn, label, kbd) {
+const kbdNode = btn.querySelector('.kbd');
+btn.textContent = label + ' ';
+if (kbdNode) { kbdNode.textContent = kbd; btn.appendChild(kbdNode); }
+else if (kbd) { const k = document.createElement('span'); k.className = 'kbd'; k.textContent = kbd; btn.appendChild(k); }
+}
+function setStatus(msg, tone = 'ok') {
+el.statusText.textContent = msg;
+el.statusbar.dataset.tone = tone;
+}
+const MAX_UNDO = 80;
+const state = {
+seed: 'the-weeping-coast', tierId: 'surveyor', puzzle: null,
+assign: null, pencil: null, liars: new Set(), trusted: new Set(),
+focus: -1, hover: -1, undo: [], redo: [], showErrors: false,
+contradictionCells: new Set(), washCells: new Set(),
+generating: false, genToken: 0, quality: 'high', animation: !prefersReduced,
+topView: false, puzzleKey: '', solved: false, startedAt: 0, elapsed: 0,
+lastHint: null, hintUses: 0, submitted: false
+};
+const atlasHolder = { api: null, failed: false };
+const workerHolder = { worker: null, ready: false, pending: new Map(), seq: 0 };
+const STORE_KEY = 'cartographers-paradox:v1';
+const memoryStore = { data: null };
+const storage = {
+available: (() => { try { const k = '__cp_test__'; localStorage.setItem(k, '1'); localStorage.removeItem(k); return true; } catch (e) { return false; } })(),
+read() {
+try {
+const raw = this.available ? localStorage.getItem(STORE_KEY) : memoryStore.data;
+return raw ? JSON.parse(raw) : null;
+} catch (e) { return null; }
+},
+write(obj) {
+try {
+const raw = JSON.stringify(obj);
+if (this.available) localStorage.setItem(STORE_KEY, raw);
+else memoryStore.data = raw;
+} catch (e) { memoryStore.data = null; }
+},
+clear() {
+try { if (this.available) localStorage.removeItem(STORE_KEY); } catch (e) { }
+memoryStore.data = null;
+}
+};
+function saveProgress() {
+if (!state.puzzle) return;
+storage.write({
+v: 1, seed: state.seed, tierId: state.tierId, puzzleKey: state.puzzleKey,
+assign: Array.from(state.assign), pencil: Array.from(state.pencil),
+liars: Array.from(state.liars), trusted: Array.from(state.trusted),
+quality: state.quality, animation: state.animation, topView: state.topView,
+solved: state.solved, elapsed: state.elapsed, hintUses: state.hintUses,
+savedAt: Date.now()
+});
+}
+function restoreSettings() {
+const data = storage.read();
+if (!data) return null;
+if (typeof data.seed === 'string') state.seed = data.seed;
+if (data.tierId && CORE.TIERS.some((t) => t.id === data.tierId)) state.tierId = data.tierId;
+if (data.quality === 'low' || data.quality === 'high') state.quality = data.quality;
+if (typeof data.animation === 'boolean') state.animation = data.animation && !prefersReduced;
+if (typeof data.topView === 'boolean') state.topView = data.topView;
+if (typeof data.hintUses === 'number') state.hintUses = data.hintUses;
+return data;
+}
+function makeWorkerSource() {
+const coreSrc = document.getElementById('core-source').textContent;
+return coreSrc + '\n' + `
+self.onmessage = function (ev) {
+var msg = ev.data || {};
+try {
+if (msg.cmd === 'generate') {
+var res = CartographerCore.buildPuzzle(msg.seed, msg.tierId, {
+maxAttempts: msg.maxAttempts || 10,
+onProgress: function (pct, label) { self.postMessage({ type: 'progress', id: msg.id, pct: pct, label: label }); }
+});
+if (!res.ok) self.postMessage({ type: 'genfail', id: msg.id, error: res.error });
+else self.postMessage({ type: 'genok', id: msg.id, puzzle: res.puzzle });
+} else if (msg.cmd === 'hint') {
+var hmap = CartographerCore.makeMap(msg.radius);
+var h = CartographerCore.nextHint(hmap, msg.T, msg.clues, msg.L, msg.player);
+self.postMessage({ type: 'hint', id: msg.id, hint: h });
+} else if (msg.cmd === 'analyze') {
+var amap = CartographerCore.makeMap(msg.radius);
+var a = CartographerCore.analyzeMarks(amap, msg.T, msg.clues, msg.L, msg.player);
+self.postMessage({ type: 'analysis', id: msg.id, analysis: a });
+} else if (msg.cmd === 'solve') {
+var smap = CartographerCore.makeMap(msg.radius);
+var s = CartographerCore.propagationSolve(smap, msg.T, msg.clues, msg.L, null);
+var c = CartographerCore.countSolutions(smap, msg.T, msg.clues, msg.L, 2, 250000);
+self.postMessage({ type: 'solved', id: msg.id, prop: { ok: s.ok, complete: s.complete, liarSet: s.liarSet }, count: { count: c.count, capped: c.capped } });
+} else if (msg.cmd === 'testcase') {
+var r = CartographerCore.testSingleCase(msg.seed, msg.tierId);
+self.postMessage({ type: 'testcase', id: msg.id, result: r });
+}
+} catch (err) {
+self.postMessage({ type: 'error', id: msg.id, error: (err && err.message) || String(err) });
+}
+};
+`;
+}
+function initWorker() {
+try {
+const blob = new Blob([makeWorkerSource()], { type: 'application/javascript' });
+const url = URL.createObjectURL(blob);
+const w = new Worker(url);
+URL.revokeObjectURL(url);
+w.onmessage = (ev) => {
+const msg = ev.data || {};
+const pending = workerHolder.pending.get(msg.id);
+if (!pending) return;
+if (msg.type === 'progress') { if (pending.onProgress) pending.onProgress(msg.pct, msg.label); return; }
+workerHolder.pending.delete(msg.id);
+if (msg.type === 'genfail' || msg.type === 'error') pending.reject(new Error(msg.error || 'Worker error'));
+else pending.resolve(msg);
+};
+w.onerror = (e) => {
+for (const [, p] of workerHolder.pending) p.reject(new Error('Worker crashed: ' + (e.message || 'unknown')));
+workerHolder.pending.clear();
+};
+workerHolder.worker = w;
+workerHolder.ready = true;
+} catch (e) {
+workerHolder.ready = false;
+}
+}
+function workerCall(cmd, payload, onProgress) {
+return new Promise((resolve, reject) => {
+const id = ++workerHolder.seq;
+if (!workerHolder.worker) { reject(new Error('Worker unavailable')); return; }
+workerHolder.pending.set(id, { resolve, reject, onProgress });
+workerHolder.worker.postMessage(Object.assign({ cmd, id }, payload));
+});
+}
+function puzzleKeyFor(seed, tierId) { return tierId + '::' + String(seed); }
+function playerSnapshot() {
+return {
+assign: state.assign ? Array.from(state.assign) : [],
+pencil: state.pencil ? Array.from(state.pencil) : [],
+liars: Array.from(state.liars), trusted: Array.from(state.trusted)
+};
+}
+function applyPuzzle(p, opts = {}) {
+state.puzzle = p;
+state.puzzleKey = puzzleKeyFor(p.seed, p.tierId);
+getMap(p.radius);
+const n = getMap(p.radius).cells.length;
+if (opts.restore && opts.restore.assign && opts.restore.assign.length === n) {
+state.assign = Int8Array.from(opts.restore.assign);
+state.pencil = Uint16Array.from(opts.restore.pencil || new Array(n).fill((1 << p.T) - 1));
+state.liars = new Set((opts.restore.liars || []).filter((c) => c >= 0 && c < p.clues.length));
+state.trusted = new Set((opts.restore.trusted || []).filter((c) => c >= 0 && c < p.clues.length));
+state.solved = !!opts.restore.solved;
+state.elapsed = opts.restore.elapsed || 0;
+} else {
+state.assign = new Int8Array(n).fill(-1);
+state.pencil = new Uint16Array(n).fill((1 << p.T) - 1);
+state.liars = new Set(); state.trusted = new Set();
+state.solved = false; state.elapsed = 0;
+}
+state.focus = -1; state.hover = -1;
+state.undo = []; state.redo = [];
+state.contradictionCells = new Set(); state.washCells = new Set();
+state.showErrors = false; state.submitted = false; state.lastHint = null;
+state.startedAt = Date.now() - (state.elapsed || 0);
+el.seed.value = p.seed;
+el.tier.value = p.tierId;
+const tier = CORE.TIERS.find((t) => t.id === p.tierId);
+el.tierBadge.textContent = `${tier.name} · R${tier.radius}`;
+el.liarBadge.textContent = `${p.L} lie${p.L === 1 ? '' : 's'}`;
+el.tierBlurb.textContent = tier.blurb;
+el.mapSeedChip.textContent = `Seed: ${p.seed}`;
+document.title = `Cartographer’s Paradox — ${tier.name} · ${p.seed}`;
+buildLegend();
+buildTerrainPalette();
+clearHint();
+el.verdict.hidden = true;
+if (atlasHolder.api) {
+try {
+atlasHolder.api.setPuzzle(p, state);
+atlasHolder.api.setGame(state);
+} catch (e) {
+showFallback('The map renderer failed to build this atlas: ' + (e.message || e));
+}
+}
+recomputeMarks();
+renderAll(true);
+if (state.topView && atlasHolder.api) atlasHolder.api.setTopView(true);
+if (!state.topView && atlasHolder.api) atlasHolder.api.frameAtlas(true);
+setStatus(`Atlas charted: ${p.clues.length} notes, ${p.L} lie${p.L === 1 ? '' : 's'}. ${p.T} terrains in play.`, 'ok');
+announce(`Atlas charted from seed ${p.seed}. ${p.clues.length} notes, exactly ${p.L} lies.`);
+saveProgress();
+}
+const terrainNames = () => CORE.TERRAIN_NAMES.slice(0, state.puzzle ? state.puzzle.T : 3);
+function pushUndo(snapshot) {
+state.undo.push(snapshot || playerSnapshot());
+if (state.undo.length > MAX_UNDO) state.undo.shift();
+state.redo.length = 0;
+}
+function restoreSnapshot(snap) {
+state.assign = Int8Array.from(snap.assign);
+state.pencil = Uint16Array.from(snap.pencil);
+state.liars = new Set(snap.liars);
+state.trusted = new Set(snap.trusted);
+recomputeMarks();
+renderAll();
+saveProgress();
+}
+function undo() {
+if (!state.undo.length) { setStatus('Nothing to undo.', 'warn'); return; }
+state.redo.push(playerSnapshot());
+restoreSnapshot(state.undo.pop());
+setStatus('Undid the last mark.', 'ok');
+}
+function redo() {
+if (!state.redo.length) { setStatus('Nothing to redo.', 'warn'); return; }
+state.undo.push(playerSnapshot());
+restoreSnapshot(state.redo.pop());
+setStatus('Redid the mark.', 'ok');
+}
+function assignTerrain(cell, t) {
+if (!state.puzzle || cell < 0) return;
+pushUndo();
+if (state.assign[cell] === t) {
+state.assign[cell] = -1;
+} else {
+state.assign[cell] = t;
+}
+recomputeMarks();
+renderAll();
+saveProgress();
+const name = CORE.TERRAIN_NAMES[t];
+setStatus(`${CORE.cellName(getMap(state.puzzle.radius), cell)} inked ${name}.`, 'ok');
+}
+function clearHex(cell) {
+if (!state.puzzle || cell < 0) return;
+pushUndo();
+state.assign[cell] = -1;
+state.pencil[cell] = (1 << state.puzzle.T) - 1;
+recomputeMarks(); renderAll(); saveProgress();
+}
+function togglePencil(cell, t) {
+if (!state.puzzle || cell < 0) return;
+pushUndo();
+const bit = 1 << t;
+if (state.pencil[cell] & bit) state.pencil[cell] &= ~bit;
+else state.pencil[cell] |= bit;
+if (state.pencil[cell] === 0) state.pencil[cell] = bit; 
+if (state.assign[cell] >= 0) state.assign[cell] = -1;
+recomputeMarks(); renderAll(); saveProgress();
+}
+function toggleLiar(ci) {
+if (!state.puzzle) return;
+pushUndo();
+if (state.liars.has(ci)) { state.liars.delete(ci); state.trusted.delete(ci); }
+else { state.liars.add(ci); state.trusted.delete(ci); }
+if (state.liars.size > state.puzzle.L) {
+}
+recomputeMarks(); renderAll(); saveProgress();
+atlasHolder.api && atlasHolder.api.bumpSeal(ci);
+const liarsNow = state.liars.size;
+setStatus(liarsNow > state.puzzle.L
+? `You have flagged ${liarsNow} lies, more than the cartographer will admit to (${state.puzzle.L}).`
+: `Clue ${ci + 1} ${state.liars.has(ci) ? 'flagged as a lie' : 'restored to truthful'}.`, liarsNow > state.puzzle.L ? 'warn' : 'ok');
+}
+function recomputeMarks() {
+if (!state.puzzle) return;
+const p = state.puzzle;
+const map = CORE.makeMap(p.radius);
+let analysis;
+try {
+analysis = CORE.analyzeMarks(map, p.T, p.clues, p.L, { assign: state.assign, pencil: state.pencil, liars: state.liars, trusted: state.trusted });
+} catch (e) { analysis = { ok: true }; }
+state.contradictionCells = new Set(analysis.ok ? [] : analysis.cells);
+state.analysis = analysis;
+}
+function buildTerrainPalette() {
+el.terrainPalette.innerHTML = '';
+if (!state.puzzle) return;
+for (let t = 0; t < state.puzzle.T; t++) {
+const name = CORE.TERRAIN_NAMES[t];
+const btn = document.createElement('button');
+btn.type = 'button';
+btn.className = 'terrain-chip';
+btn.dataset.terrain = name;
+btn.setAttribute('aria-pressed', 'false');
+btn.innerHTML = `<span class="swatch" aria-hidden="true"></span><span class="glyph" aria-hidden="true">${CORE.TERRAIN_GLYPHS[t]}</span><span>${name}</span>`;
+btn.setAttribute('aria-label', `Ink selected hex as ${name}`);
+btn.addEventListener('click', () => {
+if (state.focus < 0) { setStatus('Select a hex first, then choose its terrain.', 'warn'); return; }
+assignTerrain(state.focus, t);
+});
+el.terrainPalette.appendChild(btn);
+}
+}
+function buildLegend() {
+el.legend.innerHTML = '';
+if (!state.puzzle) return;
+for (let t = 0; t < state.puzzle.T; t++) {
+const s = document.createElement('span');
+s.className = 'legend-item';
+s.innerHTML = `<span class="swatch" style="background:${['var(--sea)', 'var(--sage)', 'color-mix(in srgb, var(--ink) 42%, var(--parchment))', 'var(--brass)', 'color-mix(in srgb, var(--sage) 52%, var(--ink))'][t]}"></span>${CORE.TERRAIN_NAMES[t]}`;
+el.legend.appendChild(s);
+}
+}
+function clueHtml(clue, i) {
+const map = getMap(state.puzzle.radius);
+const mapToHighlight = (text) => text
+.replace(/\(([-0-9]+), ([-0-9]+)\)/g, '<span class="hl">($1, $2)</span>')
+.replace(/\b(Sea|Forest|Mountain|Desert|Swamp)\b/g, '<span class="hl">$1</span>');
+const text = CORE.clueText(map, clue);
+const typeLabel = CORE.clueTypeLabel(clue.type);
+return `<article class="clue-card" role="listitem" data-clue="${i}" data-liar="${state.liars.has(i)}" style="--tilt:${((i * 37) % 5 - 2) * 0.16}deg">
+<div class="clue-top"><span class="clue-num">Note ${String(i + 1).padStart(2, '0')}</span><span class="clue-type">${typeLabel}</span></div>
+<p class="clue-text">${mapToHighlight(text)}</p>
+<span class="clue-stamp">${state.liars.has(i) ? 'a lie, surely' : ''}</span>
+<button class="lie-toggle" type="button" aria-pressed="${state.liars.has(i)}" aria-label="Mark note ${i + 1} as a lie" data-lie="${i}" title="Mark as a lie">${state.liars.has(i) ? 'LIE' : '✓'}</button>
+</article>`;
+}
+function buildClueCards() {
+if (!state.puzzle) return;
+el.clueList.innerHTML = state.puzzle.clues.map((c, i) => clueHtml(c, i)).join('');
+el.clueCount.textContent = `${state.puzzle.clues.length} notes · ${state.puzzle.L} lie${state.puzzle.L === 1 ? '' : 's'}`;
+el.clueList.querySelectorAll('[data-lie]').forEach((btn) => {
+btn.addEventListener('click', () => toggleLiar(Number(btn.dataset.lie)));
+});
+el.clueList.querySelectorAll('.clue-card').forEach((card) => {
+card.addEventListener('mouseenter', () => highlightClue(Number(card.dataset.clue), true));
+card.addEventListener('mouseleave', () => highlightClue(Number(card.dataset.clue), false));
+});
+}
+function highlightClue(ci, on) {
+const card = el.clueList.querySelector(`[data-clue="${ci}"]`);
+if (card) card.classList.toggle('is-support', on);
+}
+function refreshClueCards() {
+if (!state.puzzle) return;
+el.clueList.querySelectorAll('.clue-card').forEach((card) => {
+const i = Number(card.dataset.clue);
+const on = state.liars.has(i);
+card.dataset.liar = String(on);
+card.querySelector('.clue-stamp').textContent = on ? 'a lie, surely' : '';
+const btn = card.querySelector('[data-lie]');
+btn.setAttribute('aria-pressed', String(on));
+btn.textContent = on ? 'LIE' : '✓';
+});
+el.clueCount.textContent = `${state.puzzle.clues.length} notes · ${state.puzzle.L} lie${state.puzzle.L === 1 ? '' : 's'}`;
+}
+let puzzleMap = null;
+let puzzleMapRadius = -1;
+function getMap(radius) {
+if (!puzzleMap || puzzleMapRadius !== radius) { puzzleMap = CORE.makeMap(radius); puzzleMapRadius = radius; }
+return puzzleMap;
+}
+function renderMapChips() {
+if (!state.puzzle) return;
+el.submit.disabled = state.generating;
+el.generate.disabled = state.generating;
+let inked = 0;
+for (let i = 0; i < state.assign.length; i++) if (state.assign[i] >= 0) inked++;
+el.mapProgressChip.innerHTML = `Inked <strong>${inked}</strong> / ${state.assign.length} hexes`;
+if (state.focus >= 0) {
+const c = puzzleMap.cells[state.focus];
+el.mapFocusChip.textContent = `Focus: (${c.q}, ${c.r})`;
+} else el.mapFocusChip.textContent = 'Focus: —';
+const contradiction = state.analysis && !state.analysis.ok;
+el.markCounter.textContent = contradiction
+? `⚠ contradiction · ${state.liars.size}/${state.puzzle.L} lies flagged`
+: `${state.liars.size}/${state.puzzle.L} lies flagged · ${state.undo.length} undo`;
+if (contradiction !== state.lastContradiction) {
+state.lastContradiction = contradiction;
+if (contradiction) setStatus('Contradiction in your marks: ' + state.analysis.contradiction, 'bad');
+}
+el.undo.disabled = !state.undo.length;
+el.redo.disabled = !state.redo.length;
+el.why.disabled = !state.puzzle;
+}
+function renderHexReadout() {
+if (!state.puzzle || state.focus < 0) {
+el.hexReadout.textContent = 'No hex selected';
+el.candidateList.innerHTML = '';
+el.clearHex.disabled = true; el.markLie.disabled = true;
+return;
+}
+const map = getMap(state.puzzle.radius);
+const cell = map.cells[state.focus];
+const assigned = state.assign[state.focus];
+el.hexReadout.innerHTML = `Hex <strong>(${cell.q}, ${cell.r})</strong> · row r=${cell.r}${assigned >= 0 ? ' · <strong>' + CORE.TERRAIN_NAMES[assigned] + '</strong>' : ' · uninked'}`;
+el.candidateList.innerHTML = '';
+for (let t = 0; t < state.puzzle.T; t++) {
+const on = !!(state.pencil[state.focus] & (1 << t));
+const b = document.createElement('button');
+b.type = 'button';
+b.className = 'candidate';
+b.dataset.on = String(on);
+b.setAttribute('aria-pressed', String(on));
+b.setAttribute('aria-label', `${on ? 'Remove' : 'Keep'} pencil candidate ${CORE.TERRAIN_NAMES[t]} for this hex`);
+b.innerHTML = `<span aria-hidden="true">${CORE.TERRAIN_GLYPHS[t]}</span> ${CORE.TERRAIN_NAMES[t]}`;
+b.addEventListener('click', () => togglePencil(state.focus, t));
+el.candidateList.appendChild(b);
+}
+el.clearHex.disabled = false;
+el.markLie.disabled = false;
+}
+function renderHexGrid() {
+if (!state.puzzle) return;
+const map = getMap(state.puzzle.radius);
+el.hexGrid.innerHTML = '';
+const maxRow = map.rows.length;
+el.hexGrid.style.gridTemplateRows = `repeat(${maxRow}, minmax(26px, auto))`;
+for (const row of map.rows) {
+const frag = document.createElement('div');
+frag.className = 'hex-row';
+frag.setAttribute('role', 'row');
+frag.style.marginLeft = `calc(${(row.r + map.radius) * 0.5} * (26px + 3px))`;
+for (const idx of row.cells) {
+const c = map.cells[idx];
+const b = document.createElement('button');
+b.type = 'button';
+b.className = 'hex-cell';
+b.dataset.cell = String(idx);
+b.dataset.selected = String(state.focus === idx);
+b.setAttribute('role', 'gridcell');
+b.setAttribute('aria-selected', String(state.focus === idx));
+if (state.assign[idx] >= 0) b.dataset.terrain = CORE.TERRAIN_NAMES[state.assign[idx]];
+b.textContent = `${c.q},${c.r}`;
+b.setAttribute('aria-label', `Hex ${c.q}, ${c.r}${state.assign[idx] >= 0 ? ', ' + CORE.TERRAIN_NAMES[state.assign[idx]] : ', uninked'}`);
+b.tabIndex = (state.focus === idx || (state.focus < 0 && idx === 0)) ? 0 : -1;
+b.addEventListener('click', () => selectCell(idx, true));
+frag.appendChild(b);
+}
+el.hexGrid.appendChild(frag);
+}
+el.hexGrid.dataset.ready = 'true';
+}
+function moveGridFocus(currentIdx, dq, dr) {
+if (!state.puzzle) return -1;
+const map = getMap(state.puzzle.radius);
+const cur = map.cells[currentIdx];
+const next = map.byKey.get((cur.q + dq) + ',' + (cur.r + dr));
+return next === undefined ? -1 : next;
+}
+function renderAll(full = false) {
+if (!state.puzzle) return;
+refreshClueCards();
+renderMapChips();
+renderHexReadout();
+if (full) { buildClueCards(); renderHexGrid(); renderHexReadout(); }
+else updateHexGridStates();
+updateTerrainPressed();
+atlasHolder.api && atlasHolder.api.refreshTiles(state.puzzle, state);
+saveProgressSoon();
+}
+function updateHexGridStates() {
+el.hexGrid.querySelectorAll('[data-cell]').forEach((b) => {
+const i = Number(b.dataset.cell);
+b.dataset.selected = String(state.focus === i);
+b.setAttribute('aria-selected', String(state.focus === i));
+b.tabIndex = state.focus === i ? 0 : -1;
+if (state.assign[i] >= 0) b.dataset.terrain = CORE.TERRAIN_NAMES[state.assign[i]];
+else delete b.dataset.terrain;
+const map = getMap(state.puzzle.radius);
+const c = map.cells[i];
+b.setAttribute('aria-label', `Hex ${c.q}, ${c.r}${state.assign[i] >= 0 ? ', ' + CORE.TERRAIN_NAMES[state.assign[i]] : ', uninked'}`);
+});
+}
+function updateTerrainPressed() {
+if (!state.puzzle) return;
+const t = state.focus >= 0 ? state.assign[state.focus] : -1;
+el.terrainPalette.querySelectorAll('.terrain-chip').forEach((chip, i) => {
+chip.setAttribute('aria-pressed', String(i === t));
+});
+}
+let saveTimer = 0;
+function saveProgressSoon() {
+clearTimeout(saveTimer);
+saveTimer = setTimeout(saveProgress, 300);
+}
+function clearHint() {
+el.hintBox.hidden = true;
+el.hintRefs.innerHTML = '';
+document.querySelectorAll('.clue-card.is-support').forEach((c) => c.classList.remove('is-support'));
+}
+async function requestHint() {
+if (!state.puzzle) return;
+const p = state.puzzle;
+const map = getMap(p.radius);
+const player = { assign: Array.from(state.assign), pencil: Array.from(state.pencil), liars: Array.from(state.liars), trusted: Array.from(state.trusted) };
+let hint;
+try {
+if (workerHolder.worker) {
+const msg = await workerCall('hint', { radius: p.radius, T: p.T, clues: p.clues, L: p.L, player });
+hint = msg.hint;
+} else {
+hint = CORE.nextHint(map, p.T, p.clues, p.L, player);
+}
+} catch (e) {
+setStatus('The hint engine could not run: ' + (e.message || e), 'bad');
+return;
+}
+if (!hint) { setStatus('The hint engine returned no deduction.', 'warn'); return; }
+state.hintUses++;
+state.lastHint = hint;
+el.hintBox.hidden = false;
+document.querySelectorAll('.clue-card.is-support').forEach((c) => c.classList.remove('is-support'));
+el.hintRefs.innerHTML = '';
+if (hint.kind === 'contradiction') {
+el.hintTitle.textContent = 'Contradiction';
+el.hintText.textContent = hint.text;
+el.hintDetail.textContent = hint.detail;
+setStatus('The hint solver found a contradiction in your current marks.', 'bad');
+} else if (hint.kind === 'none') {
+el.hintTitle.textContent = hint.complete ? 'Fully deduced' : 'No forced step';
+el.hintText.textContent = hint.text;
+el.hintDetail.textContent = hint.detail;
+setStatus(hint.complete ? 'The propagation solver can already derive every hex and liar.' : 'No forced deduction: try a pencil mark or flag a note.', 'warn');
+} else {
+el.hintTitle.textContent = hint.title || 'The next deduction';
+el.hintText.textContent = hint.text;
+el.hintDetail.textContent = hint.detail;
+setStatus('Hint: ' + hint.text, 'ok');
+}
+for (const ci of hint.clues || []) {
+const card = el.clueList.querySelector(`[data-clue="${ci}"]`);
+if (card) {
+card.classList.add('is-support');
+const ref = document.createElement('span');
+ref.className = 'clue-ref';
+ref.textContent = 'Note ' + (ci + 1);
+ref.addEventListener('click', () => card.scrollIntoView({ block: 'nearest', behavior: prefersReduced ? 'auto' : 'smooth' }));
+el.hintRefs.appendChild(ref);
+}
+}
+announce('Hint: ' + hint.text + ' ' + (hint.detail || ''));
+}
+function submitAtlas() {
+if (!state.puzzle) return;
+const p = state.puzzle;
+const map = CORE.makeMap(p.radius);
+let incomplete = -1;
+for (let i = 0; i < state.assign.length; i++) if (state.assign[i] < 0) { incomplete = i; break; }
+if (incomplete >= 0) {
+state.submitted = true; state.showErrors = true;
+const res = { ok: false, kind: 'incomplete', text: 'The atlas is incomplete: ' + CORE.cellName(map, incomplete) + ' has not been inked yet.' };
+showVerdict(false, res.text, 'The cartographer refuses to sign a half-drawn map.');
+focusCell(incomplete);
+return;
+}
+const res = CORE.validateSubmission(map, p.T, p.clues, p.L, p.solution, state.assign, Array.from(state.liars));
+state.submitted = true;
+state.showErrors = true;
+if (res.ok) {
+state.solved = true;
+state.elapsed = Date.now() - state.startedAt;
+state.washCells = new Set();
+for (let i = 0; i < state.assign.length; i++) if (state.assign[i] === p.solution[i]) state.washCells.add(i);
+showVerdict(true, 'The atlas is complete and true.', `Every truthful note holds, exactly ${p.L} lie${p.L === 1 ? '' : 's'} are named, and the map is uniquely determined. Time ${formatTime(state.elapsed)} · ${state.hintUses} hint${state.hintUses === 1 ? '' : 's'} used.`);
+setStatus('Atlas accepted. The cartographer signs it — and quietly burns one page of notes.', 'ok');
+toast('Atlas accepted — exactly ' + p.L + ' lie' + (p.L === 1 ? '' : 's') + ' named.', 3600);
+renderAll(true);
+announce('Correct. The atlas is complete and uniquely verified.');
+atlasHolder.api && atlasHolder.api.refreshTiles(p, state);
+} else {
+state.showErrors = true;
+let extra = 'Corrections are highlighted in red ink on the map.';
+if (res.kind === 'clue') { extra = 'The offending note is highlighted in the field notes.'; highlightClue(res.clue, true); }
+showVerdict(false, res.text, extra);
+if (res.cell !== undefined) focusCell(res.cell);
+setStatus('Not yet: ' + res.text, 'bad');
+announce('Submission rejected. ' + res.text);
+renderAll();
+atlasHolder.api && atlasHolder.api.refreshTiles(p, state);
+}
+saveProgress();
+}
+function showVerdict(ok, text, extra) {
+el.verdict.hidden = false;
+el.verdict.className = 'verdict ' + (ok ? 'ok' : 'bad');
+el.verdictTitle.textContent = ok ? 'Atlas accepted' : 'First violated constraint';
+el.verdictText.textContent = text;
+el.verdictExtra.textContent = extra || '';
+}
+function formatTime(ms) {
+const s = Math.floor(ms / 1000), m = Math.floor(s / 60);
+return m + ':' + String(s % 60).padStart(2, '0');
+}
+function selectCell(i, fromGrid) {
+if (!state.puzzle || i < 0) return;
+state.focus = i;
+renderHexReadout();
+renderMapChips();
+updateTerrainPressed();
+updateHexGridStates();
+if (!fromGrid) {
+const gridBtn = el.hexGrid.querySelector(`[data-cell="${i}"]`);
+if (gridBtn && el.hexGridPanel.open) gridBtn.scrollIntoView({ block: 'nearest' });
+}
+atlasHolder.api && atlasHolder.api.refreshTiles(state.puzzle, state);
+announce(`Selected ${CORE.cellName(getMap(state.puzzle.radius), i)}. ${state.assign[i] >= 0 ? 'It is ' + CORE.TERRAIN_NAMES[state.assign[i]] + '.' : 'It is uninked.'}`);
+}
+function focusCell(i) {
+selectCell(i, false);
+const gridBtn = el.hexGrid.querySelector(`[data-cell="${i}"]`);
+if (gridBtn) gridBtn.focus({ preventScroll: true });
+}
+function moveFocus(dq, dr) {
+if (!state.puzzle) return;
+const map = getMap(state.puzzle.radius);
+if (state.focus < 0) { selectCell(0); return; }
+const cur = map.cells[state.focus];
+const key = (cur.q + dq) + ',' + (cur.r + dr);
+const next = map.byKey.get(key);
+if (next !== undefined) selectCell(next);
+}
+async function loadThree() {
+return THREE_MOD;
+}
+function webglSupported() {
+try {
+const c = document.createElement('canvas');
+return !!(window.WebGLRenderingContext && (c.getContext('webgl2') || c.getContext('webgl')));
+} catch (e) { return false; }
+}
+async function initAtlas() {
+if (!webglSupported()) throw new Error('WebGL unavailable');
+const THREE = await loadThree();
+const mod = createRendererModule(THREE, CORE);
+const api = mod.createAtlas({ canvas: el.canvas, stage: el.stage, lowQuality: state.quality === 'low' });
+atlasHolder.api = api;
+const canvas = el.canvas;
+canvasLost = false;
+canvas.addEventListener('webglcontextlost', (e) => {
+e.preventDefault();
+canvasLost = true;
+setStatus('The graphics context was lost. The atlas will restore itself when the browser allows.', 'warn');
+announce('Graphics context lost. All game state is safe.');
+}, false);
+canvas.addEventListener('webglcontextrestored', () => {
+canvasLost = false;
+try {
+api.resize();
+if (state.puzzle) api.setPuzzle(state.puzzle, state);
+setStatus('Graphics context restored. The atlas is redrawn.', 'ok');
+announce('Graphics context restored.');
+} catch (e) {
+setStatus('The atlas could not redraw after context restoration.', 'bad');
+}
+}, false);
+return api;
+}
+let canvasLost = false;
+function showFallback(reason) {
+el.fallback.hidden = false;
+el.fallback.querySelector('.card p').textContent = reason;
+atlasHolder.failed = true;
+setStatus('Running without the illuminated map. All puzzle controls remain available.', 'warn');
+}
+let pointerDownAt = null;
+el.canvas.addEventListener('pointermove', (e) => {
+if (!atlasHolder.api || !state.puzzle) return;
+if (e.pointerType === 'touch' && e.buttons === 0) {
+}
+const cell = atlasHolder.api.pointerToCell(e.clientX, e.clientY);
+if (cell !== state.hover) {
+state.hover = cell;
+el.canvas.style.cursor = cell >= 0 ? 'pointer' : 'grab';
+atlasHolder.api.refreshTiles(state.puzzle, state);
+}
+});
+el.canvas.addEventListener('pointerleave', () => {
+if (!atlasHolder.api || !state.puzzle) return;
+state.hover = -1;
+atlasHolder.api.refreshTiles(state.puzzle, state);
+});
+el.canvas.addEventListener('pointerdown', (e) => { pointerDownAt = { x: e.clientX, y: e.clientY, t: performance.now() }; });
+el.canvas.addEventListener('pointerup', (e) => {
+if (!atlasHolder.api || !state.puzzle) return;
+if (!pointerDownAt) return;
+const moved = Math.hypot(e.clientX - pointerDownAt.x, e.clientY - pointerDownAt.y);
+const dur = performance.now() - pointerDownAt.t;
+pointerDownAt = null;
+if (moved > 8 || dur > 600) return; 
+const cell = atlasHolder.api.pointerToCell(e.clientX, e.clientY);
+if (cell >= 0) { selectCell(cell); el.canvas.focus({ preventScroll: true }); }
+});
+el.hexGrid.addEventListener('keydown', (e) => {
+if (!state.puzzle) return;
+const btn = e.target.closest('[data-cell]');
+if (!btn) return;
+const cur = Number(btn.dataset.cell);
+let next = -1;
+if (e.key === 'ArrowRight') next = moveGridFocus(cur, 1, 0);
+else if (e.key === 'ArrowLeft') next = moveGridFocus(cur, -1, 0);
+else if (e.key === 'ArrowDown') next = moveGridFocus(cur, 0, 1);
+else if (e.key === 'ArrowUp') next = moveGridFocus(cur, 0, -1);
+else if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectCell(cur, true); return; }
+if (next >= 0) {
+e.preventDefault();
+selectCell(next, true);
+const nb = el.hexGrid.querySelector(`[data-cell="${next}"]`);
+if (nb) nb.focus({ preventScroll: true });
+}
+});
+el.canvas.addEventListener('keydown', (e) => {
+if (!state.puzzle) return;
+const k = e.key;
+const n = state.puzzle.T;
+if (k === 'ArrowRight') { e.preventDefault(); moveFocus(1, 0); }
+else if (k === 'ArrowLeft') { e.preventDefault(); moveFocus(-1, 0); }
+else if (k === 'ArrowDown') { e.preventDefault(); moveFocus(0, 1); }
+else if (k === 'ArrowUp') { e.preventDefault(); moveFocus(0, -1); }
+else if (k >= '1' && k <= String(n)) { e.preventDefault(); assignTerrain(state.focus, Number(k) - 1); }
+else if (k === 'p' || k === 'P') {
+e.preventDefault();
+if (state.focus >= 0) {
+const full = (1 << state.puzzle.T) - 1;
+const mask = state.pencil[state.focus];
+if (mask === full) {
+const keep = state.puzzle.T > 1 ? 3 : full;
+pushUndo();
+state.pencil[state.focus] = keep;
+recomputeMarks(); renderAll(); saveProgress();
+setStatus('Pencil narrowed. Use the candidate buttons to refine.', 'ok');
+} else {
+pushUndo();
+state.pencil[state.focus] = full;
+recomputeMarks(); renderAll(); saveProgress();
+setStatus('Pencil restored to all candidates.', 'ok');
+}
+}
+}
+else if (k === 'l' || k === 'L') { e.preventDefault(); setStatus('Press L on a focused field note to mark it a lie.', 'warn'); }
+else if (k === 'Enter' || k === ' ') { e.preventDefault(); if (state.focus >= 0) el.terrainPalette.querySelectorAll('button')[0]?.focus(); }
+});
+document.addEventListener('keydown', (e) => {
+const tag = (e.target && e.target.tagName) || '';
+const typing = tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || (e.target && e.target.isContentEditable);
+if (e.key === 'Escape') {
+if (!el.selftest.hidden) { closeSelfTest(); e.preventDefault(); return; }
+if (!el.hintBox.hidden) { clearHint(); e.preventDefault(); return; }
+}
+if ((e.key === 't' || e.key === 'T') && !typing && !e.metaKey && !e.ctrlKey && !e.altKey) {
+e.preventDefault(); openSelfTest(); return;
+}
+if (typing) return;
+const mod = e.metaKey || e.ctrlKey;
+if (mod && (e.key === 'z' || e.key === 'Z')) {
+e.preventDefault();
+if (e.shiftKey) redo(); else undo();
+return;
+}
+if (mod && (e.key === 'y' || e.key === 'Y')) { e.preventDefault(); redo(); return; }
+const interactive = tag === 'BUTTON' || tag === 'A' || tag === 'SUMMARY';
+if (mod && e.key === 'Enter') { e.preventDefault(); submitAtlas(); return; }
+if (e.key === 'Enter' && !interactive && !(e.target && e.target.id === 'scene')) { e.preventDefault(); submitAtlas(); return; }
+if (e.key === 'Enter' && e.target && e.target.id === 'seed-input') return;
+if (e.key === 'g' || e.key === 'G') { e.preventDefault(); generate(); return; }
+if (e.key === 'w' || e.key === 'W') { e.preventDefault(); requestHint(); return; }
+if (e.key === 'v' || e.key === 'V') { e.preventDefault(); toggleTopView(); return; }
+if (e.key === 'a' || e.key === 'A') { e.preventDefault(); toggleAnimation(); return; }
+if (e.key === 'q' || e.key === 'Q') { e.preventDefault(); toggleQuality(); return; }
+if (e.key === '?' ) { e.preventDefault(); openSelfTest(); return; }
+if (document.activeElement && document.activeElement.classList.contains('lie-toggle')) return;
+if ((e.key === 'l' || e.key === 'L') && state.focus >= 0) {
+const cards = el.clueList.querySelectorAll('.clue-card');
+const last = state.lastHint && state.lastHint.clues && state.lastHint.clues.length ? state.lastHint.clues[0] : (state.clueCursor || 0);
+state.clueCursor = last;
+if (cards[last]) { cards[last].querySelector('.lie-toggle').focus(); cards[last].scrollIntoView({ block: 'nearest' }); e.preventDefault(); }
+}
+});
+el.generate.addEventListener('click', () => generate());
+el.seed.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); generate(); } });
+el.tier.addEventListener('change', () => { saveProgress(); });
+el.why.addEventListener('click', requestHint);
+el.undo.addEventListener('click', undo);
+el.redo.addEventListener('click', redo);
+el.submit.addEventListener('click', submitAtlas);
+el.view.addEventListener('click', toggleTopView);
+el.quality.addEventListener('click', toggleQuality);
+el.anim.addEventListener('click', toggleAnimation);
+el.selftestBtn.addEventListener('click', openSelfTest);
+el.selftestClose.addEventListener('click', closeSelfTest);
+el.selftest.addEventListener('click', (e) => { if (e.target === el.selftest) closeSelfTest(); });
+el.selftestRun.addEventListener('click', runSelfTests);
+el.cancelGen.addEventListener('click', cancelGeneration);
+el.fallbackContinue.addEventListener('click', () => { el.fallback.hidden = true; });
+el.resetMarks.addEventListener('click', () => {
+if (!state.puzzle) return;
+pushUndo();
+state.assign = new Int8Array(state.assign.length).fill(-1);
+state.pencil = new Uint16Array(state.assign.length).fill((1 << state.puzzle.T) - 1);
+state.liars = new Set(); state.trusted = new Set();
+state.contradictionCells = new Set(); state.washCells = new Set();
+state.showErrors = false;
+clearHint(); el.verdict.hidden = true;
+recomputeMarks(); renderAll(true); saveProgress();
+setStatus('Marks cleared. The map is blank parchment again.', 'ok');
+});
+el.recenter.addEventListener('click', () => atlasHolder.api && atlasHolder.api.frameAtlas(false));
+el.clearHex.addEventListener('click', () => clearHex(state.focus));
+el.markLie.addEventListener('click', () => {
+if (!state.puzzle) return;
+const cards = el.clueList.querySelectorAll('.clue-card');
+let idx = state.lastHint && state.lastHint.clues && state.lastHint.clues.length ? state.lastHint.clues[0] : -1;
+if (idx < 0 || state.liars.has(idx)) {
+for (let i = 0; i < cards.length; i++) if (!state.liars.has(i)) { idx = i; break; }
+}
+if (idx < 0) idx = 0;
+toggleLiar(idx);
+const card = cards[idx];
+if (card) {
+card.querySelector('.lie-toggle').focus();
+card.scrollIntoView({ block: 'nearest' });
+}
+});
+function toggleTopView() {
+state.topView = !state.topView;
+el.view.setAttribute('aria-pressed', String(state.topView));
+el.view.classList.toggle('is-active', state.topView);
+setButtonLabel(el.view, state.topView ? 'Tilted view' : 'Top view', 'V');
+if (atlasHolder.api) atlasHolder.api.setTopView(state.topView);
+setStatus(state.topView ? 'Flat top view.' : 'Tilted atlas view.', 'ok');
+}
+function toggleAnimation() {
+state.animation = !state.animation;
+el.anim.setAttribute('aria-pressed', String(state.animation));
+el.anim.classList.toggle('is-active', state.animation);
+setButtonLabel(el.anim, state.animation ? 'Animation' : 'On demand', '');
+atlasHolder.api && atlasHolder.api.setAnimation(state.animation);
+setStatus(state.animation ? 'Animation on.' : 'Animation off: the atlas renders on demand.', 'ok');
+saveProgress();
+}
+async function toggleQuality() {
+state.quality = state.quality === 'high' ? 'low' : 'high';
+el.qualityBadge.textContent = state.quality === 'high' ? 'High quality' : 'Low quality';
+el.quality.setAttribute('aria-pressed', String(state.quality === 'low'));
+el.quality.classList.toggle('is-active', state.quality === 'low');
+setButtonLabel(el.quality, state.quality === 'high' ? 'High quality' : 'Low quality', '');
+if (atlasHolder.api) {
+try {
+atlasHolder.api.setQuality(state.quality === 'low');
+atlasHolder.api.setAnimation(state.animation);
+setStatus(`Quality set to ${state.quality}. ${state.quality === 'low' ? 'Shadows off, pixel ratio capped at 1.' : 'Soft shadows and a pixel ratio up to 2.'}`, 'ok');
+announce(`Quality set to ${state.quality}.`);
+updateRendererStats();
+} catch (e) {
+setStatus('Could not change quality: ' + (e.message || e), 'bad');
+}
+}
+saveProgress();
+}
+function updateGate(pct, label) {
+el.gate.hidden = false;
+el.gateTitle.textContent = 'Charting the atlas…';
+el.gateFailure.hidden = true;
+el.gateSpinner.hidden = false;
+el.gateText.textContent = label || 'Working';
+el.gateProgress.setAttribute('aria-valuenow', String(Math.round(pct)));
+el.gateProgress.querySelector('i').style.width = Math.max(4, Math.min(100, pct)) + '%';
+el.cancelGen.disabled = false;
+el.cancelGen.hidden = false;
+el.cancelGen.textContent = 'Cancel generation';
+}
+function showGenerationFailure(message) {
+el.gate.hidden = false;
+el.gateSpinner.hidden = true;
+el.gateTitle.textContent = 'The atlas cannot be charted';
+el.gateText.textContent = 'No verified puzzle was produced. Requirements were not weakened.';
+el.gateFailure.hidden = false;
+el.gateFailure.textContent = message;
+el.gateFailure.dataset.detail = (window.__cpLastError || '');
+el.gateProgress.setAttribute('aria-valuenow', '0');
+el.gateProgress.querySelector('i').style.width = '0%';
+el.cancelGen.textContent = 'Dismiss';
+el.cancelGen.disabled = false;
+el.cancelGen.hidden = false;
+setStatus('Generation failed: ' + message, 'bad');
+announce('Generation failed. ' + message);
+}
+function cancelGeneration() {
+if (!state.generating) { el.gate.hidden = true; return; }
+state.genToken++;
+state.generating = false;
+if (workerHolder.worker) {
+workerHolder.worker.terminate();
+workerHolder.worker = null;
+for (const [, p] of workerHolder.pending) p.reject(new Error('cancelled'));
+workerHolder.pending.clear();
+initWorker();
+}
+el.gate.hidden = true;
+setStatus('Generation cancelled. Previous atlas retained.', 'warn');
+announce('Generation cancelled.');
+}
+async function generate() {
+if (state.generating) return;
+const seed = (el.seed.value || '').trim() || 'the-weeping-coast';
+const tierId = el.tier.value;
+state.seed = seed; state.tierId = tierId;
+state.generating = true;
+const token = ++state.genToken;
+updateGate(4, 'Preparing parchment');
+el.generate.disabled = true;
+el.hintBox.hidden = true;
+try {
+if (!workerHolder.worker) initWorker();
+let msg;
+if (workerHolder.worker) {
+msg = await workerCall('generate', { seed, tierId, maxAttempts: 10 }, (pct, label) => {
+if (token !== state.genToken) return;
+updateGate(pct, label);
+});
+} else {
+updateGate(30, 'Worker unavailable — verifying on the main thread');
+await new Promise((r) => setTimeout(r, 30));
+const res = CORE.buildPuzzle(seed, tierId, { maxAttempts: 10 });
+if (!res.ok) throw new Error(res.error);
+msg = { puzzle: res.puzzle };
+}
+if (token !== state.genToken) return;
+if (!msg.puzzle) throw new Error('Worker returned no puzzle.');
+el.gate.hidden = true;
+state.generating = false;
+applyPuzzle(msg.puzzle);
+announce(`New atlas: ${msg.puzzle.clues.length} field notes, exactly ${msg.puzzle.L} lie${msg.puzzle.L === 1 ? '' : 's'}.`);
+} catch (err) {
+if (token !== state.genToken) return;
+state.generating = false;
+window.__cpLastError = (err && err.stack) || String(err);
+if (String(err.message || err).includes('cancelled')) return;
+showGenerationFailure(err.message || String(err));
+} finally {
+el.generate.disabled = false;
+if (state.generating) state.generating = false;
+}
+}
+let selfTestRunning = false;
+let selfTestToken = 0;
+function openSelfTest() {
+el.selftest.hidden = false;
+if (!el.selftestList.children.length) {
+el.selftestList.innerHTML = '<p style="font-size:13px;color:var(--ink-soft)">Run the 30-case suite to verify all three tiers. Each case is deterministic, regenerated twice, counted to two solutions, and solved by propagation alone. Hints are replayed to completion and checked against the verified map.</p>';
+}
+el.selftestClose.focus();
+updateRendererStats();
+}
+function closeSelfTest() {
+if (selfTestRunning) { setStatus('Wait for the test suite to finish, or let it complete in the background.', 'warn'); return; }
+el.selftest.hidden = true;
+el.selftestBtn.focus();
+}
+function suiteCases() { return CORE.testSuiteCases(); }
+async function runSelfTests() {
+if (selfTestRunning) return;
+selfTestRunning = true;
+const token = ++selfTestToken;
+el.selftestRun.disabled = true;
+el.selftestClose.disabled = true;
+el.selftestList.innerHTML = '';
+el.selftestSummary.innerHTML = '';
+el.selftestStatus.textContent = 'Running…';
+const cases = suiteCases();
+let pass = 0, fail = 0;
+const started = performance.now();
+const times = [];
+for (let ci = 0; ci < cases.length; ci++) {
+if (token !== selfTestToken) break;
+const c = cases[ci];
+const pct = Math.round((ci / cases.length) * 100);
+el.selftestProgress.setAttribute('aria-valuenow', String(pct));
+el.selftestProgress.querySelector('i').style.width = pct + '%';
+el.selftestStatus.textContent = `Case ${ci + 1}/${cases.length}: ${c.tierId} · ${c.seed}`;
+await new Promise((r) => setTimeout(r, 0));
+const t0 = performance.now();
+const res = CORE.testSingleCase(c.seed, c.tierId);
+times.push(performance.now() - t0);
+if (res.ok) pass++; else fail++;
+const row = document.createElement('div');
+row.className = 'test-row';
+row.innerHTML = `<span class="${res.ok ? 'ok' : 'fail'}">${res.ok ? 'PASS' : 'FAIL'}</span>` +
+`<span>${c.tierId} · ${c.seed}</span>` +
+`<code>${res.ok ? (res.stats || 'verified') : (res.issues[0] || 'failed')}</code>`;
+el.selftestList.appendChild(row);
+if (!res.ok) {
+const err = document.createElement('div');
+err.className = 'test-detail';
+err.textContent = res.issues.join(' · ');
+el.selftestList.appendChild(err);
+}
+}
+if (token !== selfTestToken) return;
+el.selftestProgress.setAttribute('aria-valuenow', '100');
+el.selftestProgress.querySelector('i').style.width = '100%';
+const ms = Math.round(performance.now() - started);
+const avg = times.length ? Math.round(times.reduce((a, b) => a + b, 0) / times.length) : 0;
+el.selftestStatus.textContent = `${pass}/${cases.length} passed`;
+el.selftestSummary.innerHTML = `
+<div class="test-stat"><b>${pass}</b><span>Passed</span></div>
+<div class="test-stat"><b>${fail}</b><span>Failed</span></div>
+<div class="test-stat"><b>30</b><span>Seeded cases</span></div>
+<div class="test-stat"><b>${ms} ms</b><span>Suite time</span></div>
+<div class="test-stat"><b>${avg} ms</b><span>Avg per case</span></div>`;
+updateRendererStats();
+selfTestRunning = false;
+el.selftestRun.disabled = false;
+el.selftestClose.disabled = false;
+el.selftestStatus.textContent = pass === cases.length ? `${pass}/${cases.length} passed — all checks green` : `${pass}/${cases.length} passed — ${fail} failed`;
+announce(`Self-test finished. ${pass} passed, ${fail} failed.`);
+setStatus(pass === cases.length ? 'Self-test: all 30 deterministic cases passed.' : `Self-test: ${fail} case(s) failed. Open the test panel for details.`, pass === cases.length ? 'ok' : 'bad');
+}
+function updateRendererStats() {
+if (atlasHolder.api) {
+try {
+const s = atlasHolder.api.stats();
+el.rendererInfo.textContent =
+`renderer.info · draw calls ${s.calls} · triangles ${s.triangles.toLocaleString()} · points ${s.points} · geometries ${s.geometries} · textures ${s.textures}\n` +
+`quality ${s.quality} · pixel ratio ${s.pixelRatio} · drawing buffer ${s.width}×${s.height} · ` +
+(s.animating ? `animation on · ~${s.fps || 0} fps (smoke measure, not a guarantee)` : 'on-demand rendering (animation off)');
+} catch (e) {
+el.rendererInfo.textContent = 'renderer.info unavailable: ' + e.message;
+}
+} else {
+el.rendererInfo.textContent = 'renderer.info: WebGL atlas unavailable; fallback controls remain active.';
+}
+}
+async function boot() {
+const saved = restoreSettings();
+el.seed.value = state.seed;
+el.tier.value = state.tierId;
+el.qualityBadge.textContent = state.quality === 'high' ? 'High quality' : 'Low quality';
+el.quality.setAttribute('aria-pressed', String(state.quality === 'low'));
+el.quality.classList.toggle('is-active', state.quality === 'low');
+setButtonLabel(el.quality, state.quality === 'high' ? 'High quality' : 'Low quality', '');
+el.anim.setAttribute('aria-pressed', String(state.animation));
+el.anim.classList.toggle('is-active', state.animation);
+setButtonLabel(el.anim, state.animation ? 'Animation' : 'On demand', '');
+el.view.setAttribute('aria-pressed', String(state.topView));
+el.view.classList.toggle('is-active', state.topView);
+setButtonLabel(el.view, state.topView ? 'Tilted view' : 'Top view', 'V');
+initWorker();
+updateGate(2, 'Warming the ink');
+try {
+await initAtlas();
+} catch (e) {
+showFallback('WebGL could not start: ' + (e.message || e) + '.');
+}
+if (atlasHolder.api) {
+atlasHolder.api.setAnimation(state.animation);
+atlasHolder.api.setTopView(state.topView);
+}
+state.generating = true;
+const token = ++state.genToken;
+try {
+const msg = await workerCall('generate', { seed: state.seed, tierId: state.tierId, maxAttempts: 10 }, (pct, label) => {
+if (token !== state.genToken) return;
+updateGate(pct, label);
+});
+if (token !== state.genToken) return;
+el.gate.hidden = true;
+state.generating = false;
+const restore = saved && saved.puzzleKey === puzzleKeyFor(msg.puzzle.seed, msg.puzzle.tierId) ? saved : null;
+applyPuzzle(msg.puzzle, { restore });
+if (restore) { setStatus('Restored your marked atlas from this browser.', 'ok'); toast('Your previous marks were restored.', 3200); }
+} catch (e) {
+state.generating = false;
+showGenerationFailure(e.message || String(e));
+} finally {
+if (state.generating) state.generating = false;
+}
+setInterval(() => {
+if (state.puzzle && !state.solved) { state.elapsed = Date.now() - state.startedAt; }
+}, 1000);
+window.__CP = {
+state, CORE, atlas: atlasHolder, storage,
+generate, requestHint, submitAtlas, assignTerrain, togglePencil, toggleLiar,
+selectCell, toggleTopView, toggleQuality, toggleAnimation, runSelfTests,
+applyPuzzle, puzzleKeyFor, validate: (assign, liars) => {
+if (!state.puzzle) return null;
+const map = getMap(state.puzzle.radius);
+return CORE.validateSubmission(map, state.puzzle.T, state.puzzle.clues, state.puzzle.L, state.puzzle.solution, assign, liars);
+}
+};
+}
+boot();
+})();</script>
+</body>
+</html>

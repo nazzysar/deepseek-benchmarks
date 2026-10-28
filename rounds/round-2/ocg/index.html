@@ -1,0 +1,3478 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<meta name="description" content="Cartographer's Paradox — a hand-inked fantasy hex-map deduction game. Find the lying margin notes, then ink the five terrains of an unreliable atlas.">
+<title>Cartographer's Paradox — A Hand-Inked Atlas Mystery</title>
+<link rel="icon" href="data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='30' fill='%23241b14'/%3E%3Cpath d='M32 8l6 18 18 6-18 6-6 18-6-18-18-6 18-6z' fill='%23b98a3e'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   PALETTE — six colours define the whole atlas:
+   parchment, ink, gold, sea, forest, crimson.
+   Mountain, desert and swamp pigments are mixed from those six.
+   ============================================================ */
+:root{
+  --parchment:#efe1c2;
+  --ink:#241b14;
+  --gold:#b98a3e;
+  --sea:#3d6a70;
+  --forest:#546b3d;
+  --crimson:#8e3326;
+  --mountain:color-mix(in srgb,var(--ink) 40%,var(--parchment));
+  --desert:color-mix(in srgb,var(--gold) 52%,var(--parchment));
+  --swamp:color-mix(in srgb,var(--forest) 42%,var(--ink));
+  --paper-edge:color-mix(in srgb,var(--ink) 24%,var(--parchment));
+  --gold-deep:color-mix(in srgb,var(--gold) 55%,var(--ink));
+  --shadow:0 22px 60px rgba(0,0,0,.55),0 3px 10px rgba(0,0,0,.4);
+  --serif:'EB Garamond',Georgia,'Times New Roman',serif;
+  --display:'Cinzel',Georgia,serif;
+}
+*,*::before,*::after{box-sizing:border-box}
+[hidden]{display:none!important} /* author display rules must never defeat the hidden attribute */
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;min-height:100vh;color:var(--parchment);
+  font-family:var(--serif);font-size:18px;line-height:1.45;
+  background:
+    radial-gradient(1100px 720px at 72% -12%,#4a3727 0%,rgba(74,55,39,0) 60%),
+    radial-gradient(900px 620px at 8% 108%,#2d2419 0%,rgba(45,36,25,0) 65%),
+    repeating-linear-gradient(93deg,rgba(255,255,255,.014) 0 2px,transparent 2px 7px),
+    #17110c;
+  overflow-x:hidden;
+}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:radial-gradient(ellipse at center,transparent 52%,rgba(0,0,0,.5) 100%);}
+h1,h2,h3{font-family:var(--display);font-weight:600;line-height:1.1;margin:0}
+p{margin:.2em 0}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer}
+a{color:var(--gold)}
+::selection{background:var(--gold);color:var(--ink)}
+:focus-visible{outline:3px solid var(--gold);outline-offset:2px;border-radius:2px}
+.sr-only{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+.skip{position:absolute;left:12px;top:-60px;z-index:100;background:var(--parchment);color:var(--ink);padding:10px 16px;border-radius:3px;transition:top .2s}
+.skip:focus{top:12px}
+.frame{position:relative;z-index:1;max-width:2200px;margin:0 auto;padding:clamp(10px,1.8vw,30px) clamp(10px,2vw,34px) 18px}
+/* ---------- masthead ---------- */
+.masthead{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:clamp(10px,2vw,26px);align-items:center;padding-bottom:14px;border-bottom:1px solid rgba(185,138,62,.35);position:relative}
+.masthead::after{content:"";position:absolute;left:0;right:0;bottom:-4px;height:1px;background:linear-gradient(90deg,transparent,rgba(185,138,62,.28),transparent)}
+.crest{width:clamp(44px,5vw,66px);height:clamp(44px,5vw,66px);border-radius:50%;display:grid;place-items:center;color:var(--gold);border:1px solid rgba(185,138,62,.55);
+  background:radial-gradient(circle at 35% 30%,#463323,#201610 65%);box-shadow:inset 0 0 18px rgba(0,0,0,.7),0 0 0 4px rgba(185,138,62,.08);font-size:clamp(20px,2.6vw,30px)}
+.eyebrow{font-family:var(--display);font-size:clamp(.58rem,.75vw,.7rem);letter-spacing:.28em;text-transform:uppercase;color:color-mix(in srgb,var(--gold) 72%,var(--parchment));margin:0 0 4px}
+.titleblock h1{font-size:clamp(1.45rem,3.1vw,2.85rem);letter-spacing:.06em;color:var(--parchment);text-shadow:0 2px 0 #000,0 8px 26px rgba(0,0,0,.5);white-space:nowrap}
+.titleblock h1 em{font-style:normal;color:var(--gold)}
+.sub{margin:3px 0 0;font-size:clamp(.78rem,1vw,.98rem);color:color-mix(in srgb,var(--parchment) 72%,var(--ink));font-style:italic}
+.sub b{color:var(--parchment);font-style:normal}
+.mast-actions{display:flex;flex-wrap:wrap;gap:8px;align-items:flex-end;justify-content:flex-end;max-width:600px}
+.field{display:flex;flex-direction:column;gap:3px;font-family:var(--display);font-size:.6rem;letter-spacing:.17em;text-transform:uppercase;color:color-mix(in srgb,var(--gold) 62%,var(--parchment))}
+.field input,.field select{min-height:34px;padding:6px 9px;background:rgba(20,14,9,.65);border:1px solid rgba(185,138,62,.4);border-radius:3px;color:var(--parchment);font-family:var(--serif);font-size:.95rem;letter-spacing:normal;text-transform:none;box-shadow:inset 0 1px 0 rgba(255,255,255,.04)}
+.field input{width:clamp(120px,13vw,190px)}
+.field select{min-width:130px}
+.field input:hover,.field select:hover{border-color:rgba(185,138,62,.75)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:34px;padding:6px 12px;border:1px solid rgba(185,138,62,.42);border-radius:3px;
+  background:linear-gradient(180deg,rgba(64,47,32,.85),rgba(31,22,15,.9));color:var(--parchment);font-family:var(--display);font-size:.66rem;letter-spacing:.13em;text-transform:uppercase;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 2px 5px rgba(0,0,0,.35);transition:background .18s,border-color .18s,transform .12s}
+.btn:hover{background:linear-gradient(180deg,rgba(92,69,43,.95),rgba(42,30,19,.95));border-color:var(--gold)}
+.btn:active{transform:translateY(1px)}
+.btn[disabled]{opacity:.42;cursor:not-allowed}
+.btn.gold{background:linear-gradient(180deg,color-mix(in srgb,var(--gold) 78%,#fff),var(--gold-deep));color:#221607;border-color:color-mix(in srgb,var(--gold) 60%,#fff);font-weight:600;text-shadow:0 1px 0 rgba(255,255,255,.25)}
+.btn.gold:hover{background:linear-gradient(180deg,color-mix(in srgb,var(--gold) 88%,#fff),var(--gold))}
+.btn.ghost{background:transparent}
+.btn.tiny{min-height:26px;padding:3px 8px;font-size:.56rem;letter-spacing:.1em}
+.btn[aria-pressed="true"]{background:linear-gradient(180deg,var(--gold),var(--gold-deep));color:#211507;border-color:color-mix(in srgb,var(--gold) 60%,#fff);text-shadow:0 1px rgba(255,255,255,.2)}
+/* ---------- workspace ---------- */
+.workspace{display:grid;grid-template-columns:minmax(0,1fr) clamp(330px,27vw,460px);gap:clamp(12px,1.8vw,26px);margin-top:clamp(12px,1.8vw,24px);align-items:start}
+.map-panel{display:flex;flex-direction:column;gap:10px;min-width:0}
+.viewport{position:relative;height:clamp(380px,58vh,760px);border-radius:5px;overflow:hidden;background:#140f0b;border:1px solid rgba(185,138,62,.3);box-shadow:var(--shadow);isolation:isolate}
+.viewport:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
+#canvasHost,.viewport canvas{position:absolute;inset:0;display:block;width:100%!important;height:100%!important}
+.viewport .hud{position:absolute;top:10px;left:12px;z-index:3;display:flex;gap:6px;flex-wrap:wrap;pointer-events:none}
+.pill{pointer-events:none;display:inline-flex;align-items:center;gap:6px;padding:4px 9px;border-radius:20px;background:rgba(18,12,8,.7);border:1px solid rgba(185,138,62,.35);font-family:var(--display);font-size:.56rem;letter-spacing:.13em;text-transform:uppercase;color:color-mix(in srgb,var(--parchment) 86%,var(--ink));backdrop-filter:blur(3px)}
+.pill b{color:var(--gold);font-weight:600;letter-spacing:.06em}
+.gen-overlay{position:absolute;inset:0;z-index:6;display:grid;place-items:center;padding:20px;background:radial-gradient(circle at center,rgba(36,27,20,.82),rgba(12,8,5,.94))}
+.gen-card{max-width:440px;width:100%;text-align:center;padding:clamp(18px,3vw,30px);border:1px solid rgba(185,138,62,.5);border-radius:4px;background:linear-gradient(160deg,rgba(58,43,29,.95),rgba(25,18,12,.98));box-shadow:var(--shadow);color:var(--parchment)}
+.gen-card h2{font-size:1.12rem;color:var(--gold);letter-spacing:.08em;margin-bottom:6px}
+.gen-card p{font-size:.95rem;color:color-mix(in srgb,var(--parchment) 78%,var(--ink));margin:6px 0 12px}
+.gen-star{font-size:2.4rem;line-height:1;color:var(--gold);display:inline-block;margin-bottom:2px;animation:spin 9s linear infinite}
+.progress{height:6px;border-radius:5px;background:rgba(0,0,0,.45);overflow:hidden;border:1px solid rgba(185,138,62,.3);margin:12px 0 6px}
+.progress i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--gold-deep),var(--gold),color-mix(in srgb,var(--gold) 70%,#fff));transition:width .25s;box-shadow:0 0 12px rgba(185,138,62,.45)}
+.gen-meta{font-family:var(--display);font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;color:color-mix(in srgb,var(--gold) 70%,var(--parchment));min-height:1.2em}
+.gen-actions{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:12px}
+.gen-error{color:color-mix(in srgb,var(--crimson) 35%,var(--parchment));font-size:.92rem}
+.webgl-fallback{position:absolute;inset:0;z-index:5;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:24px;text-align:center;background:radial-gradient(circle at 50% 32%,rgba(88,67,43,.28),rgba(15,10,7,.96));color:var(--parchment)}
+.webgl-fallback .sigil{width:84px;height:84px;border-radius:50%;border:2px solid var(--gold);display:grid;place-items:center;font-size:2rem;color:var(--gold);background:radial-gradient(circle at 34% 30%,#453322,#1b120d);box-shadow:inset 0 0 20px #000}
+.webgl-fallback h2{font-size:1.15rem;color:var(--gold);letter-spacing:.06em}
+.webgl-fallback p{max-width:46ch;font-size:.95rem;color:color-mix(in srgb,var(--parchment) 80%,var(--ink));margin:2px 0}
+.hint-banner{position:absolute;left:12px;right:12px;bottom:12px;z-index:4;display:flex;gap:10px;align-items:flex-start;padding:10px 12px;background:linear-gradient(170deg,var(--parchment),color-mix(in srgb,var(--parchment) 82%,var(--gold)));color:var(--ink);border-left:4px solid var(--gold);border-radius:2px;box-shadow:0 10px 34px rgba(0,0,0,.55);font-size:.92rem;line-height:1.35}
+.hint-banner strong{font-family:var(--display);letter-spacing:.05em;font-size:.72rem;text-transform:uppercase;color:var(--crimson);display:block;margin-bottom:2px}
+.hint-banner .btn{flex:0 0 auto;color:var(--ink);border-color:rgba(36,27,20,.35);background:rgba(255,255,255,.22);font-size:.55rem}
+.hint-banner .hint-body{flex:1;min-width:0}
+/* control deck */
+.deck{display:grid;grid-template-columns:1.25fr 1fr;gap:8px;padding:10px;border:1px solid rgba(185,138,62,.28);border-radius:4px;background:linear-gradient(170deg,rgba(46,34,23,.82),rgba(22,16,11,.9));box-shadow:var(--shadow)}
+.deck-group{display:flex;flex-direction:column;gap:6px;min-width:0}
+.deck-label{font-family:var(--display);font-size:.56rem;letter-spacing:.18em;text-transform:uppercase;color:color-mix(in srgb,var(--gold) 62%,var(--parchment));display:flex;align-items:center;gap:6px}
+.deck-label::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,rgba(185,138,62,.32),transparent)}
+.palette{display:flex;flex-wrap:wrap;gap:5px}
+.terrain-btn{display:flex;align-items:center;gap:6px;min-height:32px;padding:4px 9px;border:1px solid rgba(185,138,62,.32);border-radius:3px;background:rgba(17,12,8,.55);color:var(--parchment);font-family:var(--display);font-size:.58rem;letter-spacing:.09em;text-transform:uppercase;transition:transform .12s,background .15s}
+.terrain-btn .glyph{font-family:var(--serif);font-size:1rem;line-height:1;color:var(--terr,var(--parchment))}
+.terrain-btn:hover{border-color:var(--gold);background:rgba(52,39,26,.8)}
+.terrain-btn[aria-pressed="true"]{border-color:var(--gold);background:linear-gradient(180deg,rgba(185,138,62,.3),rgba(185,138,62,.12));box-shadow:inset 0 0 0 1px rgba(185,138,62,.35)}
+.tools{display:flex;flex-wrap:wrap;gap:5px}
+.hex-select-row{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.hex-select-row label{font-family:var(--display);font-size:.56rem;letter-spacing:.15em;text-transform:uppercase;color:color-mix(in srgb,var(--gold) 62%,var(--parchment))}
+#hexSelect{flex:1;min-width:120px;min-height:32px;padding:4px 8px;background:rgba(20,14,9,.7);border:1px solid rgba(185,138,62,.4);border-radius:3px;color:var(--parchment);font-family:var(--serif);font-size:.9rem}
+.candidates{display:flex;flex-wrap:wrap;gap:4px}
+.cand-btn{width:30px;height:28px;display:grid;place-items:center;border:1px solid rgba(185,138,62,.32);border-radius:3px;background:rgba(17,12,8,.55);color:var(--parchment);font-size:1rem;font-family:var(--serif);transition:background .15s}
+.cand-btn[aria-pressed="true"]{background:linear-gradient(180deg,var(--gold),var(--gold-deep));color:#211507;border-color:var(--gold)}
+.cand-btn:hover{border-color:var(--gold)}
+/* ---------- notes panel ---------- */
+.notes-panel{position:relative;display:flex;flex-direction:column;min-height:0;max-height:calc(58vh + 320px);border-radius:5px;color:var(--ink);
+  background:
+    radial-gradient(120% 90% at 0% 0%,rgba(255,255,255,.4),transparent 45%),
+    radial-gradient(70% 60% at 100% 100%,rgba(101,69,36,.28),transparent 60%),
+    linear-gradient(160deg,var(--parchment) 0%,color-mix(in srgb,var(--parchment) 88%,var(--gold)) 100%);
+  box-shadow:var(--shadow);border:1px solid color-mix(in srgb,var(--ink) 30%,var(--parchment));}
+.notes-panel::before,.notes-panel::after{content:"";position:absolute;pointer-events:none;inset:0;border-radius:5px;
+  background:radial-gradient(12px 8px at 8% 4%,rgba(60,40,18,.18),transparent 70%),radial-gradient(18px 11px at 92% 9%,rgba(60,40,18,.12),transparent 70%),radial-gradient(20px 13px at 12% 96%,rgba(60,40,18,.16),transparent 70%);mix-blend-mode:multiply}
+.notes-head{padding:14px 16px 10px;border-bottom:1px solid rgba(36,27,20,.28);display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.notes-head h2{font-family:var(--display);font-size:1.08rem;letter-spacing:.09em;text-transform:uppercase;color:var(--ink)}
+.notes-head .kicker{font-family:var(--display);font-size:.55rem;letter-spacing:.22em;text-transform:uppercase;color:color-mix(in srgb,var(--ink) 58%,var(--parchment));margin:0 0 3px}
+.liar-meter{text-align:right;font-family:var(--display);font-size:.55rem;letter-spacing:.12em;text-transform:uppercase;color:color-mix(in srgb,var(--ink) 68%,var(--parchment));min-width:92px}
+.liar-meter b{display:block;font-size:1.25rem;letter-spacing:.04em;color:var(--crimson);line-height:1.1}
+.seal-dots{display:flex;gap:4px;justify-content:flex-end;margin-top:3px}
+.seal-dot{width:10px;height:10px;border-radius:50%;border:1px solid rgba(142,51,38,.55);background:transparent}
+.seal-dot.on{background:radial-gradient(circle at 35% 30%,#b8523f,var(--crimson));box-shadow:0 0 5px rgba(142,51,38,.5)}
+.notes-intro{padding:9px 16px 2px;font-size:.82rem;font-style:italic;color:color-mix(in srgb,var(--ink) 78%,var(--parchment));margin:0}
+.clue-list{list-style:none;margin:0;padding:8px 12px 14px;overflow-y:auto;flex:1;min-height:120px;scrollbar-width:thin;scrollbar-color:rgba(36,27,20,.35) transparent}
+.clue-list::-webkit-scrollbar{width:9px}
+.clue-list::-webkit-scrollbar-thumb{background:rgba(36,27,20,.3);border-radius:8px}
+.clue-card{position:relative;display:grid;grid-template-columns:38px 1fr;gap:9px;margin:0 0 8px;padding:9px 10px 8px;background:linear-gradient(165deg,rgba(255,255,255,.34),rgba(255,255,255,.06));border:1px solid rgba(36,27,20,.28);border-radius:2px;box-shadow:0 2px 4px rgba(36,20,9,.15);transform:rotate(var(--tilt,0deg));transition:box-shadow .2s,border-color .2s,background .2s}
+.clue-card:hover{box-shadow:0 4px 10px rgba(36,20,9,.24)}
+.clue-card .num{font-family:var(--display);font-size:.62rem;letter-spacing:.09em;color:color-mix(in srgb,var(--ink) 62%,var(--parchment));border-right:1px solid rgba(36,27,20,.24);padding-right:7px;display:flex;align-items:flex-start;justify-content:flex-end;padding-top:2px}
+.clue-card .note-type{font-family:var(--display);font-size:.5rem;letter-spacing:.16em;text-transform:uppercase;color:color-mix(in srgb,var(--ink) 56%,var(--parchment))}
+.clue-card .claim{font-size:.93rem;line-height:1.28;margin:2px 0 6px;color:var(--ink)}
+.clue-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.lie-btn{font-family:var(--display);font-size:.5rem;letter-spacing:.12em;text-transform:uppercase;padding:4px 8px;border:1px solid rgba(142,51,38,.4);border-radius:2px;background:rgba(255,255,255,.18);color:color-mix(in srgb,var(--crimson) 80%,var(--ink));transition:background .15s}
+.lie-btn:hover{background:rgba(142,51,38,.14);border-color:var(--crimson)}
+.clue-card.is-liar{background:linear-gradient(165deg,rgba(142,51,38,.14),rgba(255,255,255,.06));border-color:rgba(142,51,38,.55)}
+.clue-card.is-liar .lie-btn{background:var(--crimson);color:var(--parchment);border-color:var(--crimson)}
+.clue-card .seal{display:none;position:absolute;top:-8px;right:-6px;width:46px;height:46px;transform:rotate(14deg);filter:drop-shadow(0 3px 4px rgba(0,0,0,.35));pointer-events:none}
+.clue-card.is-liar .seal{display:block;animation:sealbounce .55s cubic-bezier(.2,1.4,.4,1) both}
+.clue-card.support{border-color:var(--gold);box-shadow:0 0 0 2px rgba(185,138,62,.45),0 4px 10px rgba(36,20,9,.2)}
+.clue-card.contradiction{border-color:var(--crimson);animation:redpulse 1.15s ease-in-out infinite}
+.clue-card.contradiction .claim{color:color-mix(in srgb,var(--crimson) 78%,var(--ink))}
+.notes-foot{padding:10px 16px 12px;border-top:1px solid rgba(36,27,20,.25);display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:space-between}
+.notes-foot .small{font-size:.74rem;font-style:italic;color:color-mix(in srgb,var(--ink) 62%,var(--parchment));max-width:26ch}
+/* ---------- colophon / footer ---------- */
+.colophon{display:flex;gap:10px 20px;align-items:center;flex-wrap:wrap;justify-content:space-between;margin-top:16px;padding-top:10px;border-top:1px solid rgba(185,138,62,.22);font-size:.78rem;color:color-mix(in srgb,var(--parchment) 58%,var(--ink))}
+.colophon b{color:color-mix(in srgb,var(--parchment) 84%,var(--ink));font-weight:500}
+.colophon .keys{font-family:var(--display);font-size:.53rem;letter-spacing:.1em;text-transform:uppercase;line-height:1.9}
+kbd{display:inline-block;padding:1px 5px;margin:0 1px;border:1px solid rgba(185,138,62,.35);border-bottom-width:2px;border-radius:3px;background:rgba(0,0,0,.25);color:color-mix(in srgb,var(--parchment) 82%,var(--ink));font-family:var(--display);font-size:.53rem;letter-spacing:.05em}
+/* ---------- self-test ---------- */
+.test-panel{position:fixed;inset:clamp(8px,3vw,44px);z-index:40;display:flex;flex-direction:column;border-radius:6px;color:var(--ink);border:1px solid color-mix(in srgb,var(--ink) 30%,var(--parchment));
+  background:linear-gradient(165deg,var(--parchment),color-mix(in srgb,var(--parchment) 86%,var(--gold)));box-shadow:0 30px 120px rgba(0,0,0,.75);overflow:hidden}
+.test-panel[hidden]{display:none}
+.test-head{display:flex;align-items:center;gap:12px;padding:14px 18px;border-bottom:1px solid rgba(36,27,20,.3);flex-wrap:wrap}
+.test-head h2{font-family:var(--display);font-size:1rem;letter-spacing:.08em;text-transform:uppercase}
+.test-head .spacer{flex:1}
+.test-body{overflow:auto;padding:14px 18px 22px;display:grid;grid-template-columns:minmax(0,1fr) minmax(220px,300px);gap:16px;align-items:start}
+.test-summary{grid-column:1/-1;display:flex;gap:16px;flex-wrap:wrap;align-items:center;padding:10px 12px;border:1px solid rgba(36,27,20,.24);border-radius:3px;background:rgba(255,255,255,.18)}
+.test-summary .big{font-family:var(--display);font-size:1.35rem;letter-spacing:.05em;color:var(--forest)}
+.test-summary .big.bad{color:var(--crimson)}
+.test-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:5px;font-size:.82rem}
+.test-row{display:grid;grid-template-columns:auto auto 1fr;gap:9px;align-items:center;padding:5px 8px;border-bottom:1px solid rgba(36,27,20,.14)}
+.test-row .tier{font-family:var(--display);font-size:.55rem;letter-spacing:.1em;text-transform:uppercase;color:color-mix(in srgb,var(--ink) 60%,var(--parchment))}
+.test-row .verdict{font-family:var(--display);font-size:.55rem;letter-spacing:.1em;padding:2px 6px;border-radius:2px;text-transform:uppercase}
+.test-row .verdict.pass{background:rgba(84,107,61,.22);color:var(--forest);border:1px solid rgba(84,107,61,.4)}
+.test-row .verdict.fail{background:rgba(142,51,38,.18);color:var(--crimson);border:1px solid rgba(142,51,38,.45)}
+.test-row .detail{color:color-mix(in srgb,var(--ink) 62%,var(--parchment));font-size:.72rem;line-height:1.25}
+.test-stats{border:1px solid rgba(36,27,20,.24);border-radius:3px;padding:11px 13px;background:rgba(255,255,255,.16);font-size:.8rem}
+.test-stats h3{font-family:var(--display);font-size:.58rem;letter-spacing:.16em;text-transform:uppercase;margin-bottom:7px;color:color-mix(in srgb,var(--ink) 68%,var(--parchment))}
+.test-stats dl{display:grid;grid-template-columns:1fr auto;gap:2px 10px;margin:0}
+.test-stats dt{color:color-mix(in srgb,var(--ink) 66%,var(--parchment))}
+.test-stats dd{margin:0;text-align:right;font-variant-numeric:tabular-nums}
+.test-progress{grid-column:1/-1;display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:.8rem}
+.test-progress .bar{flex:1;min-width:140px;height:5px;background:rgba(36,27,20,.18);border-radius:4px;overflow:hidden}
+.test-progress .bar i{display:block;height:100%;width:0;background:var(--gold);transition:width .2s}
+.test-note{font-size:.76rem;font-style:italic;color:color-mix(in srgb,var(--ink) 62%,var(--parchment));grid-column:1/-1}
+/* ---------- misc ---------- */
+.empty-atlas{display:grid;place-items:center;height:100%;text-align:center;padding:30px;color:var(--parchment);font-size:.95rem}
+.empty-atlas .sigil{font-size:2.4rem;color:var(--gold);margin-bottom:8px}
+.solved-badge{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(-4deg);z-index:4;padding:14px 26px;border:3px double var(--gold);border-radius:3px;font-family:var(--display);letter-spacing:.18em;text-transform:uppercase;font-size:clamp(.9rem,1.6vw,1.35rem);color:var(--gold);background:rgba(20,14,9,.82);box-shadow:0 0 0 6px rgba(20,14,9,.45),0 20px 60px rgba(0,0,0,.6);animation:stamp .6s cubic-bezier(.2,1.3,.4,1) both;pointer-events:none}
+.solved-badge small{display:block;font-size:.42em;letter-spacing:.22em;color:color-mix(in srgb,var(--parchment) 76%,var(--ink));margin-top:4px}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes sealbounce{0%{opacity:0;transform:scale(.2) rotate(-28deg)}55%{opacity:1;transform:scale(1.18) rotate(9deg)}78%{transform:scale(.94) rotate(12deg)}100%{opacity:1;transform:scale(1) rotate(14deg)}}
+@keyframes redpulse{0%,100%{box-shadow:0 0 0 0 rgba(142,51,38,0);border-color:rgba(142,51,38,.45)}50%{box-shadow:0 0 0 4px rgba(142,51,38,.22);border-color:var(--crimson)}}
+@keyframes stamp{0%{opacity:0;transform:translate(-50%,-50%) scale(1.7) rotate(-10deg)}100%{opacity:1;transform:translate(-50%,-50%) scale(1) rotate(-4deg)}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}}
+/* ---------- responsive ---------- */
+@media (max-width:1240px){.workspace{grid-template-columns:minmax(0,1fr) clamp(300px,30vw,390px)}}
+@media (max-width:1040px){
+  .masthead{grid-template-columns:auto minmax(0,1fr);align-items:start}
+  .mast-actions{grid-column:1/-1;justify-content:flex-start;max-width:none}
+  .workspace{grid-template-columns:1fr}
+  .notes-panel{max-height:none}
+  .clue-list{max-height:48vh}
+  .viewport{height:clamp(360px,56vh,640px)}
+}
+@media (max-width:700px){
+  body{font-size:17px}
+  .titleblock h1{white-space:normal;font-size:clamp(1.5rem,7vw,2.2rem)}
+  .eyebrow{letter-spacing:.18em}
+  .crest{display:none}
+  .deck{grid-template-columns:1fr}
+  .viewport{height:clamp(320px,48vh,520px)}
+  .notes-head{padding:12px 12px 8px}
+  .notes-head h2{font-size:.95rem}
+  .clue-list{padding:8px 9px 12px}
+  .test-body{grid-template-columns:1fr}
+  .colophon{font-size:.72rem}
+}
+@media (max-width:420px){
+  .frame{padding-left:8px;padding-right:8px}
+  .mast-actions{gap:6px}
+  .field input{width:110px}
+  .mast-actions .btn{font-size:.56rem;padding:5px 8px}
+  .titleblock h1{letter-spacing:.03em}
+  .deck{padding:8px}
+  .viewport{height:42vh;min-height:300px}
+  .pill{font-size:.48rem}
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#clueList">Skip to the cartographer&rsquo;s notes</a>
+<div class="frame">
+  <header class="masthead">
+    <div class="crest" aria-hidden="true">✶</div>
+    <div class="titleblock">
+      <p class="eyebrow">The Royal Atlas Commission &middot; Field Notebook <span id="puzzleNo">—</span></p>
+      <h1>Cartographer&rsquo;s <em>Paradox</em></h1>
+      <p class="sub">A hand-inked atlas with unreliable marginalia. <b id="liarBlurb">One note is a lie.</b></p>
+    </div>
+    <div class="mast-actions">
+      <label class="field" for="seedInput">Seed
+        <input id="seedInput" name="seed" type="text" maxlength="48" autocomplete="off" spellcheck="false" value="wandering-coast" aria-describedby="seedHelp">
+      </label>
+      <label class="field" for="tierSelect">Tier
+        <select id="tierSelect" name="tier">
+          <option value="surveyor">Surveyor &middot; R3 &middot; 3 lands &middot; 0 lies</option>
+          <option value="cartographer" selected>Cartographer &middot; R4 &middot; 4 lands &middot; 1 lie</option>
+          <option value="archmage">Archmage &middot; R6 &middot; 5 lands &middot; 2 lies</option>
+        </select>
+      </label>
+      <button class="btn gold" id="btnGenerate" type="button" title="Draw a freshly verified atlas from this seed and tier">Draw Atlas</button>
+      <button class="btn" id="btnTop" type="button" aria-pressed="false" title="Flat top-down view (V)">Top View</button>
+      <button class="btn" id="btnQuality" type="button" aria-pressed="true" title="Toggle rendering quality">Quality: High</button>
+      <button class="btn" id="btnMotion" type="button" aria-pressed="true" title="Toggle atelier animation (M)">Motion: On</button>
+      <button class="btn" id="btnTests" type="button" aria-haspopup="dialog" title="Open the self-test panel (T)">Self-Test</button>
+    </div>
+  </header>
+
+  <main class="workspace">
+    <section class="map-panel" aria-labelledby="mapHeading">
+      <h2 id="mapHeading" class="sr-only">Atlas map and inking tools</h2>
+      <div class="viewport" id="viewport" tabindex="0" role="application"
+        aria-label="Hand-inked hex map. Use arrow keys to move the chosen hex, number keys 1 to 5 to ink the active terrain, P for pencil, E to erase, Enter to apply, H for a hint. Every action is also available in the controls below.">
+        <div id="canvasHost"></div>
+        <div class="hud" aria-hidden="true">
+          <span class="pill">Atlas <b id="hudTier">Cartographer</b></span>
+          <span class="pill">Hex <b id="hudHex">—</b></span>
+          <span class="pill">Lies <b id="hudLies">0 / 1</b></span>
+          <span class="pill">Inked <b id="hudInked">0 / 61</b></span>
+        </div>
+        <div id="webglFallback" class="webgl-fallback" hidden>
+          <div class="sigil" aria-hidden="true">✶</div>
+          <h2>The atelier&rsquo;s lamps are out</h2>
+          <p>WebGL is unavailable here, so the animated atlas cannot be drawn. The puzzle is fully playable with the accessible controls and note cards below.</p>
+          <p id="webglFallbackDetail" class="small"></p>
+        </div>
+        <div id="emptyState" class="empty-atlas" hidden>
+          <div><div class="sigil" aria-hidden="true">✶</div><p>No verified atlas is open. Draw one to begin.</p></div>
+        </div>
+        <div id="genOverlay" class="gen-overlay" hidden>
+          <div class="gen-card" role="status" aria-live="polite">
+            <div class="gen-star" aria-hidden="true">✶</div>
+            <h2 id="genTitle">Drafting the coastline</h2>
+            <p id="genMsg">Ink, salt and probability.</p>
+            <div class="progress" aria-hidden="true"><i id="genProgress"></i></div>
+            <div class="gen-meta" id="genMeta">Draft 1 of 40</div>
+            <div class="gen-actions" id="genActions"></div>
+          </div>
+        </div>
+        <div id="hintBanner" class="hint-banner" hidden>
+          <div class="hint-body">
+            <strong>From the compass</strong>
+            <div id="hintText"></div>
+          </div>
+          <button class="btn tiny" id="hintClose" type="button" aria-label="Dismiss hint">Dismiss</button>
+        </div>
+        <div id="solvedBadge" class="solved-badge" hidden>Atlas Complete<small>The lies are sealed &middot; the land is inked</small></div>
+      </div>
+
+      <div class="deck" aria-label="Inking controls">
+        <div class="deck-group">
+          <div class="deck-label" id="paletteLabel">Terrain inks</div>
+          <div class="palette" role="group" aria-labelledby="paletteLabel" id="palette"></div>
+          <div class="deck-label">Ledger tools</div>
+          <div class="tools" role="group" aria-label="Tools">
+            <button class="btn tiny" id="toolInk" type="button" data-tool="ink" aria-pressed="true" title="Ink terrain (I)">Ink</button>
+            <button class="btn tiny" id="toolPencil" type="button" data-tool="pencil" aria-pressed="false" title="Pencil a candidate (P)">Pencil</button>
+            <button class="btn tiny" id="toolErase" type="button" data-tool="erase" aria-pressed="false" title="Erase ink (E)">Erase</button>
+            <button class="btn tiny" id="btnUndo" type="button" title="Undo (Ctrl/Cmd+Z)">Undo</button>
+            <button class="btn tiny" id="btnRedo" type="button" title="Redo (Ctrl/Cmd+Shift+Z)">Redo</button>
+          </div>
+        </div>
+        <div class="deck-group">
+          <div class="deck-label">Chosen hex</div>
+          <div class="hex-select-row">
+            <label for="hexSelect">Hex</label>
+            <select id="hexSelect" aria-label="Choose a hex by coordinate"></select>
+            <button class="btn tiny" id="btnApply" type="button" title="Apply the active tool to the chosen hex (Enter)">Apply</button>
+          </div>
+          <div class="deck-label" id="candLabel">Pencil candidates</div>
+          <div class="candidates" role="group" aria-labelledby="candLabel" id="candidates"></div>
+          <div class="hex-select-row">
+            <button class="btn tiny gold" id="btnHint" type="button" title="Ask the compass for the next sound deduction (H)">Why? &middot; Hint</button>
+            <button class="btn tiny" id="btnSubmit" type="button" title="Submit the atlas for judgment">Submit Atlas</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <aside class="notes-panel" aria-labelledby="notesHeading">
+      <div class="notes-head">
+        <div>
+          <p class="kicker">The cartographer&rsquo;s</p>
+          <h2 id="notesHeading">Marginalia</h2>
+        </div>
+        <div class="liar-meter">
+          Lies marked
+          <b id="liarMeterText">0 / 1</b>
+          <div class="seal-dots" id="sealDots" aria-hidden="true"></div>
+        </div>
+      </div>
+      <p class="notes-intro" id="notesIntro">Exactly 1 of these notes is false. Seal the liar, then ink the land.</p>
+      <ol class="clue-list" id="clueList" aria-label="Cartographer's notes. Mark exactly the lying notes, then ink every hex.">
+        <li class="clue-card"><span class="num">—</span><div><span class="note-type">Waiting</span><p class="claim">The atlas is being verified&hellip;</p></div></li>
+      </ol>
+      <div class="notes-foot">
+        <span class="small" id="notesProgress">0 of 61 hexes inked.</span>
+        <button class="btn tiny" id="btnClear" type="button" title="Clear all ink, pencil marks and seals">Reset Inks</button>
+      </div>
+    </aside>
+  </main>
+
+  <footer class="colophon">
+    <span>Seed <b id="footSeed">wandering-coast</b> &middot; <span id="footTier">Cartographer</span> &middot; <span id="footClues">— notes</span></span>
+    <span class="keys">
+      <kbd>1</kbd>–<kbd>5</kbd> terrain &middot; <kbd>I</kbd> ink &middot; <kbd>P</kbd> pencil &middot; <kbd>E</kbd> erase &middot;
+      <kbd>↑↓←→</kbd> move hex &middot; <kbd>Enter</kbd> apply &middot; <kbd>H</kbd> hint &middot; <kbd>V</kbd> top view &middot;
+      <kbd>M</kbd> motion &middot; <kbd>Ctrl/⌘ Z</kbd> undo &middot; <kbd>T</kbd> self-test
+    </span>
+  </footer>
+</div>
+
+<div id="live" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
+<p id="seedHelp" class="sr-only">Any word or number is a seed. The same seed and tier always draw the identical verified atlas.</p>
+
+<div id="testPanel" class="test-panel" role="dialog" aria-modal="false" aria-labelledby="testHeading" hidden>
+  <div class="test-head">
+    <h2 id="testHeading">Atelier self-test</h2>
+    <span class="small" style="font-style:italic;color:color-mix(in srgb,var(--ink) 62%,var(--parchment))">30 deterministic seeded atlases &middot; all tiers &middot; pure logic only</span>
+    <span class="spacer"></span>
+    <button class="btn tiny" id="testRun" type="button">Run 30 Cases</button>
+    <button class="btn tiny" id="testClose" type="button" aria-label="Close self-test panel">Close</button>
+  </div>
+  <div class="test-body">
+    <div class="test-progress" id="testProgressWrap" hidden>
+      <span id="testProgressText">Preparing&hellip;</span>
+      <div class="bar"><i id="testProgressBar"></i></div>
+    </div>
+    <div class="test-summary" id="testSummary">
+      <span class="big" id="testVerdict">Not run</span>
+      <span id="testVerdictDetail">Press &ldquo;Run 30 Cases&rdquo; to verify generation, uniqueness, propagation-only solving, hint truth, and determinism.</span>
+    </div>
+    <ul class="test-list" id="testList"></ul>
+    <div class="test-stats">
+      <h3>WebGL renderer.info</h3>
+      <dl id="rendererStats">
+        <dt>Status</dt><dd>—</dd>
+      </dl>
+      <p class="test-note">Stats are a snapshot of the current scene after the latest render; they are not a frame-rate guarantee.</p>
+      <h3 style="margin-top:14px">What is checked</h3>
+      <dl>
+        <dt>30 seeded cases</dt><dd>10 each tier</dd>
+        <dt>Solutions</dt><dd>exactly 1 (capped at 2)</dd>
+        <dt>Deduction</dt><dd>no guessing used</dd>
+        <dt>Hints</dt><dd>agree with solution</dd>
+        <dt>Determinism</dt><dd>same seed = same atlas</dd>
+      </dl>
+    </div>
+  </div>
+</div>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+<script type="module">
+/* ============================================================
+   CARTOGRAPHER'S PARADOX — SINGLE-FILE ATLAS
+   Sections: §1 MODEL/SOLVER/GENERATOR (pure JS, shared with the
+   worker), §2 PALETTE & PROCEDURAL TEXTURES, §3 RENDERER,
+   §4 INPUT, §5 UI, §6 PERSISTENCE, §7 SELF-TEST & BOOT.
+   ============================================================ */
+
+/* §0 — three.js arrives through the import map. A missing CDN or a
+   browser without WebGL leaves the accessible atelier fully playable. */
+let THREE = null, OrbitControls = null, threeError = '';
+try {
+  THREE = await import('three');
+  OrbitControls = (await import('three/addons/controls/OrbitControls.js')).OrbitControls;
+} catch (err) { threeError = String(err && err.message || err); }
+
+
+/*!CP-PURE-BEGIN*/
+/* ============================================================
+   CARTOGRAPHER'S PARADOX — PURE LOGIC (no three.js, no DOM)
+   Exposed as createLogic(); embedded in the HTML and in the
+   solver Web Worker built from a Blob.
+   ============================================================ */
+function createLogic() {
+  'use strict';
+
+  const TERRAINS = [
+    { id: 0, key: 'sea', name: 'Sea', glyph: '≈' },
+    { id: 1, key: 'forest', name: 'Forest', glyph: '♣' },
+    { id: 2, key: 'mountain', name: 'Mountain', glyph: '▲' },
+    { id: 3, key: 'desert', name: 'Desert', glyph: '☼' },
+    { id: 4, key: 'swamp', name: 'Swamp', glyph: '⚘' }
+  ];
+  const TIERS = {
+    surveyor: { key: 'surveyor', name: 'Surveyor', radius: 3, terrainCount: 3, liars: 0, blurb: 'A calm inlet; every note is honest.' },
+    cartographer: { key: 'cartographer', name: 'Cartographer', radius: 4, terrainCount: 4, liars: 1, blurb: 'One margin note is a lie.' },
+    archmage: { key: 'archmage', name: 'Archmage', radius: 6, terrainCount: 5, liars: 2, blurb: 'Two notes cannot be trusted.' }
+  };
+  const TIER_KEYS = ['surveyor', 'cartographer', 'archmage'];
+  const NBR = [[1, 0], [1, -1], [0, -1], [-1, 0], [-1, 1], [0, 1]];
+  const POP = new Uint8Array(32);
+  for (let m = 0; m < 32; m++) { let c = 0; for (let b = 0; b < 5; b++) if (m & (1 << b)) c++; POP[m] = c; }
+  const LSB = new Int8Array(32);
+  for (let b = 0; b < 5; b++) LSB[1 << b] = b;
+  const MAX_GEN_ATTEMPTS = 40;
+  const SEARCH_NODE_CAP = 300000;
+
+  /* ---------------- deterministic RNG ---------------- */
+  function mulberry32(a) {
+    a = a >>> 0;
+    return function () {
+      a = (a + 0x6D2B79F5) | 0;
+      let t = Math.imul(a ^ (a >>> 15), 1 | a);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+  function hashSeed(str) {
+    let h = 2166136261 >>> 0;
+    str = String(str);
+    for (let i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 16777619); }
+    h ^= h >>> 13; h = Math.imul(h, 0x5bd1e995); h ^= h >>> 15;
+    return h >>> 0;
+  }
+  function shuffle(arr, rng) {
+    for (let i = arr.length - 1; i > 0; i--) { const j = (rng() * (i + 1)) | 0; const t = arr[i]; arr[i] = arr[j]; arr[j] = t; }
+    return arr;
+  }
+  function randInt(rng, n) { return (rng() * n) | 0; }
+  function pick(rng, arr) { return arr[randInt(rng, arr.length)]; }
+  function bit(t) { return 1 << t; }
+  function allowedMask(ids) { let m = 0; for (const t of ids) m |= 1 << t; return m; }
+
+  /* ---------------- hex model ---------------- */
+  const gridCache = {};
+  function makeGrid(radius) {
+    const cached = gridCache[radius];
+    if (cached) return cached;
+    const cells = [], index = new Map(), rows = [];
+    for (let r = -radius; r <= radius; r++) {
+      const row = [];
+      const qmin = Math.max(-radius, -r - radius), qmax = Math.min(radius, -r + radius);
+      for (let q = qmin; q <= qmax; q++) {
+        const i = cells.length;
+        cells.push({ i, q, r, row: r, neighbors: [], rowCells: null });
+        index.set(q + ',' + r, i);
+        row.push(i);
+      }
+      rows.push(row);
+    }
+    for (const c of cells) {
+      for (const d of NBR) { const j = index.get((c.q + d[0]) + ',' + (c.r + d[1])); if (j !== undefined) c.neighbors.push(j); }
+    }
+    for (const c of cells) c.rowCells = rows[c.r + radius];
+    const grid = { radius, cellCount: cells.length, cells, rows, index };
+    gridCache[radius] = grid;
+    return grid;
+  }
+  function rowLen(radius, r) { return 2 * radius + 1 - Math.abs(r); }
+  function neighborCount(radius, cellIdx) { return makeGrid(radius).cells[cellIdx].neighbors.length; }
+
+  /* ---------------- map construction ---------------- */
+  function selectTerrains(rng, count) {
+    const rest = [1, 2, 3, 4];
+    shuffle(rest, rng);
+    return [0].concat(rest.slice(0, count - 1));
+  }
+  function buildMap(grid, terrains, rng) {
+    const N = grid.cellCount, base = terrains[0];
+    const map = new Uint8Array(N).fill(base);
+    function eligible() {
+      const out = [];
+      for (let i = 0; i < N; i++) if (map[i] === base) out.push(i);
+      return out;
+    }
+    function grow(terrain, size) {
+      const starts = eligible();
+      if (!starts.length) return 0;
+      const start = starts[randInt(rng, starts.length)];
+      map[start] = terrain;
+      let count = 1;
+      const frontier = [];
+      for (const nb of grid.cells[start].neighbors) if (map[nb] === base) frontier.push(nb);
+      while (count < size && frontier.length) {
+        const j = randInt(rng, frontier.length);
+        const c = frontier[j]; frontier[j] = frontier[frontier.length - 1]; frontier.pop();
+        if (map[c] !== base) continue;
+        map[c] = terrain; count++;
+        for (const nb of grid.cells[c].neighbors) if (map[nb] === base) frontier.push(nb);
+      }
+      return count;
+    }
+    function speckle(terrain, size) {
+      const goals = eligible();
+      shuffle(goals, rng);
+      let placed = 0;
+      for (const c of goals) {
+        if (placed >= size) break;
+        let ok = true;
+        for (const nb of grid.cells[c].neighbors) if (map[nb] === terrain) { ok = false; break; }
+        if (!ok) continue;
+        map[c] = terrain; placed++;
+      }
+      return placed;
+    }
+    const R = grid.radius;
+    const roleCount = terrains.length - 1;
+    if (roleCount >= 1) grow(terrains[1], 3 * R);
+    if (roleCount === 2) speckle(terrains[2], R + 2);
+    else if (roleCount >= 3) {
+      grow(terrains[2], 2 * R + (R >= 5 ? 2 : 0));
+      speckle(terrains[3], R + 1);
+      if (roleCount >= 4) { grow(terrains[4], R + 2); grow(terrains[4], R + 2); }
+    }
+    return map;
+  }
+
+  /* ---------------- true clue derivation ---------------- */
+  function terrainCounts(grid, map, radius, r) {
+    const counts = [0, 0, 0, 0, 0];
+    for (const c of grid.rows[r + radius]) counts[map[c]]++;
+    return counts;
+  }
+  function connectivityInfo(grid, map, terrain) {
+    const R = grid.radius, bitT = bit(terrain);
+    const cells = [];
+    for (let i = 0; i < grid.cellCount; i++) if (map[i] === terrain) cells.push(i);
+    if (!cells.length) return { count: 0, components: 0 };
+    const seen = new Uint8Array(grid.cellCount);
+    let comps = 0;
+    for (const start of cells) {
+      if (seen[start]) continue;
+      comps++; const stack = [start]; seen[start] = 1;
+      while (stack.length) {
+        const c = stack.pop();
+        for (const nb of grid.cells[c].neighbors) if (map[nb] === terrain && !seen[nb]) { seen[nb] = 1; stack.push(nb); }
+      }
+    }
+    return { count: cells.length, components: comps };
+  }
+  function samePairs(grid, map, rng, count) {
+    const byTerrain = new Map();
+    for (let i = 0; i < grid.cellCount; i++) {
+      const t = map[i];
+      if (!byTerrain.has(t)) byTerrain.set(t, []);
+      byTerrain.get(t).push(i);
+    }
+    const pairs = [];
+    const keys = new Set();
+    const groups = [...byTerrain.entries()].filter(e => e[1].length >= 2);
+    shuffle(groups, rng);
+    for (let guard = 0; guard < count * 20 && pairs.length < count && groups.length; guard++) {
+      const g = pick(rng, groups);
+      const a = pick(rng, g[1]); const b = pick(rng, g[1]);
+      if (a === b) continue;
+      const key = Math.min(a, b) + '-' + Math.max(a, b);
+      if (keys.has(key)) continue;
+      keys.add(key); pairs.push([a, b]);
+    }
+    return pairs;
+  }
+  function deriveClues(grid, map, terrains, rng) {
+    const R = grid.radius, clues = [];
+    for (let i = 0; i < grid.cellCount; i++) {
+      for (const t of terrains) {
+        let k = 0;
+        for (const nb of grid.cells[i].neighbors) if (map[nb] === t) k++;
+        clues.push({ type: 1, cell: i, terrain: t, k });
+      }
+    }
+    for (let r = -R; r <= R; r++) {
+      const row = grid.rows[r + R];
+      const counts = terrainCounts(grid, map, R, r);
+      const specCell = row[randInt(rng, row.length)];
+      for (const t of terrains) clues.push({ type: 2, cell: specCell, terrain: t, k: counts[t] });
+    }
+    // One connected region clue and one "no two touch" clue are guaranteed by construction.
+    const mainTerrain = terrains[1];
+    if (connectivityInfo(grid, map, mainTerrain).components === 1) clues.push({ type: 3, terrain: mainTerrain });
+    const base = terrains[0];
+    if (connectivityInfo(grid, map, base).components === 1) clues.push({ type: 3, terrain: base });
+    const sparse = terrains.length === 3 ? terrains[2] : terrains[3];
+    let adjacent = false;
+    for (let i = 0; i < grid.cellCount && !adjacent; i++) if (map[i] === sparse) for (const nb of grid.cells[i].neighbors) if (nb > i && map[nb] === sparse) { adjacent = true; break; }
+    if (!adjacent) clues.push({ type: 4, terrain: sparse });
+    for (const p of samePairs(grid, map, rng, 2 * R + 4)) clues.push({ type: 5, a: p[0], b: p[1] });
+    return clues;
+  }
+
+  /* ---------------- truth of a clue under a complete map ---------------- */
+  function truthOf(grid, clue, map) {
+    if (clue.type === 1) {
+      let k = 0;
+      for (const nb of grid.cells[clue.cell].neighbors) if (map[nb] === clue.terrain) k++;
+      return k === clue.k;
+    }
+    if (clue.type === 2) {
+      const r = grid.cells[clue.cell].r;
+      let k = 0;
+      for (const c of grid.rows[r + grid.radius]) if (map[c] === clue.terrain) k++;
+      return k === clue.k;
+    }
+    if (clue.type === 3) {
+      const info = connectivityInfo(grid, map, clue.terrain);
+      return info.count > 0 && info.components === 1;
+    }
+    if (clue.type === 4) {
+      for (let i = 0; i < grid.cellCount; i++) if (map[i] === clue.terrain) {
+        for (const nb of grid.cells[i].neighbors) if (nb > i && map[nb] === clue.terrain) return false;
+      }
+      return true;
+    }
+    return map[clue.a] === map[clue.b];
+  }
+
+  /* ---------------- state & propagation ---------------- */
+  function makeState(grid, terrains, clueCount, record) {
+    const allowed = allowedMask(terrains);
+    return {
+      dom: new Uint8Array(grid.cellCount).fill(allowed),
+      cl: new Uint8Array(clueCount),
+      rem: record ? new Uint8Array(grid.cellCount * 5) : null,
+      fixed: record ? new Uint8Array(grid.cellCount) : null,
+      trace: record ? [] : null,
+      liars: 0, honest: 0, record, allowed
+    };
+  }
+  function cloneState(st) {
+    return { dom: st.dom.slice(), cl: st.cl.slice(), rem: null, fixed: null, trace: null, liars: st.liars, honest: st.honest, record: false, allowed: st.allowed };
+  }
+  function supportOfCell(st, cell) {
+    if (!st.rem) return [];
+    const out = [];
+    for (let t = 0; t < 5; t++) {
+      const reason = st.rem[cell * 5 + t];
+      if (reason && (st.dom[cell] & bit(t)) === 0 && out.indexOf(reason - 1) < 0) out.push(reason - 1);
+    }
+    return out.slice(0, 5);
+  }
+  function uniqSupport(list) {
+    const out = [];
+    for (const v of list) if (v >= 0 && out.indexOf(v) < 0) out.push(v);
+    return out.slice(0, 6);
+  }
+  function eliminate(st, cell, terrain, reason) {
+    const b = bit(terrain);
+    if (!(st.dom[cell] & b)) return false;
+    if (st.dom[cell] === b) return 'conflict';
+    st.dom[cell] = st.dom[cell] & ~b;
+    if (st.record && st.rem[cell * 5 + terrain] === 0) st.rem[cell * 5 + terrain] = reason;
+    if (st.dom[cell] && POP[st.dom[cell]] === 1 && st.record && !st.fixed[cell]) {
+      st.fixed[cell] = 1;
+      st.trace.push({ kind: 'cell', cell, value: LSB[st.dom[cell]], support: supportOfCell(st, cell) });
+    }
+    return true;
+  }
+  function forceTerrain(st, cell, terrain, reason) {
+    let changed = false;
+    for (const t of TERRAINS) {
+      if (t.id === terrain) continue;
+      const r = eliminate(st, cell, t.id, reason);
+      if (r === 'conflict') return 'conflict';
+      if (r) changed = true;
+    }
+    return changed;
+  }
+  function setClue(st, id, status, why, support) {
+    if (st.cl[id]) return st.cl[id] === status;
+    st.cl[id] = status;
+    if (status === 2) st.liars++; else st.honest++;
+    if (st.record) st.trace.push({ kind: 'clue', id, status, why, support: uniqSupport(support || []) });
+    return true;
+  }
+  function domainsEqual(a, b) { return a === b; }
+
+  function evalClue(grid, clue, st) {
+    const rec = st.record;
+    if (clue.type === 1) {
+      const cell = grid.cells[clue.cell], b = bit(clue.terrain);
+      let min = 0, max = 0; const rem = [], forced = [];
+      for (const nb of cell.neighbors) {
+        const d = st.dom[nb];
+        if (d === b) { min++; forced.push(nb); }
+        if (d & b) max++;
+        else if (rec && st.rem) { const rr = st.rem[nb * 5 + clue.terrain]; if (rr) rem.push(rr - 1); }
+      }
+      if (max < clue.k) return { status: 'F', support: uniqSupport(rem), kind: 'cannot' };
+      if (min > clue.k) return { status: 'F', support: uniqSupport(forced.flatMap(c => supportOfCell(st, c))), kind: 'must' };
+      if (min === max) return { status: 'T', support: uniqSupport(forced.flatMap(c => supportOfCell(st, c)).concat(rem)), kind: 'exact' };
+      return { status: '?', support: [] };
+    }
+    if (clue.type === 2) {
+      const r = grid.cells[clue.cell].r, row = grid.rows[r + grid.radius], b = bit(clue.terrain);
+      let min = 0, max = 0; const rem = [], forced = [];
+      for (const c of row) {
+        const d = st.dom[c];
+        if (d === b) { min++; forced.push(c); }
+        if (d & b) max++;
+        else if (rec && st.rem) { const rr = st.rem[c * 5 + clue.terrain]; if (rr) rem.push(rr - 1); }
+      }
+      if (max < clue.k) return { status: 'F', support: uniqSupport(rem), kind: 'cannot' };
+      if (min > clue.k) return { status: 'F', support: uniqSupport(forced.flatMap(c => supportOfCell(st, c))), kind: 'must' };
+      if (min === max) return { status: 'T', support: uniqSupport(forced.flatMap(c => supportOfCell(st, c)).concat(rem)), kind: 'exact' };
+      return { status: '?', support: [] };
+    }
+    if (clue.type === 3) {
+      const b = bit(clue.terrain), N = grid.cellCount;
+      const isF = new Uint8Array(N), isP = new Uint8Array(N);
+      const F = [], P = [];
+      for (let i = 0; i < N; i++) { const d = st.dom[i]; if (d === b) { isF[i] = 1; F.push(i); } if (d & b) { isP[i] = 1; P.push(i); } }
+      if (!P.length) return { status: 'F', support: [], kind: 'absent' };
+      const comp = new Int16Array(N).fill(-1);
+      let comps = 0;
+      for (const p of P) {
+        if (comp[p] >= 0) continue;
+        comp[p] = comps; const stack = [p];
+        while (stack.length) {
+          const c = stack.pop();
+          for (const nb of grid.cells[c].neighbors) if (isP[nb] && comp[nb] < 0) { comp[nb] = comps; stack.push(nb); }
+        }
+        comps++;
+      }
+      if (F.length) {
+        const fcomps = new Set(F.map(c => comp[c]));
+        if (fcomps.size > 1) return { status: 'F', support: uniqSupport(F.slice(0, 3).flatMap(c => supportOfCell(st, c))), kind: 'split' };
+        // connected F?
+        let fConnected = true;
+        const seenF = new Set([F[0]]), stackF = [F[0]];
+        while (stackF.length) {
+          const c = stackF.pop();
+          for (const nb of grid.cells[c].neighbors) if (isF[nb] && !seenF.has(nb)) { seenF.add(nb); stackF.push(nb); }
+        }
+        if (seenF.size === F.length) {
+          let detached = false;
+          for (const x of P) {
+            if (isF[x]) continue;
+            let adjacent = false;
+            for (const nb of grid.cells[x].neighbors) if (isF[nb]) { adjacent = true; break; }
+            if (!adjacent) { detached = true; break; }
+          }
+          if (!detached) return { status: 'T', support: uniqSupport(F.slice(0, 3).flatMap(c => supportOfCell(st, c))), kind: 'single' };
+        }
+      }
+      return { status: '?', support: [] };
+    }
+    if (clue.type === 4) {
+      const b = bit(clue.terrain); let possible = false, forced = false, support = [];
+      for (let i = 0; i < grid.cellCount; i++) {
+        if (!(st.dom[i] & b)) continue;
+        for (const nb of grid.cells[i].neighbors) {
+          if (nb <= i || !(st.dom[nb] & b)) continue;
+          possible = true;
+          if (st.dom[i] === b && st.dom[nb] === b) { forced = true; support = support.concat(supportOfCell(st, i), supportOfCell(st, nb)); }
+          else if (st.dom[i] === b && st.rem) { const rr = st.rem[nb * 5 + clue.terrain]; if (rr) support.push(rr - 1); }
+          else if (st.dom[nb] === b && st.rem) { const rr = st.rem[i * 5 + clue.terrain]; if (rr) support.push(rr - 1); }
+        }
+      }
+      if (forced) return { status: 'F', support: uniqSupport(support), kind: 'touch' };
+      if (!possible) return { status: 'T', support: uniqSupport(support), kind: 'apart' };
+      return { status: '?', support: [] };
+    }
+    // type 5
+    const da = st.dom[clue.a], db = st.dom[clue.b];
+    if ((da & db) === 0) {
+      const support = [];
+      if (st.rem) {
+        for (let t = 0; t < 5; t++) {
+          if ((da & bit(t)) && !(db & bit(t))) { const rr = st.rem[clue.b * 5 + t]; if (rr) support.push(rr - 1); }
+          if ((db & bit(t)) && !(da & bit(t))) { const rr = st.rem[clue.a * 5 + t]; if (rr) support.push(rr - 1); }
+        }
+      }
+      return { status: 'F', support: uniqSupport(support), kind: 'divide' };
+    }
+    if (da === db && POP[da] === 1) return { status: 'T', support: uniqSupport(supportOfCell(st, clue.a).concat(supportOfCell(st, clue.b))), kind: 'same' };
+    return { status: '?', support: [] };
+  }
+
+  /* ---------------- constraint application ---------------- */
+  function applyHonest(st, grid, clue, id, terrains) {
+    const tb = bit(clue.terrain), rsn = id + 1;
+    if (clue.type === 1 || clue.type === 2) {
+      const scope = clue.type === 1 ? grid.cells[clue.cell].neighbors : grid.rows[grid.cells[clue.cell].r + grid.radius];
+      let min = 0, max = 0;
+      for (const c of scope) { const d = st.dom[c]; if (d === tb) min++; if (d & tb) max++; }
+      if (min > clue.k || max < clue.k) return -1;
+      let changed = 0;
+      if (max === clue.k) for (const c of scope) {
+        if ((st.dom[c] & tb) && st.dom[c] !== tb) {
+          const r = forceTerrain(st, c, clue.terrain, rsn);
+          if (r === 'conflict') return -1; if (r) changed = 1;
+        }
+      }
+      if (min === clue.k) for (const c of scope) {
+        if ((st.dom[c] & tb) && st.dom[c] !== tb) {
+          const r = eliminate(st, c, clue.terrain, rsn);
+          if (r === 'conflict') return -1; if (r) changed = 1;
+        }
+      }
+      return changed;
+    }
+    if (clue.type === 3) {
+      const N = grid.cellCount;
+      const isF = new Uint8Array(N), isP = new Uint8Array(N);
+      let fcount = 0, pcount = 0;
+      for (let i = 0; i < N; i++) { const d = st.dom[i]; if (d === tb) { isF[i] = 1; fcount++; } if (d & tb) { isP[i] = 1; pcount++; } }
+      if (!pcount) return -1;
+      if (!fcount) return 0;
+      const comp = new Int16Array(N).fill(-1);
+      let comps = 0;
+      for (let i = 0; i < N; i++) {
+        if (!isP[i] || comp[i] >= 0) continue;
+        comp[i] = comps; const stack = [i];
+        while (stack.length) {
+          const c = stack.pop();
+          for (const nb of grid.cells[c].neighbors) if (isP[nb] && comp[nb] < 0) { comp[nb] = comps; stack.push(nb); }
+        }
+        comps++;
+      }
+      const fcomps = new Set();
+      for (let i = 0; i < N; i++) if (isF[i]) fcomps.add(comp[i]);
+      if (fcomps.size > 1) return -1;
+      let mainComp = -1;
+      for (let i = 0; i < N; i++) if (isF[i]) { mainComp = comp[i]; break; }
+      let changed = 0;
+      for (let i = 0; i < N; i++) {
+        if (isP[i] && !isF[i] && comp[i] !== mainComp) {
+          const r = eliminate(st, i, clue.terrain, rsn);
+          if (r === 'conflict') return -1; if (r) changed = 1;
+        }
+      }
+      return changed;
+    }
+    if (clue.type === 4) {
+      let changed = 0;
+      for (let i = 0; i < grid.cellCount; i++) {
+        if (st.dom[i] !== tb) continue;
+        for (const nb of grid.cells[i].neighbors) {
+          const r = eliminate(st, nb, clue.terrain, rsn);
+          if (r === 'conflict') return -1; if (r) changed = 1;
+        }
+      }
+      return changed;
+    }
+    // same-terrain pair
+    const da = st.dom[clue.a], db = st.dom[clue.b];
+    const inter = da & db;
+    if (!inter) return -1;
+    let changed = 0;
+    for (let t = 0; t < 5; t++) {
+      const b = bit(t);
+      if (!(inter & b)) {
+        if (da & b) { const r = eliminate(st, clue.a, t, rsn); if (r === 'conflict') return -1; if (r) changed = 1; }
+        if (db & b) { const r = eliminate(st, clue.b, t, rsn); if (r === 'conflict') return -1; if (r) changed = 1; }
+      }
+    }
+    return changed;
+  }
+
+  function applyLiar(st, grid, clue, id) {
+    const tb = bit(clue.terrain), rsn = id + 1;
+    if (clue.type === 1 || clue.type === 2) {
+      const scope = clue.type === 1 ? grid.cells[clue.cell].neighbors : grid.rows[grid.cells[clue.cell].r + grid.radius];
+      let min = 0, max = 0;
+      const undecided = [];
+      for (const c of scope) {
+        const d = st.dom[c];
+        if (d === tb) min++; else if (d & tb) undecided.push(c);
+        if (d & tb) max++;
+      }
+      if (min === clue.k && max === clue.k) return -1;          // statement would always be true
+      if (min === clue.k) {                                      // count must exceed k
+        if (!undecided.length) return -1;
+        if (undecided.length === 1) {
+          const r = forceTerrain(st, undecided[0], clue.terrain, rsn);
+          if (r === 'conflict') return -1; if (r) return 1;
+        }
+        return 0;
+      }
+      if (max === clue.k) {                                      // count must stay below k
+        if (undecided.length === 1) {
+          const r = eliminate(st, undecided[0], clue.terrain, rsn);
+          if (r === 'conflict') return -1; if (r) return 1;
+        }
+        return 0;
+      }
+      return 0;
+    }
+    if (clue.type === 3) {
+      const N = grid.cellCount;
+      let fcount = 0, pcount = 0;
+      const comp = new Int16Array(N).fill(-1);
+      for (let i = 0; i < N; i++) { const d = st.dom[i]; if (d === tb) fcount++; if (d & tb) pcount++; }
+      if (!pcount) return 0; // absent -> statement false, constraint satisfied
+      if (!fcount) return 0;
+      const isP = new Uint8Array(N);
+      for (let i = 0; i < N; i++) if (st.dom[i] & tb) isP[i] = 1;
+      let comps = 0;
+      for (let i = 0; i < N; i++) {
+        if (!isP[i] || comp[i] >= 0) continue;
+        comp[i] = comps; const stack = [i];
+        while (stack.length) {
+          const c = stack.pop();
+          for (const nb of grid.cells[c].neighbors) if (isP[nb] && comp[nb] < 0) { comp[nb] = comps; stack.push(nb); }
+        }
+        comps++;
+      }
+      const fcomps = new Set();
+      for (let i = 0; i < N; i++) if (st.dom[i] === tb) fcomps.add(comp[i]);
+      if (fcomps.size > 1) return 0; // already false
+      // forced complement of the single forced region is already true? (detect truth)
+      const ev = evalClueStatus(grid, clue, st);
+      if (ev === 'T') return -1;
+      return 0;
+    }
+    if (clue.type === 4) {
+      const pairs = [];
+      for (let i = 0; i < grid.cellCount; i++) {
+        if (!(st.dom[i] & tb)) continue;
+        for (const nb of grid.cells[i].neighbors) if (nb > i && (st.dom[nb] & tb)) pairs.push([i, nb]);
+      }
+      if (!pairs.length) return -1;
+      let forced = false;
+      for (const p of pairs) if (st.dom[p[0]] === tb && st.dom[p[1]] === tb) forced = true;
+      if (forced) return 0;
+      if (pairs.length === 1) {
+        let changed = 0;
+        for (const c of pairs[0]) {
+          const r = forceTerrain(st, c, clue.terrain, rsn);
+          if (r === 'conflict') return -1; if (r) changed = 1;
+        }
+        return changed;
+      }
+      return 0;
+    }
+    // differing terrains
+    const common = st.dom[clue.a] & st.dom[clue.b];
+    if (!common) return 0;
+    let changed = 0;
+    for (let t = 0; t < 5; t++) {
+      if (!(common & bit(t))) continue;
+      if (st.dom[clue.a] & bit(t)) { const r = eliminate(st, clue.a, t, rsn); if (r === 'conflict') return -1; if (r) changed = 1; }
+      if (st.dom[clue.b] & bit(t)) { const r = eliminate(st, clue.b, t, rsn); if (r === 'conflict') return -1; if (r) changed = 1; }
+    }
+    return changed;
+  }
+
+  function evalClueStatus(grid, clue, st) {
+    return evalClue(grid, clue, st).status;
+  }
+
+  function propagate(st, puzzle, grid) {
+    const clues = puzzle.clues, n = clues.length, L = puzzle.liarCount;
+    let changed = true, guard = 0;
+    while (changed && guard++ < 300) {
+      changed = false;
+      for (let i = 0; i < n; i++) {
+        const ev = evalClue(grid, clues[i], st);
+        if (st.cl[i]) {
+          if (st.cl[i] === 1 && ev.status === 'F') return false;
+          if (st.cl[i] === 2 && ev.status === 'T') return false;
+          continue;
+        }
+        if (ev.status === 'T') { setClue(st, i, 1, 'provable', ev.support); changed = true; }
+        else if (ev.status === 'F') { setClue(st, i, 2, 'impossible', ev.support); changed = true; }
+      }
+      if (st.liars > L || st.honest > n - L) return false;
+      if (st.liars === L) {
+        for (let i = 0; i < n; i++) if (!st.cl[i]) { setClue(st, i, 1, 'liarBudget', []); changed = true; }
+      } else if (st.honest === n - L) {
+        for (let i = 0; i < n; i++) if (!st.cl[i]) { setClue(st, i, 2, 'honestBudget', []); changed = true; }
+      }
+      for (let i = 0; i < n; i++) {
+        if (!st.cl[i]) continue;
+        const r = st.cl[i] === 1 ? applyHonest(st, grid, clues[i], i, puzzle.terrainIds) : applyLiar(st, grid, clues[i], i);
+        if (r === -1) return false;
+        if (r) changed = true;
+      }
+      if (st.liars > L || st.honest > n - L) return false;
+    }
+    return true;
+  }
+
+  function allFixed(st) {
+    for (let i = 0; i < st.dom.length; i++) if (POP[st.dom[i]] !== 1) return false;
+    return true;
+  }
+  function extractMap(st) {
+    const map = new Uint8Array(st.dom.length);
+    for (let i = 0; i < map.length; i++) map[i] = LSB[st.dom[i]];
+    return map;
+  }
+  function evaluateMap(grid, clues, map) {
+    const liarFlags = new Uint8Array(clues.length);
+    let falseCount = 0;
+    for (let i = 0; i < clues.length; i++) { const ok = truthOf(grid, clues[i], map); if (!ok) { liarFlags[i] = 1; falseCount++; } }
+    return { liarFlags, falseCount };
+  }
+
+  /* ---------------- propagation-only deduction solver ---------------- */
+  function solveDeduction(puzzle, record) {
+    const grid = makeGrid(puzzle.radius);
+    const st = makeState(grid, puzzle.terrainIds, puzzle.clues.length, record !== false);
+    const consistent = propagate(st, puzzle, grid);
+    if (!consistent) return { solved: false, consistent: false, state: st, trace: st.trace || [], map: null, liarFlags: null };
+    const fixed = allFixed(st);
+    let map = null, liarFlags = null;
+    if (fixed) {
+      map = extractMap(st);
+      const ev = evaluateMap(grid, puzzle.clues, map);
+      liarFlags = ev.liarFlags;
+      if (ev.falseCount !== puzzle.liarCount) return { solved: false, consistent: false, state: st, trace: st.trace || [], map, liarFlags, badCount: ev.falseCount };
+    }
+    return { solved: fixed, consistent: true, state: st, trace: st.trace || [], map, liarFlags };
+  }
+
+  /* ---------------- complete backtracking solver (count up to limit) ---------------- */
+  function countSolutions(puzzle, limit) {
+    limit = limit || 2;
+    const grid = makeGrid(puzzle.radius);
+    const root = makeState(grid, puzzle.terrainIds, puzzle.clues.length, false);
+    if (!propagate(root, puzzle, grid)) return { count: 0, solutions: [], aborted: false };
+    const solutions = [];
+    let nodes = 0;
+    function leaf(st) {
+      nodes++;
+      if (solutions.length >= limit) return;
+      const map = extractMap(st);
+      const ev = evaluateMap(grid, puzzle.clues, map);
+      if (ev.falseCount !== puzzle.liarCount) return;
+      for (let i = 0; i < puzzle.clues.length; i++) {
+        if (st.cl[i] === 1 && ev.liarFlags[i]) return;
+        if (st.cl[i] === 2 && !ev.liarFlags[i]) return;
+      }
+      solutions.push({ map: Array.from(map), liarFlags: Array.from(ev.liarFlags) });
+    }
+    function dfs(st) {
+      if (solutions.length >= limit) return;
+      if (nodes > SEARCH_NODE_CAP) return;
+      if (allFixed(st)) { leaf(st); return; }
+      let best = -1, bestSize = 99;
+      for (let i = 0; i < st.dom.length; i++) {
+        const sz = POP[st.dom[i]];
+        if (sz > 1 && sz < bestSize) { bestSize = sz; best = i; }
+      }
+      if (best < 0) { leaf(st); return; }
+      const allowed = puzzle.terrainIds;
+      for (const t of allowed) {
+        if (!(st.dom[best] & bit(t))) continue;
+        const copy = cloneState(st);
+        const r = forceTerrain(copy, best, t, 0);
+        if (r === 'conflict') continue;
+        if (!propagate(copy, puzzle, grid)) continue;
+        dfs(copy);
+        if (solutions.length >= limit || nodes > SEARCH_NODE_CAP) return;
+      }
+    }
+    dfs(root);
+    return { count: solutions.length, solutions, aborted: nodes > SEARCH_NODE_CAP };
+  }
+
+  /* ---------------- puzzle assembly, lying notes, pruning ---------------- */
+  function mapCounts(grid, map) {
+    const counts = [0, 0, 0, 0, 0];
+    for (let i = 0; i < grid.cellCount; i++) counts[map[i]]++;
+    return counts;
+  }
+  function mapLooksValid(grid, map, terrains) {
+    const counts = mapCounts(grid, map);
+    for (const t of terrains) if (!counts[t]) return false;
+    const main = terrains[1];
+    if (!main || connectivityInfo(grid, map, main).components !== 1) return false;
+    const sparse = terrains.length === 3 ? terrains[2] : terrains[3];
+    for (let i = 0; i < grid.cellCount; i++) {
+      if (map[i] !== sparse) continue;
+      for (const nb of grid.cells[i].neighbors) if (nb > i && map[nb] === sparse) return false;
+    }
+    return true;
+  }
+  function injectLies(clues, grid, rng, liars) {
+    const type1 = [], type2 = [];
+    for (let i = 0; i < clues.length; i++) {
+      const c = clues[i];
+      if (c.type === 1 && grid.cells[c.cell].neighbors.length < 6) type1.push(i);
+      else if (c.type === 2) type2.push(i);
+    }
+    shuffle(type1, rng); shuffle(type2, rng);
+    const picks = [];
+    let a = -1, b = -1;
+    if (type1.length) a = type1[0]; else if (type2.length) a = type2[0];
+    if (liars >= 1) { if (a < 0) return null; picks.push(a); }
+    if (liars >= 2) {
+      const usedType1 = a >= 0 && clues[a].type === 1;
+      if (usedType1) { if (type2.length) b = type2[0]; else if (type1.length > 1) b = type1[1]; }
+      else { if (type1.length) b = type1[0]; else if (type2.length > 1) b = type2[1]; }
+      if (b < 0 || picks.indexOf(b) >= 0) return null;
+      picks.push(b);
+    }
+    for (const idx of picks) {
+      const c = clues[idx];
+      if (c.type === 1) {
+        const n = grid.cells[c.cell].neighbors.length;
+        clues[idx] = { type: 1, cell: c.cell, terrain: c.terrain, k: n + 1 + randInt(rng, 6 - n) };
+      } else {
+        const m = grid.rows[grid.cells[c.cell].r + grid.radius].length;
+        clues[idx] = { type: 2, cell: c.cell, terrain: c.terrain, k: m + 1 + randInt(rng, 4) };
+      }
+    }
+    return picks;
+  }
+  function finalisePuzzle(meta, clues, map, grid) {
+    const liarSet = [];
+    for (let i = 0; i < clues.length; i++) if (!truthOf(grid, clues[i], map)) liarSet.push(i);
+    const puzzle = {
+      seed: meta.seed, seedNum: meta.seedNum, tierKey: meta.tierKey, radius: meta.radius,
+      terrainIds: meta.terrainIds, liarCount: meta.liarCount, clues, liarSet, map
+    };
+    return puzzle;
+  }
+  function subsetPuzzle(puzzle, keep) {
+    const n = puzzle.clues.length;
+    const indexMap = new Int32Array(n).fill(-1);
+    const clues = [];
+    for (let ni = 0; ni < keep.length; ni++) { const old = keep[ni]; indexMap[old] = ni; clues.push(puzzle.clues[old]); }
+    const liarSet = [];
+    for (const old of puzzle.liarSet) {
+      if (indexMap[old] < 0) return null;
+      liarSet.push(indexMap[old]);
+    }
+    if (liarSet.length !== puzzle.liarCount) return null;
+    return Object.assign({}, puzzle, { clues, liarSet });
+  }
+  function reasonMinimize(puzzle, grid) {
+    let cur = puzzle;
+    for (let iter = 0; iter < 10; iter++) {
+      const ded = solveDeduction(cur, true);
+      if (!ded.solved) return null;
+      const used = new Set(cur.liarSet);
+      // Keep at least one clue of each of the rarer types so every atlas teaches all five note forms.
+      for (const want of [3, 4, 5]) {
+        for (let i = 0; i < cur.clues.length; i++) if (cur.clues[i].type === want) { used.add(i); break; }
+      }
+      for (const tr of ded.trace) if (tr.support) for (const s of tr.support) used.add(s);
+      const keep = [];
+      for (let i = 0; i < cur.clues.length; i++) if (used.has(i)) keep.push(i);
+      if (keep.length === cur.clues.length) break;
+      const next = subsetPuzzle(cur, keep);
+      if (!next) break;
+      if (!solveDeduction(next, false).solved) break;
+      cur = next;
+    }
+    return cur;
+  }
+  function greedyMinimize(puzzle, grid, rng) {
+    let cur = puzzle;
+    for (let pass = 0; pass < 3; pass++) {
+      const counts = [0, 0, 0, 0, 0, 0];
+      for (const c of cur.clues) counts[c.type]++;
+      const order = [];
+      for (let i = 0; i < cur.clues.length; i++) if (cur.liarSet.indexOf(i) < 0) order.push(i);
+      shuffle(order, rng);
+      order.sort((a, b) => b - a);
+      let changed = false;
+      for (const i of order) {
+        if (i >= cur.clues.length) continue;
+        if (cur.liarSet.indexOf(i) >= 0) continue;
+        const c = cur.clues[i];
+        if (counts[c.type] <= 1) continue;
+        const keep = [];
+        for (let k = 0; k < cur.clues.length; k++) if (k !== i) keep.push(k);
+        const next = subsetPuzzle(cur, keep);
+        if (!next) continue;
+        if (solveDeduction(next, false).solved) { cur = next; counts[c.type]--; changed = true; }
+      }
+      if (!changed) break;
+    }
+    return cur;
+  }
+  function minimizePuzzle(puzzle, grid, seedNum) {
+    let cur = reasonMinimize(puzzle, grid);
+    if (!cur) return null;
+    const rng = mulberry32((seedNum ^ 0xA53C9E1D) >>> 0);
+    cur = greedyMinimize(cur, grid, rng);
+    const ded = solveDeduction(cur, false);
+    if (!ded.solved) return null;
+    const uniq = countSolutions(cur, 2);
+    if (uniq.count !== 1 || uniq.aborted) return null;
+    return cur;
+  }
+  function buildAttempt(seedStr, seedNum, tier, attempt) {
+    const rng = mulberry32((seedNum ^ Math.imul(attempt + 1, 0x9E3779B1)) >>> 0);
+    const grid = makeGrid(tier.radius);
+    const terrains = selectTerrains(rng, tier.terrainCount);
+    const map = buildMap(grid, terrains, rng);
+    if (!mapLooksValid(grid, map, terrains)) return { fail: 'shape' };
+    const clues = deriveClues(grid, map, terrains, rng);
+    if (!injectLies(clues, grid, rng, tier.liars)) return { fail: 'lies' };
+    shuffle(clues, rng);
+    const meta = { seed: seedStr, seedNum, tierKey: tier.key, radius: tier.radius, terrainIds: terrains.slice(), liarCount: tier.liars };
+    const puzzle = finalisePuzzle(meta, clues, map, grid);
+    if (puzzle.liarSet.length !== tier.liars) return { fail: 'false-count' };
+    if (!solveDeduction(puzzle, false).solved) return { fail: 'deduction' };
+    const uniq = countSolutions(puzzle, 2);
+    if (uniq.count !== 1 || uniq.aborted) return { fail: 'unique-' + uniq.count };
+    const minimised = minimizePuzzle(puzzle, grid, seedNum);
+    if (!minimised) return { fail: 'minimise' };
+    if (!solveDeduction(minimised, false).solved) return { fail: 'final-deduction' };
+    const finalUniq = countSolutions(minimised, 2);
+    if (finalUniq.count !== 1 || finalUniq.aborted) return { fail: 'final-unique-' + finalUniq.count };
+    return { puzzle: minimised };
+  }
+  function generate(seedStr, tierKey, opts) {
+    const tier = TIERS[tierKey];
+    if (!tier) return { ok: false, reason: 'Unknown tier.' };
+    const progress = (opts && opts.onProgress) || function () {};
+    const seedNum = hashSeed(String(seedStr) + '|' + tierKey);
+    let lastFail = 'draft';
+    for (let attempt = 0; attempt < MAX_GEN_ATTEMPTS; attempt++) {
+      progress({ attempt: attempt + 1, max: MAX_GEN_ATTEMPTS, stage: 'draft' });
+      const result = buildAttempt(String(seedStr), seedNum, tier, attempt);
+      if (result && result.puzzle) return { ok: true, puzzle: result.puzzle, attempts: attempt + 1 };
+      lastFail = (result && result.fail) || 'shape';
+      progress({ attempt: attempt + 1, max: MAX_GEN_ATTEMPTS, stage: 'retry', fail: lastFail });
+    }
+    return { ok: false, attempts: MAX_GEN_ATTEMPTS, reason: 'No verified atlas after ' + MAX_GEN_ATTEMPTS + ' drafts (' + lastFail + '). Try another seed.' };
+  }
+
+  /* ---------------- readable clue text ---------------- */
+  function terrainName(id) { return TERRAINS[id].name; }
+  function hexText(grid, cell) { const c = grid.cells[cell]; return '(' + c.q + ', ' + c.r + ')'; }
+  function cellsForClue(puzzle, i) {
+    const grid = makeGrid(puzzle.radius), c = puzzle.clues[i];
+    if (c.type === 1) return [c.cell].concat(grid.cells[c.cell].neighbors);
+    if (c.type === 2) return grid.rows[grid.cells[c.cell].r + grid.radius].slice();
+    if (c.type === 5) return [c.a, c.b];
+    return [];
+  }
+  function describeClue(puzzle, i) {
+    const grid = makeGrid(puzzle.radius), c = puzzle.clues[i];
+    if (c.type === 1) return 'Exactly ' + c.k + ' neighbouring hex' + (c.k === 1 ? '' : 'es') + ' of hex ' + hexText(grid, c.cell) + ' are ' + terrainName(c.terrain) + '.';
+    if (c.type === 2) return 'The row of hex ' + hexText(grid, c.cell) + ' holds exactly ' + c.k + ' ' + terrainName(c.terrain) + ' tile' + (c.k === 1 ? '' : 's') + '.';
+    if (c.type === 3) return 'Every ' + terrainName(c.terrain) + ' tile lies in a single connected region.';
+    if (c.type === 4) return 'No two ' + terrainName(c.terrain) + ' tiles touch.';
+    return 'Hex ' + hexText(grid, c.a) + ' and hex ' + hexText(grid, c.b) + ' share the same terrain.';
+  }
+  function actualText(puzzle, i, map) {
+    const grid = makeGrid(puzzle.radius), c = puzzle.clues[i];
+    if (c.type === 1) {
+      let k = 0; for (const nb of grid.cells[c.cell].neighbors) if (map[nb] === c.terrain) k++;
+      return 'that neighbourhood holds ' + k + ' ' + terrainName(c.terrain) + ' tile' + (k === 1 ? '' : 's');
+    }
+    if (c.type === 2) {
+      let k = 0; for (const x of grid.rows[grid.cells[c.cell].r + grid.radius]) if (map[x] === c.terrain) k++;
+      return 'that row holds ' + k + ' ' + terrainName(c.terrain) + ' tile' + (k === 1 ? '' : 's');
+    }
+    if (c.type === 3) {
+      const info = connectivityInfo(grid, map, c.terrain);
+      return info.count ? 'the ' + terrainName(c.terrain) + ' tiles form ' + info.components + ' separate region' + (info.components === 1 ? '' : 's') : 'there is no ' + terrainName(c.terrain) + ' at all';
+    }
+    if (c.type === 4) {
+      for (let x = 0; x < grid.cellCount; x++) if (map[x] === c.terrain) for (const nb of grid.cells[x].neighbors) if (nb > x && map[nb] === c.terrain) return 'hex ' + hexText(grid, x) + ' and hex ' + hexText(grid, nb) + ' both hold ' + terrainName(c.terrain);
+      return 'no ' + terrainName(c.terrain) + ' tiles touch';
+    }
+    const ta = terrainName(map[c.a]), tb = terrainName(map[c.b]);
+    return 'they hold ' + ta + ' and ' + tb;
+  }
+
+  /* ---------------- live contradiction analysis ---------------- */
+  function analyse(puzzle, player) {
+    const grid = makeGrid(puzzle.radius), terrains = puzzle.terrainIds;
+    const allowed = allowedMask(terrains);
+    const n = puzzle.clues.length, L = puzzle.liarCount;
+    const dom = new Uint8Array(grid.cellCount);
+    for (let i = 0; i < grid.cellCount; i++) dom[i] = player.assignment[i] >= 0 ? bit(player.assignment[i]) : allowed;
+    let flagged = 0;
+    for (let i = 0; i < n; i++) if (player.liarFlags[i]) flagged++;
+    const st = { dom, cl: new Uint8Array(n), rem: null, fixed: null, trace: null, liars: 0, honest: 0, record: false, allowed };
+    const badSeals = [], forcedFalse = [];
+    for (let i = 0; i < n; i++) {
+      const ev = evalClue(grid, puzzle.clues[i], st);
+      if (player.liarFlags[i] && ev.status === 'T') badSeals.push(i);
+      else if (!player.liarFlags[i] && ev.status === 'F') forcedFalse.push(i);
+    }
+    // A false unsealed note is only a contradiction once the lie budget is used up
+    // (or already exceeded); before that it may simply be one of the required lies.
+    const tooManyFalse = flagged + forcedFalse.length > L;
+    const violations = badSeals.slice();
+    if (tooManyFalse) for (const i of forcedFalse) if (violations.indexOf(i) < 0) violations.push(i);
+    const cells = [];
+    for (const i of violations) for (const c of cellsForClue(puzzle, i)) if (cells.indexOf(c) < 0) cells.push(c);
+    let message;
+    if (flagged > L) message = 'Too many lies marked: ' + flagged + ' of ' + L + '.';
+    else if (badSeals.length) message = 'Note ' + (badSeals[0] + 1) + ' is sealed as a lie, but your inks force it true: ' + describeClue(puzzle, badSeals[0]);
+    else if (tooManyFalse) message = flagged + ' of ' + L + ' lies sealed, yet note ' + (forcedFalse[0] + 1) + ' is also forced false: ' + describeClue(puzzle, forcedFalse[0]);
+    else message = 'No visible contradiction. ' + flagged + ' of ' + L + ' lies marked.';
+    return { ok: flagged <= L && !badSeals.length && !tooManyFalse, violations, cells, flagged, message };
+  }
+
+  /* ---------------- hint from the propagation solver ---------------- */
+  function getHint(puzzle, player) {
+    const ded = solveDeduction(puzzle, true);
+    if (!ded.solved) return { ok: false, reason: 'This atlas cannot be deduced note by note.' };
+    const flagged = player ? player.liarFlags : null;
+    const assign = player ? player.assignment : null;
+    for (const tr of ded.trace) {
+      if (tr.kind === 'clue') {
+        if (tr.status === 2 && (!flagged || !flagged[tr.id])) return { ok: true, kind: 'clue', clue: tr.id, status: 2, why: tr.why, support: tr.support || [] };
+        if (tr.status === 1 && flagged && flagged[tr.id]) return { ok: true, kind: 'clue', clue: tr.id, status: 1, why: tr.why, support: tr.support || [] };
+      } else if (tr.kind === 'cell') {
+        if (!assign || assign[tr.cell] !== tr.value) return { ok: true, kind: 'cell', cell: tr.cell, value: tr.value, support: tr.support || [] };
+      }
+    }
+    return { ok: false, reason: 'The clues agree with your work — every forced deduction is already reflected.' };
+  }
+
+  /* ---------------- submission validation ---------------- */
+  function validate(puzzle, assignment, liarFlags) {
+    const grid = makeGrid(puzzle.radius), n = puzzle.clues.length, L = puzzle.liarCount;
+    for (let i = 0; i < grid.cellCount; i++) if (assignment[i] < 0) return { ok: false, stage: 'incomplete', message: 'Every hex must be inked before the map can be judged.' };
+    let flagged = 0;
+    for (let i = 0; i < n; i++) if (liarFlags[i]) flagged++;
+    if (flagged !== L) return { ok: false, stage: 'liars', message: 'Exactly ' + L + ' note' + (L === 1 ? '' : 's') + ' must be marked as lies; you have marked ' + flagged + '.' };
+    const map = new Uint8Array(grid.cellCount);
+    for (let i = 0; i < grid.cellCount; i++) map[i] = assignment[i];
+    let falseCount = 0;
+    for (let i = 0; i < n; i++) {
+      const truth = truthOf(grid, puzzle.clues[i], map);
+      if (!truth) falseCount++;
+      if (liarFlags[i] && truth) return { ok: false, stage: 'clue', clue: i, message: 'Note ' + (i + 1) + ' is marked as a lie, but it is true: ' + describeClue(puzzle, i) + ' On your map, ' + actualText(puzzle, i, map) + '.' };
+      if (!liarFlags[i] && !truth) return { ok: false, stage: 'clue', clue: i, message: 'Note ' + (i + 1) + ' is not marked as a lie, but it is false. It claims: ' + describeClue(puzzle, i) + ' On your map, ' + actualText(puzzle, i, map) + '.' };
+    }
+    if (falseCount !== L) return { ok: false, stage: 'clue', message: 'The map must make exactly ' + L + ' notes false; this one makes ' + falseCount + '.' };
+    return { ok: true, message: 'The atlas is complete. Every honest note agrees and exactly ' + L + ' lie' + (L === 1 ? '' : 's') + ' are sealed.' };
+  }
+
+  /* ---------------- deterministic serialisation ---------------- */
+  function serializePuzzle(puzzle) {
+    return JSON.stringify({
+      seed: puzzle.seed, tierKey: puzzle.tierKey, terrainIds: puzzle.terrainIds, radius: puzzle.radius,
+      liarCount: puzzle.liarCount, clues: puzzle.clues, liarSet: puzzle.liarSet, map: Array.from(puzzle.map)
+    });
+  }
+
+  /* ---------------- built-in 30-case self-test suite ---------------- */
+  const SELF_TEST_CASES = [];
+  for (let i = 0; i < 30; i++) SELF_TEST_CASES.push({ seed: 'atlas-seed-' + (101 + i * 37), tier: TIER_KEYS[i % 3] });
+  function runSelfTests(onProgress) {
+    const progress = onProgress || function () {};
+    const results = [];
+    for (let ci = 0; ci < SELF_TEST_CASES.length; ci++) {
+      const tc = SELF_TEST_CASES[ci];
+      progress({ index: ci, total: SELF_TEST_CASES.length, seed: tc.seed, tier: tc.tier });
+      const result = { seed: tc.seed, tier: tc.tier, checks: [], ok: true };
+      function check(name, pass, detail) { result.checks.push({ name, pass: !!pass, detail: detail || '' }); if (!pass) result.ok = false; }
+      const gen = generate(tc.seed, tc.tier);
+      check('generation', gen.ok, gen.ok ? 'verified after ' + gen.attempts + ' draft(s), ' + gen.puzzle.clues.length + ' notes' : gen.reason);
+      if (!gen.ok) { results.push(result); continue; }
+      const puzzle = gen.puzzle;
+      const grid = makeGrid(puzzle.radius);
+      const uniq = countSolutions(puzzle, 2);
+      check('unique solution (capped at 2)', uniq.count === 1 && !uniq.aborted, 'solutions=' + uniq.count + (uniq.aborted ? ' (search cap)' : ''));
+      const ded = solveDeduction(puzzle, true);
+      check('propagation-only complete', ded.solved, ded.solved ? 'all hexes and liars deduced' : 'stalled');
+      const map = ded.map;
+      const mapMatch = map && map.every((v, i) => v === puzzle.map[i]);
+      check('deduced map matches', mapMatch, '');
+      let liarsMatch = ded.solved;
+      let deducedLiars = 0;
+      if (liarsMatch) for (let i = 0; i < puzzle.clues.length; i++) {
+        const isLiar = puzzle.liarSet.indexOf(i) >= 0;
+        if (ded.liarFlags[i]) deducedLiars++;
+        if (!!ded.liarFlags[i] !== isLiar) { liarsMatch = false; break; }
+      }
+      if (liarsMatch) liarsMatch = deducedLiars === puzzle.liarSet.length;
+      check('deduced liars match', liarsMatch, 'exactly ' + puzzle.liarSet.length + ' false notes');
+      let hintsOk = true, hintCount = 0;
+      if (ded.solved) {
+        for (const tr of ded.trace) {
+          hintCount++;
+          if (tr.kind === 'cell' && tr.value !== puzzle.map[tr.cell]) { hintsOk = false; break; }
+          if (tr.kind === 'clue') {
+            const isLiar = puzzle.liarSet.indexOf(tr.id) >= 0;
+            if ((tr.status === 2) !== isLiar) { hintsOk = false; break; }
+          }
+        }
+        const emptyPlayer = { assignment: new Int8Array(grid.cellCount).fill(-1), liarFlags: new Uint8Array(puzzle.clues.length), pencil: new Uint8Array(grid.cellCount) };
+        const hint = getHint(puzzle, emptyPlayer);
+        if (!hint.ok) hintsOk = false;
+        else if (hint.kind === 'cell' && hint.value !== puzzle.map[hint.cell]) hintsOk = false;
+        else if (hint.kind === 'clue') {
+          const isLiar = puzzle.liarSet.indexOf(hint.clue) >= 0;
+          if ((hint.status === 2) !== isLiar) hintsOk = false;
+        }
+      } else hintsOk = false;
+      check('hints agree with verified solution', hintsOk, hintCount + ' deductions checked');
+      const gen2 = generate(tc.seed, tc.tier);
+      const deterministic = gen2.ok && serializePuzzle(gen2.puzzle) === serializePuzzle(puzzle);
+      check('identical puzzle for identical seed', deterministic, '');
+      results.push(result);
+    }
+    const passed = results.filter(r => r.ok).length;
+    return { results, passed, total: results.length };
+  }
+
+  return {
+    TERRAINS, TIERS, TIER_KEYS, NBR, MAX_GEN_ATTEMPTS, SELF_TEST_CASES,
+    hashSeed, mulberry32, shuffle, makeGrid, generate, solveDeduction, countSolutions,
+    getHint, analyse, validate, describeClue, actualText, cellsForClue, serializePuzzle,
+    runSelfTests, evaluateMap, truthOf, connectivityInfo
+  };
+}
+
+/*!CP-PURE-END*/
+
+const LOGIC = createLogic();
+
+/* ---------- shared helpers ---------- */
+const $ = (sel, root = document) => root.querySelector(sel);
+const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
+const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+const smooth = (a, b, x) => { const t = clamp((x - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };
+const pad2 = n => String(n).padStart(2, '0');
+const hash2 = (a, b, c) => {
+  let h = (a * 374761393 + b * 668265263 + (c || 0) * 2246822519) | 0;
+  h = Math.imul(h ^ (h >>> 13), 1274126177); h ^= h >>> 16;
+  return (h >>> 0) / 4294967296;
+};
+const prefersReduced = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ---------- persistence (§6) ---------- */
+const STORE_KEY = 'cartographersParadox.v1';
+const MEMORY_STORE = { data: null };
+function readStore() {
+  try { const raw = localStorage.getItem(STORE_KEY); return raw ? JSON.parse(raw) : null; }
+  catch (err) { return MEMORY_STORE.data; }
+}
+function writeStore(value) {
+  MEMORY_STORE.data = value;
+  try { localStorage.setItem(STORE_KEY, JSON.stringify(value)); } catch (err) { /* in-memory fallback */ }
+}
+const savedAtBoot = readStore();
+
+/* ---------- game state ---------- */
+const game = {
+  seed: 'wandering-coast', tier: 'cartographer', puzzle: null, grid: null, cellCount: 0,
+  player: { assignment: null, pencil: null, liarFlags: null },
+  selected: 0, hover: -1, terrain: 1, tool: 'ink',
+  quality: 'high', motion: !prefersReduced, top: false, solved: false,
+  busy: true, ready: false, generation: { attempt: 1, max: 40, stage: 'draft' },
+  contradictions: null, support: [], hintClue: -1, hintCells: [], hintText: '',
+  history: { undo: [], redo: [] }, worker: null, genWorker: null, testWorker: null, genTimer: 0, lastContradiction: '',
+  saveTimer: 0, crumbs: { attempts: 0 }
+};
+if (savedAtBoot && LOGIC.TIERS[savedAtBoot.tier]) game.tier = savedAtBoot.tier;
+if (savedAtBoot && typeof savedAtBoot.seed === 'string' && savedAtBoot.seed) game.seed = savedAtBoot.seed;
+if (savedAtBoot && (savedAtBoot.quality === 'high' || savedAtBoot.quality === 'low')) game.quality = savedAtBoot.quality;
+if (savedAtBoot && typeof savedAtBoot.motion === 'boolean') game.motion = savedAtBoot.motion && !prefersReduced;
+
+/* ---------- DOM ---------- */
+const ui = {
+  seedInput: $('#seedInput'), tierSelect: $('#tierSelect'), btnGenerate: $('#btnGenerate'),
+  btnTop: $('#btnTop'), btnQuality: $('#btnQuality'), btnMotion: $('#btnMotion'), btnTests: $('#btnTests'),
+  viewport: $('#viewport'), canvasHost: $('#canvasHost'), webglFallback: $('#webglFallback'),
+  webglFallbackDetail: $('#webglFallbackDetail'), emptyState: $('#emptyState'),
+  genOverlay: $('#genOverlay'), genTitle: $('#genTitle'), genMsg: $('#genMsg'), genProgress: $('#genProgress'),
+  genMeta: $('#genMeta'), genActions: $('#genActions'),
+  hintBanner: $('#hintBanner'), hintText: $('#hintText'), hintClose: $('#hintClose'), solvedBadge: $('#solvedBadge'),
+  palette: $('#palette'), candidates: $('#candidates'), hexSelect: $('#hexSelect'), btnApply: $('#btnApply'),
+  toolBtns: $$('#toolInk, #toolPencil, #toolErase'), btnUndo: $('#btnUndo'), btnRedo: $('#btnRedo'),
+  btnHint: $('#btnHint'), btnSubmit: $('#btnSubmit'), btnClear: $('#btnClear'),
+  clueList: $('#clueList'), liarMeterText: $('#liarMeterText'), sealDots: $('#sealDots'), notesIntro: $('#notesIntro'),
+  notesProgress: $('#notesProgress'), hudTier: $('#hudTier'), hudHex: $('#hudHex'), hudLies: $('#hudLies'), hudInked: $('#hudInked'),
+  puzzleNo: $('#puzzleNo'), liarBlurb: $('#liarBlurb'), footSeed: $('#footSeed'), footTier: $('#footTier'), footClues: $('#footClues'),
+  live: $('#live'), status: null,
+  testPanel: $('#testPanel'), testClose: $('#testClose'), testRun: $('#testRun'),
+  testProgressWrap: $('#testProgressWrap'), testProgressText: $('#testProgressText'), testProgressBar: $('#testProgressBar'),
+  testSummary: $('#testSummary'), testVerdict: $('#testVerdict'), testVerdictDetail: $('#testVerdictDetail'),
+  testList: $('#testList'), rendererStats: $('#rendererStats')
+};
+const liveRegion = $('#live');
+function announce(message) {
+  liveRegion.textContent = '';
+  requestAnimationFrame(() => { liveRegion.textContent = message; });
+}
+function setStatus(message) { $('#notesProgress').textContent = message; announce(message); }
+
+/* ---------- worker (§ MODEL/SOLVER in a Blob worker) ---------- */
+function solveWorkerSource() {
+  return `'use strict';
+const createLogic = ${createLogic.toString()};
+const Logic = createLogic();
+let session = null;
+function strip(p) {
+  return { seed: p.seed, tierKey: p.tierKey, radius: p.radius, terrainIds: p.terrainIds, liarCount: p.liarCount, clues: p.clues };
+}
+function resolvedTerrains(full, assignment) {
+  const out = [];
+  for (const t of full.terrainIds) {
+    let has = false, ok = true;
+    for (let i = 0; i < full.map.length; i++) {
+      if (full.map[i] === t) { has = true; if (assignment[i] !== t) ok = false; }
+      else if (assignment[i] === t) ok = false;
+    }
+    if (has && ok) out.push(t);
+  }
+  return out;
+}
+self.onmessage = function (ev) {
+  const d = ev.data || {};
+  try {
+    if (d.cmd === 'generate') {
+      const result = Logic.generate(d.seed, d.tier, { onProgress: p => self.postMessage(Object.assign({ type: 'progress' }, p)) });
+      if (result.ok) {
+        session = result.puzzle;
+        self.postMessage({ type: 'generated', puzzle: strip(result.puzzle), attempts: result.attempts, clueCount: result.cluesCount || result.puzzle.clues.length, liarCount: result.puzzle.liarCount });
+      } else self.postMessage({ type: 'genError', reason: result.reason || 'Generation failed.' });
+    } else if (d.cmd === 'submit') {
+      if (!session) { self.postMessage({ type: 'submitResult', ok: false, message: 'No verified atlas is open.' }); return; }
+      const assignment = Int8Array.from(d.assignment), flags = Uint8Array.from(d.liarFlags);
+      const verdict = Logic.validate(session, assignment, flags);
+      verdict.resolvedTerrains = resolvedTerrains(session, assignment);
+      verdict.type = 'submitResult';
+      self.postMessage(verdict);
+    } else if (d.cmd === 'tests') {
+      const suite = Logic.runSelfTests(p => self.postMessage(Object.assign({ type: 'testProgress' }, p)));
+      self.postMessage({ type: 'testDone', suite });
+    }
+  } catch (err) {
+    self.postMessage({ type: 'genError', reason: 'The atelier hit an internal fault: ' + (err && err.message || err) });
+  }
+};`;
+}
+function newWorker(onMessage) {
+  const blob = new Blob([solveWorkerSource()], { type: 'text/javascript' });
+  const url = URL.createObjectURL(blob);
+  const worker = new Worker(url);
+  worker.__url = url;
+  worker.onmessage = onMessage;
+  worker.onerror = function (err) { console.error('Worker error', err); };
+  return worker;
+}
+function killWorker(worker) {
+  if (!worker) return;
+  try { worker.terminate(); } catch (err) {}
+  try { URL.revokeObjectURL(worker.__url); } catch (err) {}
+}
+
+/* ---------- generation lifecycle ---------- */
+const STAGE_TEXT = {
+  draft: ['Drafting the coastline', 'Ink, salt and probability.'],
+  retry: ['Re-inking a stubborn draft', 'The cartographer is not satisfied.'],
+  done: ['Sealing the atlas', 'Verifying every deduction.']
+};
+function setBusy(busy, hasPuzzle) {
+  game.busy = busy;
+  ui.btnGenerate.disabled = busy;
+  ui.seedInput.disabled = busy;
+  ui.tierSelect.disabled = busy;
+  ui.btnSubmit.disabled = busy || !hasPuzzle;
+  ui.btnHint.disabled = busy || !hasPuzzle;
+  for (const b of ui.toolBtns) b.disabled = busy || !hasPuzzle;
+  for (const b of $$('#palette button, #candidates button')) b.disabled = busy || !hasPuzzle;
+}
+function showGenerationOverlay() {
+  ui.genOverlay.hidden = false;
+  ui.genTitle.textContent = 'Drafting the coastline';
+  ui.genMsg.textContent = 'Ink, salt and probability.';
+  ui.genMsg.className = '';
+  ui.genProgress.style.width = '0%';
+  ui.genMeta.textContent = 'Draft 1 of 40';
+  ui.genActions.innerHTML = '<button class="btn tiny" type="button" id="genCancel">Cancel</button>';
+  const cancel = $('#genCancel');
+  if (cancel) cancel.addEventListener('click', cancelGeneration);
+  game.generation = { attempt: 1, max: 40, stage: 'draft' };
+}
+function hideGenerationOverlay() { ui.genOverlay.hidden = true; }
+function startGeneration(seed, tier, restore) {
+  killWorker(game.genWorker); game.genWorker = null;
+  clearTimeout(game.genTimer);
+  showGenerationOverlay();
+  setBusy(true, !!game.puzzle);
+  if (!game.puzzle) ui.emptyState.hidden = true;
+  const worker = newWorker(handleWorkerMessage);
+  game.genWorker = worker;
+  game.restoreCandidate = restore === false ? null : readStore();
+  worker.postMessage({ cmd: 'generate', seed, tier });
+  game.genTimer = setTimeout(() => {
+    killWorker(game.genWorker); game.genWorker = null;
+    showGenError('The atelier took too long and was closed. No unverified map was exposed.');
+  }, 45000);
+}
+function cancelGeneration() {
+  clearTimeout(game.genTimer);
+  killWorker(game.genWorker); game.genWorker = null;
+  game.busy = false; game.ready = !!game.puzzle;
+  hideGenerationOverlay();
+  setBusy(false, !!game.puzzle);
+  ui.emptyState.hidden = !!game.puzzle;
+  if (game.puzzle) { renderAll(); saveNow(); }
+  announce('Generation cancelled. No unverified atlas was shown.');
+}
+function showGenError(reason) {
+  clearTimeout(game.genTimer);
+  game.busy = false;
+  setBusy(false, !!game.puzzle);
+  ui.genOverlay.hidden = false;
+  ui.genTitle.textContent = 'The atlas would not set';
+  ui.genMsg.textContent = reason;
+  ui.genMsg.className = 'gen-error';
+  ui.genMeta.textContent = 'Bounded generation failed · nothing unverified was shown';
+  ui.genProgress.style.width = '0%';
+  ui.genActions.innerHTML = '<button class="btn tiny gold" type="button" id="genRetry">Try Again</button><button class="btn tiny" type="button" id="genDismiss">Back to the Desk</button>';
+  $('#genRetry').addEventListener('click', () => {
+    hideGenerationOverlay();
+    const seed = game.seed;
+    startGeneration(seed, game.tier, true);
+  });
+  $('#genDismiss').addEventListener('click', () => {
+    hideGenerationOverlay();
+    game.busy = false; game.ready = !!game.puzzle;
+    ui.emptyState.hidden = !!game.puzzle;
+    setBusy(false, !!game.puzzle);
+    if (game.puzzle) renderAll(); else announce('No atlas is open. Choose a seed and draw again.');
+  });
+  announce('Generation failed. ' + reason);
+}
+function handleWorkerMessage(ev) {
+  const d = ev.data || {};
+  if (d.type === 'progress') {
+    game.generation = { attempt: d.attempt || 1, max: d.max || 40, stage: d.stage || 'draft' };
+    const stage = STAGE_TEXT[d.stage] || STAGE_TEXT.draft;
+    ui.genTitle.textContent = stage[0];
+    ui.genMsg.textContent = d.stage === 'retry' ? 'A draft failed verification (' + (d.fail || 'constraints') + '); re-inking.' : stage[1];
+    ui.genMsg.className = '';
+    ui.genMeta.textContent = 'Draft ' + game.generation.attempt + ' of ' + game.generation.max;
+    ui.genProgress.style.width = Math.round((game.generation.attempt / game.generation.max) * 100) + '%';
+  } else if (d.type === 'generated') {
+    clearTimeout(game.genTimer);
+    killWorker(game.worker);
+    game.worker = game.genWorker;
+    game.genWorker = null;
+    onGenerated(d);
+  } else if (d.type === 'genError') {
+    clearTimeout(game.genTimer);
+    killWorker(game.genWorker); game.genWorker = null;
+    showGenError(d.reason || 'Generation failed.');
+  } else if (d.type === 'submitResult') {
+    onSubmitResult(d);
+  }
+}
+function onGenerated(msg) {
+  const puzzle = msg.puzzle;
+  game.puzzle = puzzle;
+  game.grid = LOGIC.makeGrid(puzzle.radius);
+  game.cellCount = game.grid.cellCount;
+  const n = game.cellCount, clues = puzzle.clues.length;
+  game.player = { assignment: new Int8Array(n).fill(-1), pencil: new Uint8Array(n), liarFlags: new Uint8Array(clues) };
+  game.solved = false;
+  game.history = { undo: [], redo: [] };
+  game.selected = 0; game.hover = -1; game.top = false;
+  game.hintClue = -1; game.hintCells = []; game.contradictions = null; game.support = [];
+  ui.hintBanner.hidden = true; ui.solvedBadge.hidden = true;
+  game.crumbs.attempts = msg.attempts || 1;
+  const restore = game.restoreCandidate;
+  if (restore && restore.seed === game.seed && restore.tier === game.tier && restore.progress) {
+    const p = restore.progress;
+    if (Array.isArray(p.assignment) && p.assignment.length === n) game.player.assignment = Int8Array.from(p.assignment);
+    if (Array.isArray(p.pencil) && p.pencil.length === n) game.player.pencil = Uint8Array.from(p.pencil);
+    if (Array.isArray(p.liarFlags) && p.liarFlags.length === clues) game.player.liarFlags = Uint8Array.from(p.liarFlags);
+  }
+  game.restoreCandidate = null;
+  const available = puzzle.terrainIds;
+  game.terrain = available.indexOf(1) >= 0 ? 1 : available[0];
+  game.tool = 'ink';
+  game.ready = true; game.busy = false;
+  setBusy(false, true);
+  hideGenerationOverlay();
+  if (webglReady) {
+    try { buildScene(); } catch (err) {
+      console.error('Scene construction failed', err);
+      showWebGLFailure('The atlas scene could not be built (' + (err && err.message || err) + '). The puzzle remains playable with the accessible controls.');
+    }
+  } else { ui.emptyState.hidden = true; }
+  renderAll();
+  saveNow();
+  announce('Verified ' + LOGIC.TIERS[game.tier].name + ' atlas ready: ' + clues + ' marginalia, exactly ' + puzzle.liarCount + ' lie' + (puzzle.liarCount === 1 ? '' : 's') + '.');
+}
+
+/* ---------- undo / redo ---------- */
+function snapshot() {
+  return {
+    assignment: Array.from(game.player.assignment),
+    pencil: Array.from(game.player.pencil),
+    liarFlags: Array.from(game.player.liarFlags)
+  };
+}
+function pushHistory() {
+  if (!game.ready) return;
+  game.history.undo.push(snapshot());
+  if (game.history.undo.length > 80) game.history.undo.shift();
+  game.history.redo.length = 0;
+  updateUndoButtons();
+}
+function restoreSnapshot(snap) {
+  game.player.assignment = Int8Array.from(snap.assignment);
+  game.player.pencil = Uint8Array.from(snap.pencil);
+  game.player.liarFlags = Uint8Array.from(snap.liarFlags);
+  afterPlayerChange(false);
+}
+function undo() {
+  if (!game.ready || game.solved || !game.history.undo.length) return;
+  game.history.redo.push(snapshot());
+  restoreSnapshot(game.history.undo.pop());
+  updateUndoButtons();
+  announce('Undone.');
+}
+function redo() {
+  if (!game.ready || game.solved || !game.history.redo.length) return;
+  game.history.undo.push(snapshot());
+  restoreSnapshot(game.history.redo.pop());
+  updateUndoButtons();
+  announce('Redone.');
+}
+
+/* ---------- persistence save ---------- */
+function saveNow() {
+  clearTimeout(game.saveTimer);
+  if (!game.ready || !game.puzzle) return;
+  writeStore({
+    seed: game.seed, tier: game.tier, quality: game.quality, motion: game.motion,
+    progress: snapshot(), at: Date.now()
+  });
+}
+function saveSoon() { clearTimeout(game.saveTimer); game.saveTimer = setTimeout(saveNow, 350); }
+
+/* ============================================================
+   §2 — PALETTE & PROCEDURAL TEXTURES  (all drawn in-canvas)
+   ============================================================ */
+const COL = {
+  parchment: 0xefe1c2, ink: 0x241b14, gold: 0xb98a3e, sea: 0x3d6a70, forest: 0x546b3d,
+  crimson: 0x8e3326, mountain: 0x8d8779, desert: 0xc9a96f, swamp: 0x3f4a35,
+  pale: 0xf4ead4, snow: 0xf2ead8
+};
+const TERRAIN_HEIGHT = [0.105, 0.245, 0.30, 0.19, 0.175];
+const UNASSIGNED_HEIGHT = 0.225;
+const HEX_SCALE = 1.0;
+const HEX_W = Math.sqrt(3) * HEX_SCALE;
+
+let webglReady = false;
+let sealURL = '';
+const T3 = { renderer: null, scene: null, camera: null, controls: null, world: null, textures: [] };
+const sceneCache = { seedNum: 0 };
+
+function makeCanvas(size, draw) {
+  const c = document.createElement('canvas'); c.width = size; c.height = size;
+  draw(c.getContext('2d'), size); return c;
+}
+function canvasTexture(canvas, opts) {
+  if (!THREE || !canvas) return null;
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  tex.anisotropy = 4;
+  if (opts && opts.repeat) { tex.wrapS = tex.wrapT = THREE.RepeatWrapping; tex.repeat.set(opts.repeat[0], opts.repeat[1]); }
+  T3.textures.push(tex);
+  return tex;
+}
+function fillMottle(g, size, rng, count, colors, maxR) {
+  for (let i = 0; i < count; i++) {
+    const x = rng() * size, y = rng() * size, r = 2 + rng() * maxR;
+    const grad = g.createRadialGradient(x, y, 0, x, y, r);
+    const c = colors[(rng() * colors.length) | 0];
+    grad.addColorStop(0, c); grad.addColorStop(1, 'rgba(0,0,0,0)');
+    g.fillStyle = grad; g.beginPath(); g.arc(x, y, r, 0, Math.PI * 2); g.fill();
+  }
+}
+function makeParchmentTexture(seedNum) {
+  const size = 1024, rng = LOGIC.mulberry32((seedNum ^ 0x51ed270b) >>> 0);
+  const canvas = makeCanvas(size, (g, s) => {
+    g.fillStyle = '#efe1c2'; g.fillRect(0, 0, s, s);
+    const warm = ['rgba(150,111,62,.10)', 'rgba(206,172,112,.14)', 'rgba(120,86,44,.08)', 'rgba(246,231,197,.20)'];
+    fillMottle(g, s, rng, 420, warm, 90);
+    // long fibres
+    for (let i = 0; i < 1600; i++) {
+      const x = rng() * s, y = rng() * s, len = 4 + rng() * 26, ang = rng() * Math.PI;
+      g.strokeStyle = rng() < 0.5 ? 'rgba(112,81,43,.045)' : 'rgba(255,247,226,.07)';
+      g.lineWidth = 0.6 + rng() * 0.8;
+      g.beginPath(); g.moveTo(x, y); g.lineTo(x + Math.cos(ang) * len, y + Math.sin(ang) * len); g.stroke();
+    }
+    // speckle / foxing
+    for (let i = 0; i < 9000; i++) {
+      const x = rng() * s, y = rng() * s, r = 0.4 + rng() * 1.6;
+      g.fillStyle = 'rgba(' + (60 + rng() * 70 | 0) + ',' + (40 + rng() * 45 | 0) + ',' + (20 + rng() * 30 | 0) + ',' + (0.015 + rng() * 0.05) + ')';
+      g.beginPath(); g.arc(x, y, r, 0, Math.PI * 2); g.fill();
+    }
+    // old stains
+    const stainCols = ['rgba(128,84,34,.12)', 'rgba(94,62,30,.10)', 'rgba(172,120,54,.09)'];
+    for (let i = 0; i < 14; i++) {
+      const x = rng() * s, y = rng() * s, r = 30 + rng() * 130;
+      const grad = g.createRadialGradient(x, y, r * 0.1, x, y, r);
+      const sc = stainCols[i % stainCols.length];
+      grad.addColorStop(0, sc); grad.addColorStop(0.65, sc.replace(/[\d.]+\)$/, '0.035)')); grad.addColorStop(1, 'rgba(0,0,0,0)');
+      g.fillStyle = grad; g.beginPath(); g.arc(x, y, r, 0, Math.PI * 2); g.fill();
+      g.strokeStyle = 'rgba(96,62,28,.10)'; g.lineWidth = 1.2; g.beginPath(); g.arc(x, y, r * 0.82, 0, Math.PI * 2); g.stroke();
+    }
+    // burnt edges
+    const edge = 70;
+    const edges = [[0, 0, 0, edge, 0], [0, s, 0, s - edge, 1], [0, 0, edge, 0, 2], [s, 0, s - edge, 0, 3]];
+    for (const e of edges) {
+      const grad = g.createLinearGradient(e[0], e[1], e[2], e[3]);
+      grad.addColorStop(0, 'rgba(48,28,12,.62)'); grad.addColorStop(0.35, 'rgba(96,58,24,.22)'); grad.addColorStop(1, 'rgba(0,0,0,0)');
+      g.fillStyle = grad; g.fillRect(0, 0, s, s);
+    }
+    for (let i = 0; i < 150; i++) {
+      const side = (rng() * 4) | 0;
+      let x = rng() * s, y = rng() * s;
+      if (side === 0) y = rng() * 46; else if (side === 1) y = s - rng() * 46; else if (side === 2) x = rng() * 46; else x = s - rng() * 46;
+      const r = 3 + rng() * 22;
+      const grad = g.createRadialGradient(x, y, 0, x, y, r);
+      grad.addColorStop(0, 'rgba(44,25,11,' + (0.1 + rng() * 0.3) + ')'); grad.addColorStop(1, 'rgba(0,0,0,0)');
+      g.fillStyle = grad; g.beginPath(); g.arc(x, y, r, 0, Math.PI * 2); g.fill();
+    }
+    // faint corner shadow
+    const vg = g.createRadialGradient(s / 2, s / 2, s * 0.28, s / 2, s / 2, s * 0.72);
+    vg.addColorStop(0, 'rgba(0,0,0,0)'); vg.addColorStop(1, 'rgba(56,30,10,.18)');
+    g.fillStyle = vg; g.fillRect(0, 0, s, s);
+  });
+  const tex = canvasTexture(canvas);
+  tex.wrapS = tex.wrapT = THREE.ClampToEdgeWrapping;
+  return tex;
+}
+function makeTerrainTexture(id, seedNum) {
+  const rng = LOGIC.mulberry32((seedNum ^ (0x2f1b3c4d + id * 7919)) >>> 0);
+  const base = ['#3d6a70', '#546b3d', '#8d8779', '#c9a96f', '#3f4a35'][id];
+  const dark = ['#2c4f55', '#3b4d2b', '#676154', '#a1814b', '#2b3527'][id];
+  const light = ['#5b8f92', '#78915a', '#b0a897', '#e0c48c', '#5c6a4a'][id];
+  const canvas = makeCanvas(256, (g, s) => {
+    g.fillStyle = base; g.fillRect(0, 0, s, s);
+    fillMottle(g, s, rng, 80, ['rgba(255,255,255,.05)', 'rgba(0,0,0,.05)', light, dark], 40);
+    g.lineCap = 'round';
+    if (id === 0) { // sea — layered wave hatching
+      for (let i = 0; i < 26; i++) {
+        g.strokeStyle = 'rgba(214,236,225,' + (0.05 + rng() * 0.08) + ')'; g.lineWidth = 1 + rng() * 1.2;
+        const y = rng() * s;
+        g.beginPath(); g.moveTo(0, y);
+        for (let x = 0; x <= s; x += 18) g.lineTo(x, y + Math.sin(x * 0.05 + i) * 2.4);
+        g.stroke();
+      }
+    } else if (id === 1) { // forest — stipple canopy and hatched trunks
+      for (let i = 0; i < 240; i++) {
+        const x = rng() * s, y = rng() * s;
+        g.fillStyle = 'rgba(' + (40 + rng() * 30 | 0) + ',' + (55 + rng() * 40 | 0) + ',' + (25 + rng() * 25 | 0) + ',.35)';
+        g.beginPath(); g.arc(x, y, 2 + rng() * 6, 0, Math.PI * 2); g.fill();
+        if (rng() < 0.35) { g.strokeStyle = 'rgba(30,38,18,.25)'; g.lineWidth = 1; g.beginPath(); g.moveTo(x, y); g.lineTo(x, y + 5 + rng() * 5); g.stroke(); }
+      }
+    } else if (id === 2) { // mountain — cracks & strata
+      for (let i = 0; i < 18; i++) {
+        g.strokeStyle = 'rgba(50,44,36,.22)'; g.lineWidth = 1 + rng() * 1.6;
+        let x = rng() * s, y = rng() * s;
+        g.beginPath(); g.moveTo(x, y);
+        for (let k = 0; k < 4; k++) { x += (rng() - 0.5) * 40; y += (rng() - 0.5) * 40; g.lineTo(x, y); }
+        g.stroke();
+      }
+      for (let i = 0; i < 40; i++) { g.fillStyle = 'rgba(255,246,224,.10)'; g.beginPath(); g.arc(rng() * s, rng() * s, 2 + rng() * 5, 0, Math.PI * 2); g.fill(); }
+    } else if (id === 3) { // desert — dune contours
+      for (let i = 0; i < 16; i++) {
+        g.strokeStyle = 'rgba(120,85,38,.20)'; g.lineWidth = 1.4;
+        const y = 12 + i * 15 + (rng() - 0.5) * 6;
+        g.beginPath(); g.moveTo(0, y);
+        for (let x = 0; x <= s; x += 16) g.lineTo(x, y + Math.sin(x * 0.035 + i * 0.9) * 4);
+        g.stroke();
+      }
+      for (let i = 0; i < 320; i++) { g.fillStyle = 'rgba(255,240,200,' + (0.06 + rng() * 0.12) + ')'; g.fillRect(rng() * s, rng() * s, 1, 1); }
+    } else { // swamp — pools and reeds
+      for (let i = 0; i < 22; i++) {
+        g.fillStyle = 'rgba(' + (35 + rng() * 25 | 0) + ',' + (55 + rng() * 30 | 0) + ',' + (35 + rng() * 20 | 0) + ',.38)';
+        g.beginPath(); g.ellipse(rng() * s, rng() * s, 8 + rng() * 24, 4 + rng() * 10, rng() * Math.PI, 0, Math.PI * 2); g.fill();
+      }
+      for (let i = 0; i < 90; i++) {
+        const x = rng() * s, y = rng() * s;
+        g.strokeStyle = 'rgba(120,128,82,.35)'; g.lineWidth = 1;
+        g.beginPath(); g.moveTo(x, y); g.lineTo(x + (rng() - 0.5) * 5, y - 5 - rng() * 12); g.stroke();
+      }
+    }
+    // ink foxing / hatch flecks for all
+    for (let i = 0; i < 900; i++) {
+      g.fillStyle = 'rgba(36,27,20,' + (0.02 + rng() * 0.05) + ')';
+      g.fillRect(rng() * s, rng() * s, 1, 1);
+    }
+  });
+  const tex = canvasTexture(canvas, { repeat: [1, 1] });
+  return tex;
+}
+function makeUnassignedTexture(seedNum) {
+  const rng = LOGIC.mulberry32((seedNum ^ 0x77ca11) >>> 0);
+  const canvas = makeCanvas(256, (g, s) => {
+    g.fillStyle = '#e6d6b4'; g.fillRect(0, 0, s, s);
+    fillMottle(g, s, rng, 70, ['rgba(255,255,255,.10)', 'rgba(120,82,38,.06)'], 40);
+    for (let i = 0; i < 600; i++) { g.fillStyle = 'rgba(80,58,30,.05)'; g.fillRect(rng() * s, rng() * s, 1, 1); }
+    g.strokeStyle = 'rgba(120,92,52,.16)'; g.lineWidth = 1.4;
+    g.beginPath(); g.arc(s / 2, s / 2, 56, 0, Math.PI * 2); g.stroke();
+    g.setLineDash([4, 7]); g.beginPath(); g.arc(s / 2, s / 2, 40, 0, Math.PI * 2); g.stroke();
+    g.setLineDash([]);
+    g.fillStyle = 'rgba(120,92,52,.34)'; g.font = 'italic 26px Georgia,serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('?', s / 2, s / 2 + 2);
+  });
+  return canvasTexture(canvas);
+}
+function makeWoodTexture() {
+  const rng = LOGIC.mulberry32(0x1a2b3c4d);
+  const tex = canvasTexture(makeCanvas(512, (g, s) => {
+    g.fillStyle = '#24170f'; g.fillRect(0, 0, s, s);
+    for (let i = 0; i < 9; i++) {
+      g.fillStyle = 'rgba(' + (40 + rng() * 22 | 0) + ',' + (25 + rng() * 16 | 0) + ',' + (14 + rng() * 10 | 0) + ',.55)';
+      g.fillRect(0, i * 58 + rng() * 8, s, 46 + rng() * 10);
+      g.strokeStyle = 'rgba(10,6,4,.6)'; g.lineWidth = 2; g.beginPath(); g.moveTo(0, i * 58 + 4); g.lineTo(s, i * 58 + 4); g.stroke();
+    }
+    for (let i = 0; i < 1200; i++) {
+      g.strokeStyle = 'rgba(90,58,32,' + (0.03 + rng() * 0.08) + ')'; g.lineWidth = 0.7;
+      const x = rng() * s, y = rng() * s, len = 10 + rng() * 60;
+      g.beginPath(); g.moveTo(x, y); g.bezierCurveTo(x + len * .4, y + 3, x + len * .7, y - 3, x + len, y); g.stroke();
+    }
+  }), { repeat: [5, 5] });
+  return tex;
+}
+function makeGlyphTexture(terr) {
+  return canvasTexture(makeCanvas(96, (g, s) => {
+    g.clearRect(0, 0, s, s);
+    g.fillStyle = 'rgba(239,225,194,.94)';
+    g.beginPath(); g.arc(s / 2, s / 2, 34, 0, Math.PI * 2); g.fill();
+    g.strokeStyle = 'rgba(36,27,20,.72)'; g.lineWidth = 2;
+    g.beginPath(); g.arc(s / 2, s / 2, 34, 0, Math.PI * 2); g.stroke();
+    g.fillStyle = '#241b14'; g.font = '600 40px ' + (terr.id === 2 ? 'serif' : 'Georgia,serif');
+    g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(terr.glyph, s / 2, s / 2 + 3);
+  }));
+}
+function makeBubbleTexture() {
+  return canvasTexture(makeCanvas(48, (g, s) => {
+    const grad = g.createRadialGradient(s / 2, s / 2, 0, s / 2, s / 2, s / 2);
+    grad.addColorStop(0, 'rgba(220,235,196,.9)'); grad.addColorStop(.55, 'rgba(170,195,150,.35)'); grad.addColorStop(1, 'rgba(170,195,150,0)');
+    g.fillStyle = grad; g.fillRect(0, 0, s, s);
+  }));
+}
+function makeWashTexture() {
+  const rng = LOGIC.mulberry32(0x8f00d);
+  return canvasTexture(makeCanvas(160, (g, s) => {
+    g.clearRect(0, 0, s, s);
+    for (let i = 0; i < 8; i++) {
+      const x = s / 2 + (rng() - .5) * 30, y = s / 2 + (rng() - .5) * 30, r = 26 + rng() * 28;
+      const grad = g.createRadialGradient(x, y, 0, x, y, r);
+      grad.addColorStop(0, 'rgba(255,255,255,.45)'); grad.addColorStop(.6, 'rgba(255,255,255,.22)'); grad.addColorStop(1, 'rgba(255,255,255,0)');
+      g.fillStyle = grad; g.beginPath(); g.arc(x, y, r, 0, Math.PI * 2); g.fill();
+    }
+  }));
+}
+function makeCompassTexture() {
+  return canvasTexture(makeCanvas(256, (g, s) => {
+    g.clearRect(0, 0, s, s);
+    const cx = s / 2, cy = s / 2, R = 124;
+    const grad = g.createRadialGradient(cx - 20, cy - 24, 8, cx, cy, R);
+    grad.addColorStop(0, '#f2e5c6'); grad.addColorStop(.7, '#d8c193'); grad.addColorStop(1, '#b98a3e');
+    g.fillStyle = grad; g.beginPath(); g.arc(cx, cy, R, 0, Math.PI * 2); g.fill();
+    g.strokeStyle = '#241b14'; g.lineWidth = 3; g.beginPath(); g.arc(cx, cy, R, 0, Math.PI * 2); g.stroke();
+    g.strokeStyle = 'rgba(36,27,20,.5)'; g.lineWidth = 1; g.beginPath(); g.arc(cx, cy, R - 14, 0, Math.PI * 2); g.stroke();
+    for (let i = 0; i < 64; i++) {
+      const a = i / 64 * Math.PI * 2, len = i % 8 === 0 ? 13 : 6;
+      g.strokeStyle = 'rgba(36,27,20,' + (i % 8 === 0 ? '.65' : '.32') + ')'; g.lineWidth = i % 8 === 0 ? 2 : 1;
+      g.beginPath(); g.moveTo(cx + Math.cos(a) * (R - 16), cy + Math.sin(a) * (R - 16)); g.lineTo(cx + Math.cos(a) * (R - 16 - len), cy + Math.sin(a) * (R - 16 - len)); g.stroke();
+    }
+    // eight-point rose
+    for (let i = 0; i < 8; i++) {
+      const a = i / 8 * Math.PI * 2 - Math.PI / 2, long = i % 2 === 0;
+      const L = long ? 82 : 54, w = long ? 13 : 9;
+      g.fillStyle = i === 0 ? '#8e3326' : (i === 4 ? '#241b14' : (long ? '#b98a3e' : 'rgba(36,27,20,.72)'));
+      g.beginPath();
+      g.moveTo(cx + Math.cos(a) * L, cy + Math.sin(a) * L);
+      g.lineTo(cx + Math.cos(a + Math.PI / 2) * w, cy + Math.sin(a + Math.PI / 2) * w);
+      g.lineTo(cx + Math.cos(a + Math.PI) * (w * 1.6), cy + Math.sin(a + Math.PI) * (w * 1.6));
+      g.lineTo(cx + Math.cos(a - Math.PI / 2) * w, cy + Math.sin(a - Math.PI / 2) * w);
+      g.closePath(); g.fill();
+    }
+    g.fillStyle = '#241b14'; g.font = '600 22px Georgia,serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
+    g.fillText('N', cx, cy - R + 32); g.fillText('E', cx + R - 30, cy); g.fillText('S', cx, cy + R - 30); g.fillText('W', cx - R + 30, cy);
+    g.fillStyle = '#b98a3e'; g.beginPath(); g.arc(cx, cy, 8, 0, Math.PI * 2); g.fill();
+    g.strokeStyle = '#241b14'; g.lineWidth = 2; g.beginPath(); g.arc(cx, cy, 8, 0, Math.PI * 2); g.stroke();
+  }));
+}
+function makeSealTextures() {
+  const rng = LOGIC.mulberry32(0x5ea1);
+  const color = makeCanvas(256, (g, s) => {
+    g.clearRect(0, 0, s, s);
+    const grad = g.createRadialGradient(96, 86, 12, s / 2, s / 2, 128);
+    grad.addColorStop(0, '#b8523f'); grad.addColorStop(.55, '#8e3326'); grad.addColorStop(1, '#5e1f17');
+    g.fillStyle = grad; g.fillRect(0, 0, s, s);
+    for (let i = 0; i < 700; i++) { g.fillStyle = 'rgba(' + (40 + rng() * 60 | 0) + ',8,6,' + (0.04 + rng() * 0.12) + ')'; g.fillRect(rng() * s, rng() * s, 1 + rng() * 2, 1); }
+    g.strokeStyle = 'rgba(52,12,8,.6)'; g.lineWidth = 3; g.beginPath(); g.arc(s / 2, s / 2, 92, 0, Math.PI * 2); g.stroke();
+    g.strokeStyle = 'rgba(255,215,190,.3)'; g.lineWidth = 2; g.beginPath(); g.arc(s / 2, s / 2, 82, 0, Math.PI * 2); g.stroke();
+    g.fillStyle = 'rgba(52,12,8,.5)'; g.font = '600 92px Cinzel,Georgia,serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('C', s / 2, s / 2 + 4);
+    g.fillStyle = 'rgba(255,200,170,.35)'; g.fillText('C', s / 2 - 2, s / 2 + 2);
+  });
+  const bump = makeCanvas(256, (g, s) => {
+    g.fillStyle = '#808080'; g.fillRect(0, 0, s, s);
+    g.strokeStyle = '#d0d0d0'; g.lineWidth = 4; g.beginPath(); g.arc(s / 2, s / 2, 92, 0, Math.PI * 2); g.stroke();
+    g.strokeStyle = '#4a4a4a'; g.lineWidth = 2; g.beginPath(); g.arc(s / 2, s / 2, 82, 0, Math.PI * 2); g.stroke();
+    g.fillStyle = '#3a3a3a'; g.font = '600 92px Cinzel,Georgia,serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('C', s / 2, s / 2 + 4);
+    for (let i = 0; i < 400; i++) { g.fillStyle = 'rgba(' + (100 + rng() * 120 | 0) + ',0,0,.25)'; g.fillRect(rng() * s, rng() * s, 2, 2); }
+  });
+  return { color, bump };
+}
+
+/* ---------- shared geometries ---------- */
+function hexPrismGeometry() {
+  const shape = new THREE.Shape();
+  for (let i = 0; i < 6; i++) {
+    const a = Math.PI / 6 + i * Math.PI / 3, x = Math.cos(a), y = Math.sin(a);
+    if (i === 0) shape.moveTo(x, y); else shape.lineTo(x, y);
+  }
+  shape.closePath();
+  const geo = new THREE.ExtrudeGeometry(shape, { depth: 1, bevelEnabled: true, bevelThickness: 0.035, bevelSize: 0.035, bevelSegments: 2, curveSegments: 1, steps: 1 });
+  geo.rotateX(-Math.PI / 2);
+  const pos = geo.attributes.position, nrm = geo.attributes.normal, uv = geo.attributes.uv;
+  for (let i = 0; i < pos.count; i++) {
+    uv.setXY(i, clamp(pos.getX(i) * 0.5 + 0.5, 0, 1), clamp(pos.getZ(i) * 0.5 + 0.5, 0, 1));
+  }
+  uv.needsUpdate = true;
+  const colors = new Float32Array(pos.count * 3);
+  for (let i = 0; i < pos.count; i++) {
+    const ny = nrm.getY(i), t = smooth(0.18, 0.9, ny); // sides become inked
+    const v = 0.12 + 0.88 * t;
+    colors[i * 3] = v; colors[i * 3 + 1] = v * 0.985; colors[i * 3 + 2] = v * 0.96;
+  }
+  geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+  return geo;
+}
+function hexOutlineGeometry(radius) {
+  const pts = [];
+  for (let i = 0; i <= 6; i++) {
+    const a = Math.PI / 6 + i * Math.PI / 3;
+    pts.push(new THREE.Vector3(Math.cos(a) * (radius || 1.02), 0, Math.sin(a) * (radius || 1.02)));
+  }
+  const geo = new THREE.BufferGeometry().setFromPoints(pts);
+  return geo;
+}
+function mergeColored(parts) {
+  let total = 0;
+  const prepared = parts.map(part => {
+    let geo = part.geo.index ? part.geo.toNonIndexed() : part.geo.clone();
+    if (part.matrix) geo.applyMatrix4(part.matrix);
+    const count = geo.attributes.position.count;
+    const col = new Float32Array(count * 3);
+    const c = new THREE.Color(part.color);
+    for (let i = 0; i < count; i++) { col[i * 3] = c.r; col[i * 3 + 1] = c.g; col[i * 3 + 2] = c.b; }
+    geo.setAttribute('color', new THREE.BufferAttribute(col, 3));
+    total += count;
+    return geo;
+  });
+  const position = new Float32Array(total * 3), normal = new Float32Array(total * 3), color = new Float32Array(total * 3);
+  let off = 0;
+  for (const geo of prepared) {
+    position.set(geo.attributes.position.array, off * 3);
+    normal.set(geo.attributes.normal.array, off * 3);
+    color.set(geo.attributes.color.array, off * 3);
+    off += geo.attributes.position.count;
+    geo.dispose();
+  }
+  const out = new THREE.BufferGeometry();
+  out.setAttribute('position', new THREE.BufferAttribute(position, 3));
+  out.setAttribute('normal', new THREE.BufferAttribute(normal, 3));
+  out.setAttribute('color', new THREE.BufferAttribute(color, 3));
+  return out;
+}
+function makePineGeometry(scale) {
+  const s = scale || 1;
+  const trunk = new THREE.CylinderGeometry(0.045 * s, 0.07 * s, 0.28 * s, 5);
+  trunk.translate(0, 0.14 * s, 0);
+  const lower = new THREE.ConeGeometry(0.29 * s, 0.56 * s, 6);
+  lower.translate(0, 0.47 * s, 0);
+  const upper = new THREE.ConeGeometry(0.21 * s, 0.46 * s, 6);
+  upper.translate(0, 0.79 * s, 0);
+  return mergeColored([{ geo: trunk, color: 0x4a3423 }, { geo: lower, color: 0x3f5330 }, { geo: upper, color: 0x50653a }]);
+}
+function makePeakGeometry() {
+  const rock = new THREE.ConeGeometry(0.46, 1.06, 5);
+  rock.translate(0, 0.53, 0);
+  const snow = new THREE.ConeGeometry(0.2, 0.34, 5);
+  snow.translate(0, 0.98, 0);
+  return mergeColored([{ geo: rock, color: 0x8d8779 }, { geo: snow, color: 0xf2ead8 }]);
+}
+function makeDuneGeometry() {
+  const dune = new THREE.SphereGeometry(0.5, 7, 4, 0, Math.PI * 2, 0, Math.PI / 2);
+  dune.scale(1.55, 0.42, 0.95);
+  return mergeColored([{ geo: dune, color: 0xc9a96f }]);
+}
+function makeReedGeometry() {
+  const a = new THREE.ConeGeometry(0.035, 0.58, 4);
+  a.translate(0, 0.29, 0);
+  const b = new THREE.ConeGeometry(0.028, 0.44, 4);
+  b.rotateZ(0.35); b.translate(0.09, 0.22, 0.02);
+  return mergeColored([{ geo: a, color: 0x5b6038 }, { geo: b, color: 0x6b6a44 }]);
+}
+
+/* ---------- seal preview (LatheGeometry + procedural emboss) ---------- */
+function makeSealMesh() {
+  const pts = [
+    new THREE.Vector2(0.0, 0.0), new THREE.Vector2(0.34, 0.0), new THREE.Vector2(0.42, 0.03),
+    new THREE.Vector2(0.46, 0.08), new THREE.Vector2(0.44, 0.13), new THREE.Vector2(0.33, 0.165),
+    new THREE.Vector2(0.16, 0.185), new THREE.Vector2(0.0, 0.19)
+  ];
+  const geo = new THREE.LatheGeometry(pts, 48);
+  const tex = makeSealTextures();
+  const map = canvasTexture(tex.color); const bump = canvasTexture(tex.bump);
+  const mat = new THREE.MeshStandardMaterial({ map, bumpMap: bump, bumpScale: 0.035, roughness: 0.52, metalness: 0.08 });
+  const mesh = new THREE.Mesh(geo, mat);
+  mesh.castShadow = true; mesh.receiveShadow = true;
+  return mesh;
+}
+function renderSealPreview(renderer) {
+  try {
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(30, 1, 0.1, 20);
+    camera.position.set(0.15, 1.35, 1.75); camera.lookAt(0, 0.1, 0);
+    scene.add(new THREE.AmbientLight(0xfff0dc, 1.6));
+    const key = new THREE.DirectionalLight(0xfff3e0, 3.2); key.position.set(-2, 3.4, 2.4); scene.add(key);
+    const seal = makeSealMesh(); scene.add(seal);
+    const oldRatio = renderer.getPixelRatio(); const oldSize = new THREE.Vector2(); renderer.getSize(oldSize);
+    renderer.setPixelRatio(1); renderer.setSize(180, 180, false);
+    renderer.setClearColor(0x000000, 0); renderer.render(scene, camera);
+    const url = renderer.domElement.toDataURL('image/png');
+    seal.geometry.dispose(); seal.material.map.dispose(); seal.material.bumpMap.dispose(); seal.material.dispose();
+    renderer.setPixelRatio(oldRatio); renderer.setSize(oldSize.x || 1, oldSize.y || 1, false);
+    renderer.setClearColor(0x000000, 0);
+    return url;
+  } catch (err) { console.warn('Seal preview failed', err); return ''; }
+}
+
+/* ============================================================
+   §3 — RENDERER: tabletop, curled parchment, instanced atlas
+   ============================================================ */
+let dirty = true, animTime = 0, lastFrame = 0, camTween = null;
+let rendererStatsSnapshot = {};
+function requestRender() { dirty = true; }
+function cellXZ(cell) {
+  const c = game.grid.cells[cell];
+  return { x: HEX_W * (c.q + c.r / 2), z: 1.5 * HEX_SCALE * c.r };
+}
+function tileHeight(cell) {
+  const t = game.player.assignment ? game.player.assignment[cell] : -1;
+  return t < 0 ? UNASSIGNED_HEIGHT : TERRAIN_HEIGHT[t];
+}
+function cellWorldPos(cell) { const p = cellXZ(cell); return new THREE.Vector3(p.x, 0, p.z); }
+function makeInstanceMatrix(cell, terrainId, lift) {
+  const p = cellXZ(cell);
+  const h = (terrainId < 0 ? UNASSIGNED_HEIGHT : TERRAIN_HEIGHT[terrainId]) + (lift || 0);
+  const rot = Math.round(hash2(cell, 11, 3) * 6) * Math.PI / 3;
+  const m = new THREE.Matrix4();
+  m.compose(new THREE.Vector3(p.x, 0, p.z), new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), rot), new THREE.Vector3(1, h, 1));
+  return m;
+}
+function instanceTint(cell) {
+  const v = 0.86 + hash2(cell, 5, 13) * 0.26;
+  return new THREE.Color(v, v, v * 0.97);
+}
+
+function refreshTiles() {
+  if (!T3.tileMeshes || !game.player.assignment) return;
+  const lists = [[], [], [], [], []], un = [];
+  const assign = game.player.assignment;
+  for (let i = 0; i < game.cellCount; i++) { const t = assign[i]; if (t < 0) un.push(i); else lists[t].push(i); }
+  T3.meshOfCell.fill(-1);
+  T3.slotOfCell.fill(-1);
+  for (let t = 0; t < 5; t++) {
+    const mesh = T3.tileMeshes[t], cells = lists[t];
+    mesh.count = cells.length;
+    mesh.visible = cells.length > 0;
+    for (let slot = 0; slot < cells.length; slot++) {
+      const cell = cells[slot];
+      mesh.setMatrixAt(slot, makeInstanceMatrix(cell, t, cell === game.hover ? 0.075 : 0));
+      mesh.setColorAt(slot, instanceTint(cell));
+      T3.meshOfCell[cell] = t; T3.slotOfCell[cell] = slot;
+    }
+    mesh.instanceMatrix.needsUpdate = true;
+    if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
+  }
+  const um = T3.unTile;
+  um.count = un.length;
+  um.visible = un.length > 0;
+  for (let slot = 0; slot < un.length; slot++) {
+    const cell = un[slot];
+    um.setMatrixAt(slot, makeInstanceMatrix(cell, -1, cell === game.hover ? 0.075 : 0));
+    um.setColorAt(slot, instanceTint(cell));
+    T3.meshOfCell[cell] = -1; T3.slotOfCell[cell] = slot;
+  }
+  um.instanceMatrix.needsUpdate = true;
+  if (um.instanceColor) um.instanceColor.needsUpdate = true;
+  requestRender();
+}
+function updateTileCell(cell) {
+  if (!webglReady || !game.player.assignment || !T3.tileMeshes) return;
+  const t = game.player.assignment[cell];
+  const mesh = t < 0 ? T3.unTile : T3.tileMeshes[t];
+  if (!mesh) return;
+  const slot = T3.slotOfCell[cell];
+  if (slot < 0 || slot >= mesh.count) return;
+  mesh.setMatrixAt(slot, makeInstanceMatrix(cell, t, cell === game.hover ? 0.075 : 0));
+  mesh.instanceMatrix.needsUpdate = true;
+  requestRender();
+}
+function initRenderer() {
+  if (!THREE) {
+    showWebGLFailure('The three.js CDN could not be reached, so the animated atlas is unavailable. ' + (threeError || '') + ' All puzzle controls remain usable.');
+    return false;
+  }
+  let renderer;
+  try {
+    renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' });
+  } catch (err) {
+    showWebGLFailure('WebGL could not be started on this device. ' + (err && err.message || ''));
+    return false;
+  }
+  T3.renderer = renderer;
+  renderer.setPixelRatio(game.quality === 'high' ? Math.min(window.devicePixelRatio || 1, 2) : 1);
+  renderer.setClearColor(0x000000, 0);
+  renderer.outputColorSpace = THREE.SRGBColorSpace;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.04;
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  renderer.domElement.setAttribute('aria-hidden', 'true');
+  renderer.domElement.style.touchAction = 'none';
+  sealURL = renderSealPreview(renderer);
+  ui.canvasHost.appendChild(renderer.domElement);
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x161009);
+  T3.scene = scene;
+  const camera = new THREE.PerspectiveCamera(38, 1, 0.1, 300);
+  T3.camera = camera;
+  const controls = new OrbitControls(camera, renderer.domElement);
+  controls.enableDamping = game.motion;
+  controls.dampingFactor = 0.07;
+  controls.enablePan = false;
+  controls.rotateSpeed = 0.42;
+  controls.zoomSpeed = 0.65;
+  controls.minPolarAngle = 0.04;
+  controls.maxPolarAngle = 1.27;
+  controls.target.set(0, 0.35, 0);
+  T3.controls = controls;
+  controls.addEventListener('change', requestRender);
+  controls.addEventListener('start', () => { if (game.top) { game.top = false; updateToggleButtons(); } });
+  webglReady = true;
+  resizeRenderer();
+  attachCanvasEvents();
+  renderer.setAnimationLoop(tick);
+  window.addEventListener('resize', resizeRenderer);
+  if (window.ResizeObserver) {
+    try { new ResizeObserver(() => resizeRenderer()).observe(ui.viewport); } catch (err) {}
+  }
+  renderer.domElement.addEventListener('webglcontextlost', onContextLost, false);
+  renderer.domElement.addEventListener('webglcontextrestored', onContextRestored, false);
+  return true;
+}
+function showWebGLFailure(message) {
+  webglReady = false;
+  ui.webglFallback.hidden = false;
+  ui.emptyState.hidden = true;
+  ui.webglFallbackDetail.textContent = message || '';
+  if (T3.renderer && T3.renderer.domElement && T3.renderer.domElement.parentNode) T3.renderer.domElement.parentNode.removeChild(T3.renderer.domElement);
+}
+let contextLost = false;
+function onContextLost(ev) {
+  ev.preventDefault();
+  contextLost = true;
+  if (T3.renderer) T3.renderer.setAnimationLoop(null);
+  ui.webglFallback.hidden = false;
+  ui.webglFallbackDetail.textContent = 'The WebGL context was lost. The atelier is waiting for the browser to restore it.';
+  announce('The animated atlas paused because the WebGL context was lost.');
+}
+function onContextRestored() {
+  contextLost = false;
+  ui.webglFallback.hidden = true;
+  if (!webglReady) return;
+  try {
+    if (T3.renderer) { T3.renderer.shadowMap.needsUpdate = true; T3.renderer.setAnimationLoop(tick); }
+    if (game.puzzle) buildScene();
+    resizeRenderer();
+    requestRender();
+    announce('The animated atlas has been restored.');
+  } catch (err) { showWebGLFailure('The atlas could not be rebuilt after the context was restored.'); }
+}
+function resizeRenderer() {
+  if (!webglReady || !T3.renderer) return;
+  const w = ui.viewport.clientWidth, h = ui.viewport.clientHeight;
+  if (!w || !h) return;
+  T3.renderer.setPixelRatio(game.quality === 'high' ? Math.min(window.devicePixelRatio || 1, 2) : 1);
+  T3.renderer.setSize(w, h, false);
+  T3.camera.aspect = w / h;
+  T3.camera.updateProjectionMatrix();
+  requestRender();
+}
+function disposeWorld() {
+  if (!T3.world) return;
+  T3.scene.remove(T3.world);
+  T3.world.traverse(obj => {
+    if (obj.geometry) obj.geometry.dispose();
+    if (obj.material) {
+      const mats = Array.isArray(obj.material) ? obj.material : [obj.material];
+      for (const mat of mats) { if (mat.dispose) mat.dispose(); }
+    }
+  });
+  for (const tex of T3.textures) { try { tex.dispose(); } catch (err) {} }
+  T3.textures.length = 0;
+  T3.world = null;
+  T3.tileMeshes = null; T3.unTile = null; T3.decor = null; T3.water = null; T3.compass = null;
+  T3.selectionLine = null; T3.hoverLine = null; T3.hintLines = null; T3.redLines = null;
+  T3.pencilMeshes = null; T3.washMeshes = null; T3.bubbles = null; T3.keyLight = null;
+}
+function buildScene() {
+  if (!webglReady || !game.puzzle) return;
+  disposeWorld();
+  const R = game.puzzle.radius;
+  const seedNum = LOGIC.hashSeed(game.seed + '|' + game.tier);
+  const S = 2 * (Math.sqrt(3) * R + 5.2);
+  T3.layout = { R, S, seedNum };
+  const world = new THREE.Group();
+  T3.world = world; T3.scene.add(world);
+
+  const hemi = new THREE.HemisphereLight(0xfff1d6, 0x231810, 1.45); world.add(hemi);
+  const key = new THREE.DirectionalLight(0xfff2d6, 2.35);
+  key.position.set(-R * 2.6 - 6, R * 3 + 16, R * 2.4 + 9);
+  key.castShadow = true;
+  key.shadow.mapSize.set(game.quality === 'high' ? 2048 : 1024, game.quality === 'high' ? 2048 : 1024);
+  key.shadow.camera.near = 1; key.shadow.camera.far = S * 4;
+  key.shadow.camera.left = -S * 0.72; key.shadow.camera.right = S * 0.72;
+  key.shadow.camera.top = S * 0.72; key.shadow.camera.bottom = -S * 0.72;
+  key.shadow.camera.updateProjectionMatrix();
+  key.shadow.bias = -0.0005; key.shadow.normalBias = 0.025; key.shadow.radius = 3;
+  world.add(key);
+  T3.keyLight = key;
+  const fill = new THREE.DirectionalLight(0x93b4c2, 0.6);
+  fill.position.set(R * 2 + 8, R * 1.2 + 7, -R * 2 - 10); world.add(fill);
+
+  const tableTex = makeWoodTexture();
+  const table = new THREE.Mesh(new THREE.PlaneGeometry(S * 6, S * 6), new THREE.MeshStandardMaterial({ map: tableTex, roughness: 0.92, metalness: 0.02, color: 0x8a7057 }));
+  table.rotation.x = -Math.PI / 2; table.position.y = -1.45; table.receiveShadow = true; world.add(table);
+
+  let parchTex = makeParchmentTexture(seedNum);
+  const parchGeo = new THREE.PlaneGeometry(S, S, 64, 64);
+  parchGeo.rotateX(-Math.PI / 2);
+  const pp = parchGeo.attributes.position;
+  for (let i = 0; i < pp.count; i++) {
+    const x = pp.getX(i), z = pp.getZ(i);
+    const nx = Math.abs(x) / (S / 2), nz = Math.abs(z) / (S / 2);
+    const curl = -0.62 * (Math.pow(smooth(0.62, 1, nx), 2) + Math.pow(smooth(0.62, 1, nz), 2));
+    pp.setY(i, curl + 0.012 * Math.sin(x * 0.7) * Math.sin(z * 0.6));
+  }
+  parchGeo.computeVertexNormals();
+  const parchment = new THREE.Mesh(parchGeo, new THREE.MeshStandardMaterial({ map: parchTex, bumpMap: parchTex, bumpScale: 0.022, roughness: 0.96, metalness: 0.0 }));
+  parchment.position.y = -0.055; parchment.receiveShadow = true; world.add(parchment);
+  const mapGroup = new THREE.Group(); mapGroup.position.y = 0.0; world.add(mapGroup);
+  T3.mapGroup = mapGroup;
+
+  // tiles
+  const tileGeo = hexPrismGeometry();
+  T3.tileMeshes = [];
+  for (let t = 0; t < 5; t++) {
+    const mat = new THREE.MeshStandardMaterial({ map: makeTerrainTexture(t, seedNum), vertexColors: true, roughness: t === 0 ? 0.44 : 0.86, metalness: t === 0 ? 0.12 : 0.02 });
+    const mesh = new THREE.InstancedMesh(tileGeo, mat, game.cellCount);
+    mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+    mesh.castShadow = true; mesh.receiveShadow = true; mesh.frustumCulled = false;
+    mesh.count = 0; mapGroup.add(mesh); T3.tileMeshes.push(mesh);
+  }
+  T3.unTile = new THREE.InstancedMesh(tileGeo, new THREE.MeshStandardMaterial({ map: makeUnassignedTexture(seedNum), vertexColors: true, roughness: 0.92 }), game.cellCount);
+  T3.unTile.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+  T3.unTile.castShadow = true; T3.unTile.receiveShadow = true; T3.unTile.frustumCulled = false;
+  mapGroup.add(T3.unTile);
+  T3.meshOfCell = new Int8Array(game.cellCount).fill(-1);
+  T3.slotOfCell = new Int16Array(game.cellCount).fill(-1);
+
+  buildWater(mapGroup, R, S, seedNum);
+  buildDecor(mapGroup);
+  buildBubbles(mapGroup);
+  buildPencil(mapGroup, seedNum);
+  buildMarks(mapGroup);
+  buildWash(mapGroup);
+  buildCompass(mapGroup, S);
+
+  refreshTiles();
+  refreshDecor();
+  refreshBubbles();
+  refreshPencil();
+  refreshMarks();
+  resetWash();
+  frameCamera(true);
+  requestRender();
+}
+function buildWater(group, R, S, seedNum) {
+  const uniforms = {
+    uTime: { value: 0 }, uRadius: { value: R }, uSeaA: { value: new THREE.Color(0x2c5057) },
+    uSeaB: { value: new THREE.Color(0x5a8a86) }, uFoam: { value: new THREE.Color(0xd8e3c8) }, uEdge: { value: new THREE.Color(0x1d2f31) }
+  };
+  const mat = new THREE.ShaderMaterial({
+    uniforms, transparent: true, depthWrite: false, side: THREE.DoubleSide,
+    vertexShader: 'varying vec3 vW; void main(){ vec4 wp=modelMatrix*vec4(position,1.0); vW=wp.xyz; gl_Position=projectionMatrix*viewMatrix*wp; }',
+    fragmentShader: 'precision highp float; varying vec3 vW; uniform float uTime,uRadius; uniform vec3 uSeaA,uSeaB,uFoam,uEdge;\n' +
+      'void main(){ float r=vW.z/1.5; float q=vW.x/1.7320508-r*0.5; float hd=max(max(abs(q),abs(r)),abs(q+r));\n' +
+      ' float mask=1.0-smoothstep(uRadius+0.40,uRadius+0.60,hd); if(mask<0.02) discard;\n' +
+      ' float t=uTime; float w=sin(vW.x*2.0+t*0.9)+sin(vW.z*2.6-t*0.75)+sin((vW.x+vW.z)*3.3+t*1.25);\n' +
+      ' vec3 col=mix(uSeaA,uSeaB,0.5+0.24*w); col=mix(col,uFoam,smoothstep(1.9,2.9,w)*0.22);\n' +
+      ' col=mix(uEdge,col,smoothstep(uRadius+0.05,uRadius+0.44,hd)*0.85+0.15);\n' +
+      ' gl_FragColor=vec4(col, mask*0.94); }'
+  });
+  const geo = new THREE.PlaneGeometry(S * 0.98, S * 0.98);
+  geo.rotateX(-Math.PI / 2);
+  const mesh = new THREE.Mesh(geo, mat);
+  mesh.position.y = TERRAIN_HEIGHT[0] + 0.026;
+  mesh.renderOrder = 1;
+  group.add(mesh);
+  T3.water = mesh;
+}
+function makeInstancedDecor(group, geo, mat, capacity, perCell) {
+  const mesh = new THREE.InstancedMesh(geo, mat, capacity);
+  mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+  mesh.castShadow = true; mesh.receiveShadow = true; mesh.frustumCulled = false;
+  mesh.count = 0; group.add(mesh);
+  return { mesh, perCell, terrain: 0 };
+}
+function buildDecor(group) {
+  const cellCap = game.cellCount;
+  const pineGeo = makePineGeometry(1);
+  const pineMat = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.9, metalness: 0.0, flatShading: true });
+  const pine = makeInstancedDecor(group, pineGeo, pineMat, cellCap * 3, 1);
+  pine.terrain = 1;
+  const peakGeo = makePeakGeometry();
+  const peakMat = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.92, metalness: 0.02, flatShading: true });
+  const peak = makeInstancedDecor(group, peakGeo, peakMat, cellCap * 2, 2);
+  peak.terrain = 2;
+  const duneGeo = makeDuneGeometry();
+  const duneMat = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.95, metalness: 0.0, flatShading: true });
+  const dune = makeInstancedDecor(group, duneGeo, duneMat, cellCap * 2, 3);
+  dune.terrain = 3;
+  const reedGeo = makeReedGeometry();
+  const reedMat = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.9, metalness: 0.0, flatShading: true });
+  const reed = makeInstancedDecor(group, reedGeo, reedMat, cellCap * 3, 4);
+  reed.terrain = 4;
+  T3.decor = { pine, peak, dune, reed, all: [pine, peak, dune, reed] };
+}
+function refreshDecor() {
+  if (!T3.decor || !webglReady) return;
+  const high = game.quality === 'high';
+  const counts = { pine: high ? 3 : 2, peak: high ? 2 : 1, dune: high ? 2 : 1, reed: high ? 3 : 2 };
+  const caps = { pine: 3, peak: 2, dune: 2, reed: 3 };
+  const out = { pine: 0, peak: 0, dune: 0, reed: 0 };
+  const tint = new THREE.Color(); const m = new THREE.Matrix4(); const q = new THREE.Quaternion(); const yAxis = new THREE.Vector3(0, 1, 0);
+  const assign = game.player.assignment;
+  for (let cell = 0; cell < game.cellCount; cell++) {
+    const t = assign[cell];
+    let key = null;
+    if (t === 1) key = 'pine'; else if (t === 2) key = 'peak'; else if (t === 3) key = 'dune'; else if (t === 4) key = 'reed';
+    if (!key) continue;
+    const entry = T3.decor[key];
+    if (out[key] >= caps[key] * game.cellCount) continue;
+    const n = counts[key];
+    for (let k = 0; k < n; k++) {
+      const slot = out[key]++;
+      const p = cellXZ(cell);
+      const a = hash2(cell, k, 21) * Math.PI * 2;
+      const rad = (key === 'pine' ? 0.34 : 0.24) * Math.sqrt(hash2(cell, k, 33));
+      const ox = p.x + Math.cos(a) * rad, oz = p.z + Math.sin(a) * rad;
+      const sc = (key === 'pine' ? 0.62 : key === 'peak' ? 0.75 : key === 'dune' ? 0.6 : 0.7) * (0.7 + hash2(cell, k, 47) * 0.55);
+      const rot = key === 'dune' ? hash2(cell, k, 55) * Math.PI : hash2(cell, k, 55) * Math.PI * 2;
+      q.setFromAxisAngle(yAxis, rot);
+      const yBase = TERRAIN_HEIGHT[t] - 0.015;
+      m.compose(new THREE.Vector3(ox, yBase, oz), q, new THREE.Vector3(sc, sc, sc));
+      entry.mesh.setMatrixAt(slot, m);
+      tint.setScalar(0.82 + hash2(cell, k, 71) * 0.32);
+      entry.mesh.setColorAt(slot, tint);
+    }
+  }
+  for (const key of ['pine', 'peak', 'dune', 'reed']) {
+    const entry = T3.decor[key];
+    entry.mesh.count = out[key];
+    entry.mesh.visible = out[key] > 0;
+    entry.mesh.castShadow = game.quality === 'high';
+    entry.mesh.instanceMatrix.needsUpdate = true;
+    if (entry.mesh.instanceColor) entry.mesh.instanceColor.needsUpdate = true;
+  }
+}
+function buildBubbles(group) {
+  const cap = 120;
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(cap * 3), 3));
+  geo.setDrawRange(0, 0);
+  const mat = new THREE.PointsMaterial({ map: makeBubbleTexture(), size: 0.16, transparent: true, opacity: 0.7, depthWrite: false, color: 0xd7e3b4, sizeAttenuation: true, alphaTest: 0.02 });
+  const points = new THREE.Points(geo, mat);
+  points.frustumCulled = false; points.renderOrder = 2; group.add(points);
+  T3.bubbles = { points, cap, defense: null, count: 0, base: new Float32Array(cap), phase: new Float32Array(cap), posAttr: geo.attributes.position };
+}
+function refreshBubbles() {
+  const b = T3.bubbles;
+  if (!b || !webglReady) return;
+  const items = [];
+  const cap = b.cap;
+  for (let cell = 0; cell < game.cellCount && items.length < cap; cell++) {
+    if (game.player.assignment[cell] !== 4) continue;
+    const p = cellXZ(cell);
+    for (let k = 0; k < 2 && items.length < cap; k++) {
+      const a = hash2(cell, k, 83) * Math.PI * 2, rad = 0.22 * Math.sqrt(hash2(cell, k, 91));
+      items.push({ x: p.x + Math.cos(a) * rad, z: p.z + Math.sin(a) * rad, y: TERRAIN_HEIGHT[4] + 0.03, phase: hash2(cell, k, 97) });
+    }
+  }
+  b.items = items; b.count = items.length;
+  const arr = b.posAttr.array;
+  for (let i = 0; i < items.length; i++) { arr[i * 3] = items[i].x; arr[i * 3 + 1] = items[i].y; arr[i * 3 + 2] = items[i].z; }
+  b.posAttr.needsUpdate = true;
+  b.points.geometry.setDrawRange(0, items.length);
+  b.points.visible = items.length > 0;
+  requestRender();
+}
+function buildPencil(group, seedNum) {
+  T3.pencilMeshes = [];
+  const tex = {};
+  for (const t of LOGIC.TERRAINS) tex[t.id] = makeGlyphTexture(t);
+  for (let t = 0; t < 5; t++) {
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(game.cellCount * 3), 3));
+    geo.setDrawRange(0, 0);
+    const mat = new THREE.PointsMaterial({ map: tex[t], size: 0.4, transparent: true, opacity: 0.95, depthWrite: false, alphaTest: 0.03, sizeAttenuation: true });
+    const pts = new THREE.Points(geo, mat);
+    pts.frustumCulled = false; pts.renderOrder = 3; pts.visible = false; group.add(pts);
+    T3.pencilMeshes.push({ points: pts, attr: geo.attributes.position });
+  }
+  T3.glyphTex = tex;
+}
+function refreshPencil() {
+  if (!T3.pencilMeshes || !webglReady) return;
+  const pencil = game.player.pencil, assign = game.player.assignment;
+  for (let t = 0; t < 5; t++) {
+    const entry = T3.pencilMeshes[t];
+    let count = 0; const arr = entry.attr.array;
+    if (game.puzzle && game.puzzle.terrainIds.indexOf(t) >= 0) {
+      for (let cell = 0; cell < game.cellCount; cell++) {
+        if (!(pencil[cell] & (1 << t)) || assign[cell] >= 0) continue;
+        const p = cellXZ(cell);
+        arr[count * 3] = p.x; arr[count * 3 + 1] = 0.53 + hash2(cell, t, 101) * 0.08; arr[count * 3 + 2] = p.z;
+        count++;
+      }
+    }
+    entry.attr.needsUpdate = true;
+    entry.points.geometry.setDrawRange(0, count);
+    entry.points.visible = count > 0;
+  }
+  requestRender();
+}
+function buildMarks(group) {
+  const geo = hexOutlineGeometry(1.02);
+  T3.selectionLine = new THREE.LineLoop(geo, new THREE.LineBasicMaterial({ color: COL.gold, transparent: true, opacity: 0.95, depthWrite: false }));
+  T3.hoverLine = new THREE.LineLoop(hexOutlineGeometry(1.015), new THREE.LineBasicMaterial({ color: 0xf7ecd2, transparent: true, opacity: 0.5, depthWrite: false }));
+  T3.hintLines = [];
+  for (let i = 0; i < 10; i++) {
+    const line = new THREE.LineLoop(hexOutlineGeometry(1.025), new THREE.LineBasicMaterial({ color: 0xffe8b0, transparent: true, opacity: 0.85, depthWrite: false }));
+    line.visible = false; T3.hintLines.push(line);
+  }
+  T3.redLines = [];
+  for (let i = 0; i < 12; i++) {
+    const line = new THREE.LineLoop(hexOutlineGeometry(1.035), new THREE.LineBasicMaterial({ color: COL.crimson, transparent: true, opacity: 0.9, depthWrite: false }));
+    line.visible = false; T3.redLines.push(line);
+  }
+  group.add(T3.selectionLine, T3.hoverLine);
+  for (const l of T3.hintLines) group.add(l);
+  for (const l of T3.redLines) group.add(l);
+  T3.selectionLine.visible = false; T3.hoverLine.visible = false;
+}
+function placeMarkLine(line, cell, lift) {
+  const p = cellXZ(cell);
+  line.position.set(p.x, tileHeight(cell) + (lift || 0.035), p.z);
+  line.visible = true;
+}
+function refreshMarks() {
+  if (!T3.selectionLine || !webglReady) return;
+  const sel = game.selected, hover = game.hover;
+  if (sel >= 0 && game.ready) placeMarkLine(T3.selectionLine, sel); else T3.selectionLine.visible = false;
+  if (hover >= 0 && hover !== sel && game.ready) placeMarkLine(T3.hoverLine, hover); else T3.hoverLine.visible = false;
+  for (let i = 0; i < T3.hintLines.length; i++) {
+    const line = T3.hintLines[i];
+    const cell = game.hintCells[i];
+    if (cell !== undefined && cell >= 0) placeMarkLine(line, cell, 0.06); else line.visible = false;
+  }
+  const redCells = (game.contradictions && game.contradictions.cells) || [];
+  for (let i = 0; i < T3.redLines.length; i++) {
+    const line = T3.redLines[i];
+    if (redCells[i] !== undefined) placeMarkLine(line, redCells[i], 0.07); else line.visible = false;
+  }
+  requestRender();
+}
+function buildWash(group) {
+  T3.washMeshes = [];
+  const washTex = makeWashTexture();
+  const cols = [0x6fa8a4, 0x8aa562, 0xb6ab96, 0xe0c58e, 0x7a8a66];
+  for (let t = 0; t < 5; t++) {
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(game.cellCount * 3), 3));
+    geo.setDrawRange(0, 0);
+    const mat = new THREE.PointsMaterial({ map: washTex, size: 2.5, transparent: true, opacity: 0, depthWrite: false, color: cols[t], sizeAttenuation: true, alphaTest: 0.01 });
+    const pts = new THREE.Points(geo, mat);
+    pts.frustumCulled = false; pts.renderOrder = 4; pts.visible = false; group.add(pts);
+    T3.washMeshes.push({ points: pts, attr: geo.attributes.position, target: 0 });
+  }
+}
+function resetWash() {
+  if (!T3.washMeshes) return;
+  for (const w of T3.washMeshes) { w.target = 0; w.points.material.opacity = 0; w.points.visible = false; w.points.geometry.setDrawRange(0, 0); }
+}
+function showWash(terrainIds) {
+  if (!T3.washMeshes || !webglReady) return;
+  for (const t of terrainIds) {
+    const w = T3.washMeshes[t];
+    if (!w) continue;
+    let count = 0; const arr = w.attr.array;
+    for (let cell = 0; cell < game.cellCount; cell++) {
+      if (game.player.assignment[cell] !== t) continue;
+      const p = cellXZ(cell);
+      arr[count * 3] = p.x; arr[count * 3 + 1] = tileHeight(cell) + 0.08; arr[count * 3 + 2] = p.z;
+      count++;
+    }
+    w.attr.needsUpdate = true;
+    w.points.geometry.setDrawRange(0, count);
+    w.points.visible = count > 0;
+    w.target = count > 0 ? 0.55 : 0;
+    if (!game.motion) w.points.material.opacity = w.target;
+  }
+  requestRender();
+}
+function buildCompass(group, S) {
+  const compass = new THREE.Group();
+  compass.position.set(S * 0.365, 0.01, S * 0.345);
+  const ringMat = new THREE.MeshStandardMaterial({ color: 0xcaa24e, metalness: 0.88, roughness: 0.3 });
+  const ring = new THREE.Mesh(new THREE.TorusGeometry(1.03, 0.075, 10, 48), ringMat);
+  ring.rotation.x = Math.PI / 2; ring.position.y = 0.045; ring.castShadow = true; ring.receiveShadow = true;
+  const face = new THREE.Mesh(new THREE.CircleGeometry(0.99, 48), new THREE.MeshStandardMaterial({ map: makeCompassTexture(), roughness: 0.62, metalness: 0.22 }));
+  face.rotation.x = -Math.PI / 2; face.position.y = 0.035; face.receiveShadow = true;
+  const needle = new THREE.Group();
+  const nA = new THREE.Mesh(new THREE.ConeGeometry(0.11, 0.76, 4), new THREE.MeshStandardMaterial({ color: COL.crimson, metalness: 0.35, roughness: 0.45, flatShading: true }));
+  nA.rotation.x = Math.PI / 2; nA.position.set(0, 0.09, 0.4);
+  const nB = new THREE.Mesh(new THREE.ConeGeometry(0.09, 0.64, 4), new THREE.MeshStandardMaterial({ color: COL.ink, metalness: 0.3, roughness: 0.5, flatShading: true }));
+  nB.rotation.x = -Math.PI / 2; nB.position.set(0, 0.09, -0.34);
+  const knob = new THREE.Mesh(new THREE.SphereGeometry(0.1, 10, 8), ringMat);
+  knob.position.y = 0.1;
+  needle.add(nA, nB, knob); needle.castShadow = true;
+  compass.add(ring, face, needle);
+  group.add(compass);
+  T3.compass = compass;
+}
+function frameCamera(snap) {
+  if (!T3.camera) return;
+  const S = (T3.layout && T3.layout.S) || 30;
+  const dist = S * 1.52;
+  const tilt = Math.PI * 0.305;
+  const basePos = new THREE.Vector3(0, Math.sin(tilt) * dist, Math.cos(tilt) * dist);
+  const topPos = new THREE.Vector3(0, dist * 1.02, dist * 0.02);
+  const target = new THREE.Vector3(0, 0.35, 0);
+  T3.basePos = basePos; T3.topPos = topPos; T3.baseTarget = target;
+  T3.controls.minDistance = dist * 0.55;
+  T3.controls.maxDistance = dist * 1.5;
+  if (snap) {
+    T3.camera.position.copy(game.top ? topPos : basePos);
+    T3.controls.target.copy(target);
+    T3.controls.update();
+  }
+  requestRender();
+}
+function setTopView() {
+  if (!webglReady) return;
+  game.top = !game.top;
+  updateToggleButtons();
+  if (!game.motion) {
+    T3.camera.position.copy(game.top ? T3.topPos : T3.basePos);
+    T3.controls.target.copy(T3.baseTarget);
+    T3.controls.update();
+    requestRender();
+    announce(game.top ? 'Flat top view.' : 'Tilted atlas view.');
+    return;
+  }
+  camTween = { from: T3.camera.position.clone(), to: (game.top ? T3.topPos : T3.basePos).clone(), fromT: T3.controls.target.clone(), toT: T3.baseTarget.clone(), t: 0, dur: 0.7 };
+  announce(game.top ? 'Flat top view.' : 'Tilted atlas view.');
+}
+function setQuality(quality) {
+  game.quality = quality === 'low' ? 'low' : 'high';
+  updateToggleButtons();
+  if (!webglReady) { saveNow(); return; }
+  T3.renderer.setPixelRatio(game.quality === 'high' ? Math.min(window.devicePixelRatio || 1, 2) : 1);
+  if (T3.keyLight) {
+    const size = game.quality === 'high' ? 2048 : 1024;
+    T3.keyLight.shadow.mapSize.set(size, size);
+    if (T3.keyLight.shadow.map) { T3.keyLight.shadow.map.dispose(); T3.keyLight.shadow.map = null; }
+  }
+  refreshDecor();
+  resizeRenderer();
+  requestRender();
+  saveNow();
+  announceLater('Quality set to ' + game.quality + '.');
+}
+function setMotion(motion) {
+  game.motion = !!motion;
+  if (T3.controls) T3.controls.enableDamping = game.motion;
+  if (!game.motion) {
+    animTime = 0;
+    if (T3.water) T3.water.material.uniforms.uTime.value = 0;
+    for (const w of T3.washMeshes || []) w.points.material.opacity = w.target;
+  }
+  updateToggleButtons();
+  requestRender();
+  saveNow();
+  announceLater('Animation ' + (game.motion ? 'on.' : 'off. Rendering on demand.'));
+}
+function updateToggleButtons() {
+  ui.btnTop.setAttribute('aria-pressed', game.top ? 'true' : 'false');
+  ui.btnTop.textContent = game.top ? 'Tilted View' : 'Top View';
+  ui.btnQuality.setAttribute('aria-pressed', game.quality === 'high' ? 'true' : 'false');
+  ui.btnQuality.textContent = 'Quality: ' + (game.quality === 'high' ? 'High' : 'Low');
+  ui.btnMotion.setAttribute('aria-pressed', game.motion ? 'true' : 'false');
+  ui.btnMotion.textContent = 'Motion: ' + (game.motion ? 'On' : 'Off');
+}
+function animateBubbles() {
+  const b = T3.bubbles;
+  if (!b || !b.items || !b.count) return;
+  const arr = b.posAttr.array;
+  for (let i = 0; i < b.count; i++) {
+    const item = b.items[i];
+    arr[i * 3] = item.x;
+    arr[i * 3 + 1] = item.y + ((animTime * 0.22 + item.phase) % 1) * 0.5;
+    arr[i * 3 + 2] = item.z;
+  }
+  b.posAttr.needsUpdate = true;
+}
+function tick(now) {
+  if (!webglReady || contextLost) return;
+  const dt = lastFrame ? Math.min(0.06, (now - lastFrame) / 1000) : 0.016;
+  lastFrame = now;
+  if (camTween) {
+    camTween.t += dt / camTween.dur;
+    const k = camTween.t >= 1 ? 1 : (camTween.t * camTween.t * (3 - 2 * camTween.t));
+    T3.camera.position.lerpVectors(camTween.from, camTween.to, k);
+    T3.controls.target.lerpVectors(camTween.fromT, camTween.toT, k);
+    if (camTween.t >= 1) camTween = null;
+    dirty = true;
+  }
+  if (game.motion) {
+    animTime += dt;
+    if (T3.water) T3.water.material.uniforms.uTime.value = animTime;
+    if (T3.compass) T3.compass.rotation.y += dt * 0.16;
+    animateBubbles();
+    if (T3.selectionLine) T3.selectionLine.material.opacity = 0.7 + Math.sin(animTime * 2.6) * 0.22;
+    if (T3.redLines) for (const line of T3.redLines) if (line.visible) line.material.opacity = 0.5 + Math.sin(animTime * 5.2) * 0.35;
+    if (T3.washMeshes) for (const w of T3.washMeshes) {
+      const target = w.target;
+      const op = w.points.material.opacity;
+      if (Math.abs(op - target) > 0.005) { w.points.material.opacity = op + (target - op) * Math.min(1, dt * 2.4); dirty = true; }
+    }
+    dirty = true;
+  }
+  T3.controls.update();
+  if (dirty) {
+    T3.renderer.render(T3.scene, T3.camera);
+    rendererStatsSnapshot = rendererInfo();
+    dirty = false;
+  }
+}
+function rendererInfo() {
+  if (!webglReady || !T3.renderer) return { status: 'WebGL unavailable' };
+  const info = T3.renderer.info;
+  return {
+    'Draw calls': info.render.calls,
+    Triangles: info.render.triangles,
+    Points: info.render.points || 0,
+    Geometries: info.memory.geometries,
+    Textures: info.memory.textures,
+    Programs: info.programs ? info.programs.length : 0,
+    'Pixel ratio': T3.renderer.getPixelRatio()
+  };
+}
+function announceLater(message) { announce(message); }
+
+/* ============================================================
+   §4 — INPUT: rays, hexes, pointer & keyboard
+   ============================================================ */
+const SEAL_FALLBACK = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(
+  '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><defs><radialGradient id="w" cx="35%" cy="30%"><stop offset="0" stop-color="#c05a45"/><stop offset=".6" stop-color="#8e3326"/><stop offset="1" stop-color="#5c1e16"/></radialGradient></defs><circle cx="32" cy="33" r="27" fill="url(#w)" stroke="#4a140e" stroke-width="2"/><circle cx="32" cy="33" r="20" fill="none" stroke="#f0c9a8" stroke-opacity=".35" stroke-width="1.5"/><text x="32" y="43" font-family="Georgia,serif" font-size="30" font-weight="700" fill="#3f0f0a" text-anchor="middle">C</text></svg>');
+const TYPE_LABEL = { 1: 'Neighbour count', 2: 'Row count', 3: 'One region', 4: 'No touching', 5: 'Same terrain' };
+const TERRAIN_CSS = { sea: '--sea', forest: '--forest', mountain: '--mountain', desert: '--desert', swamp: '--swamp' };
+
+let pointerDown = null;
+const raycaster = THREE ? new THREE.Raycaster() : null;
+const groundPlane = THREE ? new THREE.Plane(new THREE.Vector3(0, 1, 0), -0.18) : null;
+
+function attachCanvasEvents() {
+  const canvas = T3.renderer.domElement;
+  canvas.addEventListener('pointermove', ev => {
+    if (!game.ready) return;
+    const cell = pickCell(ev.clientX, ev.clientY);
+    if (cell !== game.hover) setHover(cell);
+  });
+  canvas.addEventListener('pointerleave', () => { if (!game.ready) return; setHover(-1); });
+  canvas.addEventListener('pointerdown', ev => { pointerDown = { x: ev.clientX, y: ev.clientY, id: ev.pointerId }; });
+  canvas.addEventListener('pointerup', ev => {
+    if (!pointerDown || pointerDown.id !== ev.pointerId) return;
+    const moved = Math.hypot(ev.clientX - pointerDown.x, ev.clientY - pointerDown.y);
+    pointerDown = null;
+    if (moved > 7 || !game.ready || game.busy || game.solved) return;
+    const cell = pickCell(ev.clientX, ev.clientY);
+    if (cell < 0) return;
+    setSelected(cell);
+    applyTool(cell, ev.shiftKey);
+  });
+  canvas.addEventListener('contextmenu', ev => {
+    ev.preventDefault();
+    if (!game.ready || game.busy || game.solved) return;
+    const cell = pickCell(ev.clientX, ev.clientY);
+    if (cell >= 0) { setSelected(cell); togglePencilCell(cell); }
+  });
+}
+function pickCell(clientX, clientY) {
+  if (!webglReady || !game.grid) return -1;
+  const rect = T3.renderer.domElement.getBoundingClientRect();
+  if (!rect.width || !rect.height) return -1;
+  const ndc = new THREE.Vector2(((clientX - rect.left) / rect.width) * 2 - 1, -((clientY - rect.top) / rect.height) * 2 + 1);
+  raycaster.setFromCamera(ndc, T3.camera);
+  const hit = new THREE.Vector3();
+  if (!raycaster.ray.intersectPlane(groundPlane, hit)) return -1;
+  const rf = hit.z / (1.5 * HEX_SCALE);
+  const qf = hit.x / (HEX_W) - rf / 2;
+  let x = qf, z = rf, y = -x - z;
+  let rx = Math.round(x), ry = Math.round(y), rz = Math.round(z);
+  const dx = Math.abs(rx - x), dy = Math.abs(ry - y), dz = Math.abs(rz - z);
+  if (dx > dy && dx > dz) rx = -ry - rz; else if (dy > dz) ry = -rx - rz; else rz = -rx - ry;
+  const idx = game.grid.index.get(rx + ',' + rz);
+  return idx === undefined ? -1 : idx;
+}
+function setHover(cell) {
+  const old = game.hover;
+  if (old === cell) return;
+  game.hover = cell;
+  if (webglReady) { if (old >= 0) updateTileCell(old); if (cell >= 0) updateTileCell(cell); refreshMarks(); }
+  requestRender();
+}
+function setSelected(cell) {
+  if (cell < 0 || cell >= game.cellCount) return;
+  game.selected = cell;
+  ui.hexSelect.value = String(cell);
+  updateHudHex();
+  updateCandidates();
+  refreshMarks();
+}
+function selectTerrain(id) {
+  if (!game.puzzle || game.puzzle.terrainIds.indexOf(id) < 0) return;
+  game.terrain = id;
+  updatePaletteState();
+  updateCandidates();
+  announce(LOGIC.TERRAINS[id].name + ' ink selected.');
+}
+function setTool(tool) {
+  game.tool = tool;
+  updateToolState();
+  announce(tool === 'ink' ? 'Ink tool.' : tool === 'pencil' ? 'Pencil tool.' : 'Erase tool.');
+}
+function updatePaletteState() {
+  for (const btn of ui.palette.querySelectorAll('[data-terrain]')) btn.setAttribute('aria-pressed', (+btn.dataset.terrain === game.terrain) ? 'true' : 'false');
+}
+function updateToolState() {
+  for (const btn of ui.toolBtns) btn.setAttribute('aria-pressed', btn.dataset.tool === game.tool ? 'true' : 'false');
+}
+function updateCandidates() {
+  ui.candidates.innerHTML = '';
+  if (!game.puzzle) return;
+  for (const t of game.puzzle.terrainIds) {
+    const terr = LOGIC.TERRAINS[t];
+    const btn = document.createElement('button');
+    btn.type = 'button'; btn.className = 'cand-btn'; btn.dataset.cand = String(t);
+    btn.title = 'Pencil ' + terr.name + ' as a candidate for the chosen hex';
+    btn.setAttribute('aria-label', 'Pencil candidate ' + terr.name);
+    const pressed = !!(game.player.pencil[game.selected] & (1 << t)) && game.player.assignment[game.selected] < 0;
+    btn.setAttribute('aria-pressed', pressed ? 'true' : 'false');
+    btn.innerHTML = '<span class="glyph" aria-hidden="true">' + terr.glyph + '</span>';
+    btn.addEventListener('click', () => togglePencilTerrain(game.selected, t));
+    ui.candidates.appendChild(btn);
+  }
+}
+function updateHudHex() {
+  if (!game.grid) { ui.hudHex.textContent = '—'; return; }
+  const c = game.grid.cells[game.selected];
+  ui.hudHex.textContent = '(' + c.q + ', ' + c.r + ')';
+}
+function setCellTerrain(cell, terrainId) {
+  if (!game.ready || game.busy || game.solved) return;
+  if (game.player.assignment[cell] === terrainId) return;
+  pushHistory();
+  game.player.assignment[cell] = terrainId;
+  game.player.pencil[cell] = 0;
+  hideHint();
+  updateHexOption(cell);
+  afterPlayerChange();
+  const c = game.grid.cells[cell];
+  announce(terrainId < 0 ? 'Hex (' + c.q + ', ' + c.r + ') erased.' : 'Hex (' + c.q + ', ' + c.r + ') inked as ' + LOGIC.TERRAINS[terrainId].name + '.');
+}
+function togglePencilCell(cell) { togglePencilTerrain(cell, game.terrain); }
+function togglePencilTerrain(cell, id) {
+  if (!game.ready || game.busy || game.solved) return;
+  if (cell < 0 || cell >= game.cellCount) return;
+  if (game.player.assignment[cell] >= 0) { announce('Erase that hex before pencilling candidates.'); return; }
+  if (game.puzzle.terrainIds.indexOf(id) < 0) return;
+  pushHistory();
+  game.player.pencil[cell] ^= (1 << id);
+  hideHint();
+  afterPlayerChange();
+  const c = game.grid.cells[cell];
+  announce((game.player.pencil[cell] & (1 << id) ? 'Pencilled ' : 'Removed ') + LOGIC.TERRAINS[id].name + ' at hex (' + c.q + ', ' + c.r + ').');
+}
+function applyTool(cell, pencilOverride) {
+  if (!game.ready || game.busy || game.solved) return;
+  if (pencilOverride || game.tool === 'pencil') togglePencilCell(cell);
+  else if (game.tool === 'erase') setCellTerrain(cell, -1);
+  else setCellTerrain(cell, game.terrain);
+}
+function toggleLiar(index) {
+  if (!game.ready || game.busy || game.solved) return;
+  pushHistory();
+  const on = !game.player.liarFlags[index];
+  game.player.liarFlags[index] = on ? 1 : 0;
+  hideHint();
+  afterPlayerChange();
+  announce('Note ' + (index + 1) + (on ? ' sealed as a lie.' : ' unsealed.'));
+}
+function clearInks() {
+  if (!game.ready || game.busy) return;
+  pushHistory();
+  game.player.assignment.fill(-1);
+  game.player.pencil.fill(0);
+  game.player.liarFlags.fill(0);
+  game.solved = false;
+  ui.solvedBadge.hidden = true;
+  game.top = false;
+  hideHint();
+  afterPlayerChange();
+  renderAll();
+  announce('All inks, pencil marks and seals cleared.');
+}
+function afterPlayerChange() {
+  if (!game.ready) return;
+  if (webglReady) {
+    refreshTiles(); refreshDecor(); refreshPencil(); refreshBubbles(); refreshMarks();
+  }
+  updateMetrics();
+  updateCandidates();
+  runAnalysis();
+  updateUndoButtons();
+  saveSoon();
+  requestRender();
+}
+function runAnalysis() {
+  if (!game.puzzle) return;
+  game.contradictions = LOGIC.analyse(game.puzzle, game.player);
+  const bad = !game.contradictions.ok && game.contradictions.message;
+  if (bad && bad !== game.lastContradiction) { game.lastContradiction = bad; announce('Contradiction: ' + bad); }
+  if (!bad) game.lastContradiction = '';
+  updateMetrics();
+  updateClueStates();
+  if (webglReady) refreshMarks();
+}
+
+/* ============================================================
+   §5 — UI: cards, palette, ledger, hints, judgment, tests
+   ============================================================ */
+function renderAll() {
+  if (!game.puzzle) return;
+  renderPalette();
+  renderClueList();
+  renderHexSelect();
+  updateMetrics();
+  updateClueStates();
+  updateToolState();
+  updateUndoButtons();
+  updateToggleButtons();
+  updateCandidates();
+  ui.notesIntro.textContent = 'Exactly ' + game.puzzle.liarCount + ' of these ' + game.puzzle.clues.length + ' notes ' + (game.puzzle.liarCount === 1 ? 'is a lie' : 'are lies') + '. Seal the liar, then ink every hex.';
+  ui.liarBlurb.textContent = LOGIC.TIERS[game.tier].blurb;
+  ui.puzzleNo.textContent = 'No. ' + String(LOGIC.hashSeed(game.seed + '|' + game.tier) % 900 + 100).padStart(3, '0');
+  ui.footSeed.textContent = game.seed;
+  ui.footTier.textContent = LOGIC.TIERS[game.tier].name;
+  ui.footClues.textContent = game.puzzle.clues.length + ' notes';
+  ui.hudTier.textContent = LOGIC.TIERS[game.tier].name;
+  ui.solvedBadge.hidden = !game.solved;
+  runAnalysis();
+}
+function renderPalette() {
+  ui.palette.innerHTML = '';
+  for (const t of game.puzzle.terrainIds) {
+    const terr = LOGIC.TERRAINS[t];
+    const btn = document.createElement('button');
+    btn.type = 'button'; btn.className = 'terrain-btn'; btn.dataset.terrain = String(t);
+    btn.setAttribute('aria-pressed', t === game.terrain ? 'true' : 'false');
+    btn.title = 'Select ' + terr.name + ' ink (key ' + (game.puzzle.terrainIds.indexOf(t) + 1) + ')';
+    btn.innerHTML = '<span class="glyph" style="--terr:var(' + TERRAIN_CSS[terr.key] + ')" aria-hidden="true">' + terr.glyph + '</span><span>' + terr.name + '</span>';
+    btn.addEventListener('click', () => selectTerrain(t));
+    ui.palette.appendChild(btn);
+  }
+}
+function renderClueList() {
+  ui.clueList.innerHTML = '';
+  const sealSrc = sealURL || SEAL_FALLBACK;
+  game.puzzle.clues.forEach((clue, i) => {
+    const li = document.createElement('li');
+    li.className = 'clue-card';
+    li.dataset.index = String(i);
+    li.style.setProperty('--tilt', ((hash2(i, 3, 7) - 0.5) * 0.5).toFixed(2) + 'deg');
+    const num = document.createElement('span'); num.className = 'num'; num.textContent = pad2(i + 1);
+    const body = document.createElement('div');
+    const type = document.createElement('span'); type.className = 'note-type'; type.textContent = TYPE_LABEL[clue.type];
+    const claim = document.createElement('p'); claim.className = 'claim'; claim.textContent = LOGIC.describeClue(game.puzzle, i);
+    const actions = document.createElement('div'); actions.className = 'clue-actions';
+    const lieBtn = document.createElement('button'); lieBtn.type = 'button'; lieBtn.className = 'lie-btn'; lieBtn.dataset.lie = String(i);
+    lieBtn.setAttribute('aria-pressed', 'false'); lieBtn.setAttribute('aria-label', 'Mark note ' + (i + 1) + ' as a lie');
+    lieBtn.textContent = 'Mark as lie';
+    actions.appendChild(lieBtn); body.appendChild(type); body.appendChild(claim); body.appendChild(actions);
+    const seal = document.createElement('img'); seal.className = 'seal'; seal.src = sealSrc; seal.alt = ''; seal.setAttribute('aria-hidden', 'true');
+    li.appendChild(num); li.appendChild(body); li.appendChild(seal);
+    ui.clueList.appendChild(li);
+  });
+}
+function renderHexSelect() {
+  ui.hexSelect.innerHTML = '';
+  game.hexOptions = [];
+  for (let i = 0; i < game.cellCount; i++) {
+    const opt = document.createElement('option');
+    opt.value = String(i);
+    game.hexOptions.push(opt);
+    ui.hexSelect.appendChild(opt);
+  }
+  for (let i = 0; i < game.cellCount; i++) updateHexOption(i);
+  ui.hexSelect.value = String(game.selected);
+}
+function updateHexOption(cell) {
+  if (!game.hexOptions || !game.hexOptions[cell]) return;
+  const c = game.grid.cells[cell];
+  const t = game.player.assignment[cell];
+  game.hexOptions[cell].textContent = '(' + c.q + ', ' + c.r + ') · ' + (t < 0 ? 'unknown' : LOGIC.TERRAINS[t].name);
+}
+function updateMetrics() {
+  if (!game.puzzle) return;
+  let inked = 0, flagged = 0;
+  for (let i = 0; i < game.cellCount; i++) if (game.player.assignment[i] >= 0) inked++;
+  for (let i = 0; i < game.puzzle.clues.length; i++) if (game.player.liarFlags[i]) flagged++;
+  const L = game.puzzle.liarCount;
+  ui.hudInked.textContent = inked + ' / ' + game.cellCount;
+  ui.hudLies.textContent = flagged + ' / ' + L;
+  ui.liarMeterText.textContent = flagged + ' / ' + L;
+  updateHudHex();
+  if (!ui.hexSelect.value) ui.hexSelect.value = String(game.selected);
+  if (!game.contradictions || game.contradictions.ok) ui.notesProgress.textContent = inked + ' of ' + game.cellCount + ' hexes inked · ' + flagged + ' of ' + L + ' lies sealed.';
+  else ui.notesProgress.textContent = game.contradictions.message;
+  const dots = ui.sealDots;
+  if (dots.childElementCount !== L) {
+    dots.innerHTML = '';
+    for (let i = 0; i < L; i++) { const d = document.createElement('span'); d.className = 'seal-dot'; dots.appendChild(d); }
+  }
+  for (let i = 0; i < dots.children.length; i++) dots.children[i].className = 'seal-dot' + (i < flagged ? ' on' : '');
+  ui.btnClear.disabled = !game.ready || game.busy;
+}
+function updateClueStates() {
+  if (!game.puzzle || !ui.clueList.children.length) return;
+  const flagged = game.player.liarFlags;
+  const violated = (game.contradictions && game.contradictions.violations) || [];
+  for (let i = 0; i < game.puzzle.clues.length; i++) {
+    const card = ui.clueList.children[i];
+    if (!card) continue;
+    const isLiar = !!flagged[i];
+    card.classList.toggle('is-liar', isLiar);
+    card.classList.toggle('contradiction', violated.indexOf(i) >= 0);
+    card.classList.toggle('support', game.support.indexOf(i) >= 0);
+    const btn = card.querySelector('.lie-btn');
+    if (btn) {
+      btn.setAttribute('aria-pressed', isLiar ? 'true' : 'false');
+      btn.textContent = isLiar ? 'Sealed as a lie' : 'Mark as lie';
+      btn.setAttribute('aria-label', (isLiar ? 'Remove lie seal from note ' : 'Mark note ') + (i + 1) + (isLiar ? '' : ' as a lie'));
+      btn.disabled = !game.ready || game.busy || game.solved;
+    }
+  }
+}
+function updateUndoButtons() {
+  ui.btnUndo.disabled = !game.ready || game.solved || !game.history.undo.length;
+  ui.btnRedo.disabled = !game.ready || game.solved || !game.history.redo.length;
+  const canEdit = !!game.ready && !game.busy && !game.solved;
+  for (const b of ui.toolBtns) b.disabled = !canEdit;
+  for (const b of ui.palette.querySelectorAll('button')) b.disabled = !canEdit;
+  ui.btnApply.disabled = !canEdit;
+  ui.btnHint.disabled = !canEdit;
+  ui.btnSubmit.disabled = !canEdit;
+  ui.btnClear.disabled = !canEdit;
+  ui.hexSelect.disabled = !game.ready || game.busy;
+  for (const b of ui.candidates.querySelectorAll('button')) b.disabled = !canEdit;
+  for (const b of ui.clueList.querySelectorAll('.lie-btn')) b.disabled = !canEdit;
+}
+function hideHint() {
+  ui.hintBanner.hidden = true;
+  game.support = []; game.hintCells = []; game.hintClue = -1;
+  updateClueStates();
+  if (webglReady) refreshMarks();
+}
+function setHint(title, text) {
+  ui.hintBanner.hidden = false;
+  ui.hintText.textContent = text;
+  const strong = ui.hintBanner.querySelector('strong');
+  if (strong) strong.textContent = title;
+  updateClueStates();
+  if (webglReady) refreshMarks();
+}
+function supportSentence(ids) {
+  const notes = [];
+  for (const id of ids) if (id >= 0 && notes.indexOf(id + 1) < 0) notes.push(id + 1);
+  if (!notes.length) return '';
+  return 'Supporting notes: #' + notes.slice(0, 4).join(', #') + (notes.length > 4 ? '…' : '') + '.';
+}
+function showHint() {
+  if (!game.ready || game.busy || game.solved) return;
+  const hint = LOGIC.getHint(game.puzzle, game.player);
+  game.support = []; game.hintCells = [];
+  if (!hint.ok) {
+    setHint('The compass is quiet', 'Every forced deduction is already reflected in your work. ' + hint.reason);
+    announce('No new forced deduction is available.');
+    return;
+  }
+  if (hint.kind === 'clue') {
+    const noteNo = hint.clue + 1;
+    const claim = LOGIC.describeClue(game.puzzle, hint.clue);
+    game.support = [hint.clue].concat(hint.support || []).filter((v, i, a) => a.indexOf(v) === i);
+    game.hintCells = LOGIC.cellsForClue(game.puzzle, hint.clue);
+    let text;
+    if (hint.status === 2) {
+      let geometry = '';
+      const c = game.puzzle.clues[hint.clue];
+      if (c.type === 1 && c.k > game.grid.cells[c.cell].neighbors.length) geometry = 'That hex has only ' + game.grid.cells[c.cell].neighbors.length + ' neighbours, so it cannot have ' + c.k + '.';
+      else if (c.type === 2 && c.k > game.grid.rows[game.grid.cells[c.cell].r + game.grid.radius].length) geometry = 'That row has only ' + game.grid.rows[game.grid.cells[c.cell].r + game.grid.radius].length + ' hexes, so it cannot hold ' + c.k + '.';
+      text = 'Seal note #' + noteNo + ' as a lie. It claims: ' + claim + ' ' + (geometry || (supportSentence(hint.support) ? supportSentence(hint.support) + ' Those notes rule the claim out.' : 'The geometry of the atlas makes the claim impossible.')) + ' ' + supportSentence(hint.support);
+    } else {
+      text = 'Note #' + noteNo + ' cannot be the lie. It claims: ' + claim + ' The propagation solver proves it true. ' + supportSentence(hint.support) + ' Remove its seal if you placed one.';
+    }
+    setHint('The compass points', text.trim());
+    announce(text.trim());
+  } else {
+    const c = game.grid.cells[hint.cell];
+    game.hintCells = [hint.cell];
+    game.support = (hint.support || []).slice();
+    const wrong = game.player.assignment[hint.cell] >= 0 && game.player.assignment[hint.cell] !== hint.value;
+    const text = (wrong ? 'Your ink at hex (' + c.q + ', ' + c.r + ') is wrong; it must be ' + LOGIC.TERRAINS[hint.value].name + '. ' : 'Ink hex (' + c.q + ', ' + c.r + ') as ' + LOGIC.TERRAINS[hint.value].name + '. ') +
+      supportSentence(hint.support) + ' Propagation rules out every other terrain there.';
+    setHint('The compass points', text);
+    announce(text);
+    const el = ui.clueList.querySelector('.clue-card.support');
+    if (el) el.scrollIntoView({ block: 'nearest', behavior: prefersReduced ? 'auto' : 'smooth' });
+  }
+  if (webglReady) refreshMarks();
+}
+function submitAtlas() {
+  if (!game.ready || game.busy || game.solved) return;
+  if (!game.worker) { announce('The verification worker is unavailable; draw the atlas again.'); return; }
+  ui.btnSubmit.disabled = true;
+  game.worker.postMessage({ cmd: 'submit', assignment: Array.from(game.player.assignment), liarFlags: Array.from(game.player.liarFlags) });
+}
+function onSubmitResult(result) {
+  ui.btnSubmit.disabled = false;
+  if (!result) return;
+  if (result.ok) {
+    game.solved = true;
+    ui.solvedBadge.hidden = false;
+    hideHint();
+    if (webglReady) showWash(game.puzzle.terrainIds);
+    updateUndoButtons(); updateClueStates();
+    saveNow();
+    setHint('The atlas is complete', result.message);
+    announce(result.message);
+    return;
+  }
+  if (result.resolvedTerrains && result.resolvedTerrains.length && webglReady) showWash(result.resolvedTerrains);
+  let text = result.message || 'The atlas was not accepted.';
+  if (result.clue !== undefined && result.clue !== null) {
+    game.support = [result.clue]; game.hintCells = LOGIC.cellsForClue(game.puzzle, result.clue);
+    const card = ui.clueList.children[result.clue];
+    if (card) card.scrollIntoView({ block: 'center', behavior: prefersReduced ? 'auto' : 'smooth' });
+  } else { game.support = []; game.hintCells = []; }
+  setHint('Judgment', text);
+  updateClueStates();
+  refreshMarks();
+  announce('Atlas rejected. ' + text);
+}
+
+/* ---------- self-test panel ---------- */
+let testsRunning = false, testsRan = false, testWatchdog = 0;
+function updateRendererStats() {
+  const stats = webglReady ? (rendererStatsSnapshot && Object.keys(rendererStatsSnapshot).length ? rendererStatsSnapshot : rendererInfo()) : { status: 'WebGL unavailable on this device' };
+  const dl = ui.rendererStats;
+  dl.innerHTML = '';
+  for (const key of Object.keys(stats)) {
+    const dt = document.createElement('dt'); dt.textContent = key;
+    const dd = document.createElement('dd'); dd.textContent = String(stats[key]);
+    dl.appendChild(dt); dl.appendChild(dd);
+  }
+}
+function openTests() {
+  ui.testPanel.hidden = false;
+  ui.btnTests.setAttribute('aria-expanded', 'true');
+  updateRendererStats();
+  if (!testsRan && !testsRunning) startTests();
+  ui.testClose.focus();
+  announce('Self-test panel opened.');
+}
+function closeTests() {
+  ui.testPanel.hidden = true;
+  ui.btnTests.setAttribute('aria-expanded', 'false');
+  ui.btnTests.focus();
+  announce('Self-test panel closed.');
+}
+function toggleTests() { if (ui.testPanel.hidden) openTests(); else closeTests(); }
+function startTests() {
+  if (testsRunning) return;
+  testsRunning = true; testsRan = false;
+  ui.testProgressWrap.hidden = false;
+  ui.testList.innerHTML = '';
+  ui.testVerdict.textContent = 'Running…';
+  ui.testVerdict.className = 'big';
+  ui.testVerdictDetail.textContent = 'Generating, solving and re-generating 30 seeded atlases in the logic worker. Nothing unverified is exposed.';
+  ui.testProgressBar.style.width = '0%';
+  ui.testProgressText.textContent = 'Preparing cases…';
+  killWorker(game.testWorker);
+  game.testWorker = newWorker(ev => {
+    const d = ev.data || {};
+    if (d.type === 'testProgress') {
+      const pct = Math.round(((d.index + 0.5) / d.total) * 100);
+      ui.testProgressBar.style.width = pct + '%';
+      ui.testProgressText.textContent = 'Case ' + (d.index + 1) + ' of ' + d.total + ' · ' + d.tier + ' · ' + d.seed;
+    } else if (d.type === 'testDone') {
+      clearTimeout(testWatchdog);
+      killWorker(game.testWorker); game.testWorker = null;
+      renderTestSuite(d.suite);
+      testsRunning = false; testsRan = true;
+      updateRendererStats();
+    } else if (d.type === 'genError') {
+      clearTimeout(testWatchdog);
+      killWorker(game.testWorker); game.testWorker = null;
+      testsRunning = false;
+      ui.testVerdict.textContent = 'Failed';
+      ui.testVerdict.className = 'big bad';
+      ui.testVerdictDetail.textContent = d.reason || 'The logic worker failed.';
+      ui.testProgressText.textContent = 'Test run aborted.';
+    }
+  });
+  game.testWorker.postMessage({ cmd: 'tests' });
+  clearTimeout(testWatchdog);
+  testWatchdog = setTimeout(() => {
+    killWorker(game.testWorker); game.testWorker = null;
+    testsRunning = false;
+    ui.testVerdict.textContent = 'Timed out';
+    ui.testVerdict.className = 'big bad';
+    ui.testVerdictDetail.textContent = 'The 30-case suite did not finish within 60 seconds. Results are not claimed.';
+    ui.testProgressText.textContent = 'Stopped at the deadline.';
+  }, 60000);
+}
+function renderTestSuite(suite) {
+  ui.testProgressWrap.hidden = true;
+  if (!suite || !suite.results) {
+    ui.testVerdict.textContent = 'No results';
+    ui.testVerdict.className = 'big bad';
+    return;
+  }
+  const passed = suite.passed, total = suite.total;
+  ui.testVerdict.textContent = passed + ' / ' + total + ' passed';
+  ui.testVerdict.className = 'big' + (passed === total ? '' : ' bad');
+  ui.testVerdictDetail.textContent = passed === total
+    ? 'All 30 cases: one solution each (counted to 2), complete propagation-only solvability including liar identities, hints agreeing with the verified solution, and identical puzzles from identical seeds.'
+    : 'Some checks failed; no atlas built by this panel is silently accepted. See the failing rows for the exact check.';
+  ui.testList.innerHTML = '';
+  for (const result of suite.results) {
+    const li = document.createElement('li'); li.className = 'test-row';
+    const verdict = document.createElement('span');
+    verdict.className = 'verdict ' + (result.ok ? 'pass' : 'fail');
+    verdict.textContent = result.ok ? 'Pass' : 'Fail';
+    const tier = document.createElement('span'); tier.className = 'tier'; tier.textContent = result.tier;
+    const detail = document.createElement('span'); detail.className = 'detail';
+    if (result.ok) {
+      const gen = result.checks.find(c => c.name === 'generation');
+      detail.textContent = result.seed + ' · ' + (gen && gen.detail ? gen.detail : 'all checks pass');
+    } else {
+      const failed = result.checks.filter(c => !c.pass).map(c => c.name + (c.detail ? ' (' + c.detail + ')' : ''));
+      detail.textContent = result.seed + ' · failed: ' + failed.join('; ');
+    }
+    li.appendChild(verdict); li.appendChild(tier); li.appendChild(detail);
+    li.title = result.checks.map(c => (c.pass ? '✓ ' : '✗ ') + c.name + (c.detail ? ': ' + c.detail : '')).join('\n');
+    ui.testList.appendChild(li);
+  }
+}
+
+/* ============================================================
+   §5b — keyboard & control wiring
+   ============================================================ */
+function isTyping(el) {
+  if (!el) return false;
+  const tag = el.tagName;
+  return tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || el.isContentEditable;
+}
+function moveSelection(dq, dr, alts) {
+  const cur = game.grid.cells[game.selected];
+  const attempts = [[dq, dr]].concat(alts || []);
+  for (const d of attempts) {
+    const found = game.grid.index.get((cur.q + d[0]) + ',' + (cur.r + d[1]));
+    if (found !== undefined) { setSelected(found); return true; }
+  }
+  return false;
+}
+function attachControls() {
+  ui.btnGenerate.addEventListener('click', () => {
+    if (game.busy) return;
+    const seed = (ui.seedInput.value || '').trim() || 'wandering-coast';
+    const tier = ui.tierSelect.value;
+    if (!LOGIC.TIERS[tier]) return;
+    game.seed = seed; game.tier = tier;
+    game.busy = true;
+    startGeneration(seed, tier, true);
+    saveNow();
+  });
+  ui.seedInput.addEventListener('keydown', ev => { if (ev.key === 'Enter') { ev.preventDefault(); ui.btnGenerate.click(); } });
+  ui.tierSelect.addEventListener('change', () => announce('Tier set to ' + ui.tierSelect.options[ui.tierSelect.selectedIndex].text + '. Draw Atlas to begin.'));
+  ui.btnTop.addEventListener('click', setTopView);
+  ui.btnQuality.addEventListener('click', () => setQuality(game.quality === 'high' ? 'low' : 'high'));
+  ui.btnMotion.addEventListener('click', () => setMotion(!game.motion));
+  ui.btnTests.addEventListener('click', toggleTests);
+  ui.testClose.addEventListener('click', closeTests);
+  ui.testRun.addEventListener('click', () => { if (!testsRunning) { testsRan = false; startTests(); } });
+  ui.btnUndo.addEventListener('click', undo);
+  ui.btnRedo.addEventListener('click', redo);
+  ui.btnHint.addEventListener('click', showHint);
+  ui.btnSubmit.addEventListener('click', submitAtlas);
+  ui.btnClear.addEventListener('click', clearInks);
+  ui.btnApply.addEventListener('click', () => applyTool(game.selected, false));
+  ui.hintClose.addEventListener('click', hideHint);
+  ui.clueList.addEventListener('click', ev => {
+    const btn = ev.target.closest('[data-lie]');
+    if (btn) toggleLiar(+btn.dataset.lie);
+  });
+  ui.hexSelect.addEventListener('change', () => setSelected(+ui.hexSelect.value));
+  for (const btn of ui.toolBtns) btn.addEventListener('click', () => setTool(btn.dataset.tool));
+  ui.viewport.addEventListener('keydown', ev => {
+    if (!game.ready || game.busy) return;
+    let handled = true;
+    if (ev.key === 'ArrowRight') setSelected(moveSelection(1, 0, [[1, -1]]) ? game.selected : game.selected);
+    else if (ev.key === 'ArrowLeft') setSelected(moveSelection(-1, 0, [[-1, 1]]) ? game.selected : game.selected);
+    else if (ev.key === 'ArrowUp') setSelected(moveSelection(0, -1, [[1, -1]]) ? game.selected : game.selected);
+    else if (ev.key === 'ArrowDown') setSelected(moveSelection(0, 1, [[-1, 1]]) ? game.selected : game.selected);
+    else if (ev.key === 'Enter' || ev.key === ' ') applyTool(game.selected, ev.shiftKey);
+    else if (ev.key === 'Home') setSelected(0);
+    else if (ev.key === 'End') setSelected(game.cellCount - 1);
+    else handled = false;
+    if (handled) ev.preventDefault();
+  });
+  document.addEventListener('keydown', ev => {
+    if (ev.key === 'Escape') {
+      if (!ui.testPanel.hidden) { closeTests(); ev.preventDefault(); return; }
+      if (!ui.hintBanner.hidden) { hideHint(); ev.preventDefault(); return; }
+      return;
+    }
+    if ((ev.key === 't' || ev.key === 'T') && !isTyping(document.activeElement) && !(ev.metaKey || ev.ctrlKey || ev.altKey)) {
+      ev.preventDefault(); toggleTests(); return;
+    }
+    if (isTyping(document.activeElement)) return;
+    if ((ev.metaKey || ev.ctrlKey) && (ev.key === 'z' || ev.key === 'Z')) { ev.preventDefault(); if (ev.shiftKey) redo(); else undo(); return; }
+    if ((ev.metaKey || ev.ctrlKey) && (ev.key === 'y' || ev.key === 'Y')) { ev.preventDefault(); redo(); return; }
+    if (!ui.testPanel.hidden) return;
+    if (!game.ready || game.busy) return;
+    if (/^[1-5]$/.test(ev.key)) {
+      const id = +ev.key - 1;
+      if (game.puzzle.terrainIds.indexOf(id) >= 0) selectTerrain(id);
+      else announce('That terrain is not present on this atlas.');
+      return;
+    }
+    const key = ev.key.toLowerCase();
+    if (key === 'i') setTool('ink');
+    else if (key === 'p') setTool('pencil');
+    else if (key === 'e') setTool('erase');
+    else if (key === 'h') showHint();
+    else if (key === 'v') setTopView();
+    else if (key === 'm') setMotion(!game.motion);
+  });
+  window.addEventListener('pagehide', saveNow);
+  document.addEventListener('visibilitychange', () => { if (document.hidden) saveNow(); });
+}
+
+/* ============================================================
+   §7 — BOOT
+   ============================================================ */
+function boot() {
+  ui.seedInput.value = game.seed;
+  ui.tierSelect.value = game.tier;
+  ui.btnTests.setAttribute('aria-expanded', 'false');
+  updateToggleButtons();
+  attachControls();
+  try { initRenderer(); } catch (err) {
+    console.error('WebGL initialisation failed', err);
+    showWebGLFailure('WebGL initialisation failed (' + (err && err.message || err) + '). The puzzle remains playable with the accessible controls.');
+  }
+  updateToolState();
+  updatePaletteState();
+  if (!webglReady) ui.emptyState.hidden = true;
+  startGeneration(game.seed, game.tier, true);
+}
+boot();
+
+</script>
+</body>
+</html>
