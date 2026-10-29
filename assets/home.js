@@ -46,7 +46,7 @@ for (const [index, round] of window.BENCHMARK_ROUNDS.entries()) {
     const figure = document.createElement("figure");
     figure.className = "round-video";
     const caption = document.createElement("figcaption");
-    caption.textContent = "Four atlases in motion · 15-second gameplay comparison";
+    caption.textContent = round.videoCaption || "Four atlases in motion · 15-second gameplay comparison";
     const video = document.createElement("video");
     video.src = round.video;
     if (round.poster) video.poster = round.poster;

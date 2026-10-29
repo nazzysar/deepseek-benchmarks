@@ -24,5 +24,20 @@ window.BENCHMARK_ROUNDS = [
       { id: "od", name: "OpenDesign", shortName: "OD", title: "Cartographer’s Paradox — A Hand-Inked Atlas", description: "Complete a fantasy hex atlas while its cartographer lies exactly L times.", path: "rounds/round-2/od/index.html", tone: "paper" },
       { id: "oll", name: "Ollama API", shortName: "OLL", title: "Cartographer’s Paradox · A Hand-Inked Atlas of Lies", description: "Deduce the map and unmask the liars among the clues.", path: "rounds/round-2/oll/index.html", tone: "blue" }
     ]
+  },
+  {
+    id: "round-3",
+    title: "Round 3",
+    description: "Rune Compiler. Four alchemical workbenches, one challenge: wire runes into a tiny visual program.",
+    prompt: "assets/round-3-prompt.txt",
+    video: "assets/video/round-3-comparison.mp4",
+    poster: "assets/video/round-3-comparison-poster.jpg",
+    videoCaption: "Four workbenches in motion · 30-second gameplay comparison",
+    demos: [
+      { id: "dsp", name: "DeepSeek API", shortName: "DSP", title: "Rune Compiler — Alchemical Dataflow Bench", description: "Wire glowing glyphs through an alchemist’s dataflow bench.", path: "rounds/round-3/dsp/index.html", tone: "blue" },
+      { id: "ocg", name: "OpenCode Go", shortName: "OCG", title: "Rune Compiler — An Alchemist’s Dataflow Puzzle", description: "Thread sigils through brass runes and compile a tiny mind.", path: "rounds/round-3/ocg/index.html", tone: "aqua" },
+      { id: "od", name: "OpenDesign", shortName: "OD", title: "Rune Compiler — Alchemical Signal Foundry", description: "Carry runes across an alchemical signal foundry.", path: "rounds/round-3/od/index.html", tone: "paper" },
+      { id: "oll", name: "Ollama API", shortName: "OLL", title: "Rune Compiler — Alchemical Workbench", description: "Build the flow and guide glyphs into the reliquary.", path: "rounds/round-3/oll/index.html", tone: "blue" }
+    ]
   }
 ];

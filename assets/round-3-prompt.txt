@@ -1,0 +1,50 @@
+Build this inside “round 3/rune-compiler” within this thread’s assigned working directory. Each concurrent thread has its own separate folder; do not create alternate project directories.
+
+
+Build a single-file HTML/CSS/JS game called "RUNE COMPILER". No build step. Render the workbench in 3D with three.js.
+Three.js Requirements
+- Load three.js r160 via importmap from https://cdn.jsdelivr.net/npm/three@0.160.0/ (build/three.module.js, plus examples/jsm/ as "three/addons/"). This CDN, plus optional Google Fonts with fallbacks, is the ONLY network resource. Everything else is procedural.
+- Styled WebGL fallback; pixel ratio capped at 2; ResizeObserver; context-loss handling.
+- The compiler, VM, and level definitions are pure JS with zero three.js imports, supporting headless self-tests.
+- Use a fixed near-top-down perspective camera with slight tilt, subtle parallax, and optional zoom and pan so drag-and-drop stays precise. Pointer picking via Raycaster against a workbench plane, with grid snapping. InstancedMesh where sensible, dispose on level change, High/Low quality toggle.
+- Mirror interactions with DOM controls: node palette, inspector, and keyboard operation. Include aria-labels, visible focus, and an aria-live region.
+Concept
+An alchemist's workbench where the player builds a tiny visual program from rune nodes to turn input symbol streams into a required output stream. Think Shenzhen I/O with a mystical look.
+Virtual Machine — Implement Exactly
+1. Symbols are integers 0–9 shown as glowing glyphs. Nodes: Input, Output, Add, Sub, Compare (emits <, =, > as glyph values), Router (sends left or right by condition), Merge (priority-ordered), Delay (one-tick buffer), Dup, Discard, Counter (stateful), Memory cell (read/write).
+2. Synchronous tick execution. Each wire holds at most one symbol; if downstream is full, upstream blocks through backpressure. Define a deterministic evaluation order. Detect deadlock when no state changes for 2 consecutive ticks with outputs incomplete, and report the stuck wires and nodes.
+3. Each level provides input streams and an expected output stream, including an interleaving rule. Submissions run against 20 hidden test streams from a seeded PRNG plus the visible ones; all must pass.
+4. Score cycles, node count, and wire count. Show a Pareto chart of the player's best attempts.
+5. Include 8 levels: pass-through, add pairs, sort 2 values, running maximum, filter evens, balanced-parentheses checker, sum until a sentinel, merge two sorted streams. Include a reference solution per level for self-tests only.
+3D Visual Design
+- A dark slate bench with etched copper traces. Nodes are extruded brass-framed plates with engraved glyph textures using CanvasTexture and emissive runes that glow when active.
+- Wires are TubeGeometry along smooth curves with orthogonal routing and rounded corners. Symbols travel along wires as glowing glyph sprites with light pulses. Blocked wires visibly pressure-pulse red.
+- Ambient dust motes using Points, a soft bloom, and a transmutation particle burst with a chime-style glow when an output matches.
+- Palette of 6 CSS variables; responsive; touch-friendly.
+Features
+- Drag-and-drop node placement and wiring with snapping and illegal-wire validation.
+- Step, run, pause, and speed slider.
+- Live inspector of wire symbols and node state.
+- Rewindable execution trace.
+- “Explain failure” panel showing the first mismatching output and its tick.
+- Import/export a program as a compact base64 string.
+- localStorage with try/catch and an in-memory fallback.
+- Full keyboard operation.
+- Respect prefers-reduced-motion.
+Engineering
+Organize the file into sections: compiler (graph to executable), VM, levels, renderer, input, UI, persistence.
+
+Treat the headless self-test suite as the primary correctness gate. Provide a self-test panel accessible with the T key that verifies:
+- Every reference solution passes its level’s visible tests and all 20 hidden tests.
+- Execution is deterministic.
+- Deadlock detection fires on a crafted bad graph.
+- Export/import round-trips preserve the program.
+Include a renderer.info readout.
+Process
+Brief plan, then code in one HTML block, then a 5-line demo checklist.
+
+Work in three phases:
+1. Design: Settle the architecture, VM semantics, and acceptance criteria.
+2. Implementation: Complete all systems and integrate them before presentation review. Use headless self-tests and targeted code checks to resolve correctness issues.
+3. Final verification: Once the implementation is feature-complete and self-tests pass, perform one consolidated browser review covering rendering, interaction, accessibility, and responsive layout. Batch any issues found into a single correction pass, then recheck only the affected behavior.
+Keep verification focused on acceptance criteria. Avoid repeated presentation reviews of intermediate states. Stop when the required checks pass. Report checks actually performed and identify any that could not be run.
